@@ -62,6 +62,7 @@ uint8_t colorStep = 0;
 #define GREEN 1
 #define BLUE  2
 uint8_t getIntensity(uint8_t step, uint8_t color);
+uint8_t screensaverShiftTimer = IRQ_HZ / 4;
 
 void setup()
 {
@@ -175,46 +176,53 @@ void doEverything()
   if(screensaverTimer == 0) {
     /* display screensaver */
 
-    /* Shift leftward */
-    for(x = 0; x < BOARD_SIZE - 1; x++) {
-      for(y = 0; y < BOARD_SIZE; y++) {
-        field[x][y][0] = field[x + 1][y][0];
-        field[x][y][1] = field[x + 1][y][1];
-        field[x][y][2] = field[x + 1][y][2];
-      }
+    if(screensaverShiftTimer > 0) {
+      screensaverShiftTimer--;
     }
+    if(screensaverShiftTimer == 0) {
+      screensaverShiftTimer = IRQ_HZ / 4;
 
-    /* Draw new rightmost column */
-    if(squareWavePoint < SQUARE_WAVE_SIZE - 1) {
-      /* top bar */
-      SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
-               getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
-               getIntensity(colorStep, BLUE));
-    }
-    else if(squareWavePoint == SQUARE_WAVE_SIZE - 1) {
-      /* falling edge */
-      for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
-          y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
-                 getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+      /* Shift leftward */
+      for(x = 0; x < BOARD_SIZE - 1; x++) {
+        for(y = 0; y < BOARD_SIZE; y++) {
+          field[x][y][0] = field[x + 1][y][0];
+          field[x][y][1] = field[x + 1][y][1];
+          field[x][y][2] = field[x + 1][y][2];
+        }
       }
-    }
-    else if(squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 1) {
-      /* bottom bar */
-      SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
-               getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
-               getIntensity(colorStep, BLUE));
-    }
-    else if(squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 1) {
-      /* rising edge */
-      for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
-          y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
-                 getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+
+      /* Draw new rightmost column */
+      if(squareWavePoint < SQUARE_WAVE_SIZE - 1) {
+        /* top bar */
+        SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
+                 getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
+                 getIntensity(colorStep, BLUE));
       }
+      else if(squareWavePoint == SQUARE_WAVE_SIZE - 1) {
+        /* falling edge */
+        for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
+            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
+          SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
+                   getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+        }
+      }
+      else if(squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 1) {
+        /* bottom bar */
+        SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
+                 getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
+                 getIntensity(colorStep, BLUE));
+      }
+      else if(squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 1) {
+        /* rising edge */
+        for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
+            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
+          SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
+                   getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+        }
+      }
+      squareWavePoint = (squareWavePoint + 1) % (SQUARE_WAVE_SIZE * 2);
+      colorStep = (colorStep + 1) % 48;
     }
-    squareWavePoint = (squareWavePoint + 1) % (SQUARE_WAVE_SIZE * 2);
-    colorStep = (colorStep + 1) % 48;
   }
   else {
     /* Yep, the game mode is being changed */
