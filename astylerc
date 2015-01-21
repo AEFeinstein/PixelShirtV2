@@ -1,0 +1,17 @@
+--style=kr
+--break-closing-brackets
+--add-brackets
+--add-one-line-brackets
+--max-code-length=80
+--mode=c
+--lineend=linux
+--convert-tabs
+--indent=spaces=2
+--indent-modifiers
+--indent-switches
+--indent-cases
+--indent-preproc-define
+--indent-preproc-cond
+--indent-col1-comments
+--align-pointer=type
+--align-reference=type
