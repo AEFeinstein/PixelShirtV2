@@ -129,7 +129,7 @@ void SuperSquare::ProcessInput(
   __attribute__((unused)) int8_t p2bd)
 {
   uint8_t newPos[2];
-
+  uint8_t i;
 
   if(resetTimer > 0) {
     return;
@@ -150,7 +150,19 @@ void SuperSquare::ProcessInput(
 
   /* Draw the new player pixel */
   PlacePlayerPixel(newPos);
-  SetPixel(newPos[0], newPos[1], 0,0,0x40);
+  
+  if(IsPixelLit(newPos[0], newPos[1])) {
+    /* Clear all lines */
+    for(i = 0; i < NUM_LINES; i++) {
+      INVALIDATE_LINE(lines[i]);
+    }
+
+    DisplayScore(field, score);
+    resetTimer = IRQ_HZ * 5;
+  }
+  else {
+    SetPixel(newPos[0], newPos[1], 0,0,0x40);
+  }
 }
 
 void SuperSquare::PlacePlayerPixel(uint8_t position[])
