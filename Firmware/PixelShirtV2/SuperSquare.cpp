@@ -150,7 +150,7 @@ void SuperSquare::ProcessInput(
 
   /* Draw the new player pixel */
   PlacePlayerPixel(newPos);
-  
+
   if(IsPixelLit(newPos[0], newPos[1])) {
     /* Clear all lines */
     for(i = 0; i < NUM_LINES; i++) {

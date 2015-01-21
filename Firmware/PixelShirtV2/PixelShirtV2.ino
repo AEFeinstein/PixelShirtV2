@@ -47,9 +47,21 @@ uint32_t microsLast = 0;
 
 /* I2C Frame start sequence */
 #define I2C_BUFFER_SIZE 128
-uint8_t StartSeq[] = {0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t StartSeq[] = {
+  0xFF, 0xFF, 0xFF, 0xFF
+};
 
 #define HEARTBEAT_PIN 13
+
+#define SCREENSAVER_TIMEOUT (IRQ_HZ * 30)
+#define SQUARE_WAVE_SIZE  6
+uint16_t screensaverTimer = 1;
+uint8_t squareWavePoint = 0;
+uint8_t colorStep = 0;
+#define RED   0
+#define GREEN 1
+#define BLUE  2
+uint8_t getIntensity(uint8_t step, uint8_t color);
 
 void setup()
 {
@@ -118,65 +130,191 @@ void loop()
 
 void doEverything()
 {
-  uint8_t i;
+  uint8_t i, x, y;
   uint8_t* fieldPtr;
 
+  uint8_t p1buVal = p1bu.read();
+  uint8_t p1bdVal = p1bd.read();
+  uint8_t p1brVal = p1br.read();
+  uint8_t p1blVal = p1bl.read();
+  int16_t p1ax = analogRead(P1_X);
+  int16_t p1ay = analogRead(P1_Y);
+
+  uint8_t p2buVal = p2bu.read();
+  uint8_t p2bdVal = p2bd.read();
+  uint8_t p2brVal = p2br.read();
+  uint8_t p2blVal = p2bl.read();
+  int16_t p2ax = analogRead(P2_X);
+  int16_t p2ay = analogRead(P2_Y);
+
   /* If both up buttons are held, maybe the game mode is being changed */
-  if(!p1bu.read() && !p2bu.read()) {
+  if(!p1buVal && !p2buVal) {
     downTimer++;
   }
   else {
     downTimer = 0;
   }
 
-  /* Yep, the game mode is being changed */
-  if(downTimer == IRQ_HZ * 2) {
-    downTimer = 0;
-    gameMode = (gameMode+1)%NUM_GAMES;
-    switch(gameMode) {
-      case PONG: {
-          currentGame = &pong;
-          break;
-        }
-      case LIGHTCYCLE: {
-          currentGame = &lightcycle;
-          break;
-        }
-      case TETRIS: {
-          currentGame = &tetris;
-          break;
-        }
-      case SUPER_SQUARE: {
-          currentGame = &superSquare;
-          break;
-        }
-      case SHOOTER: {
-          currentGame = &shooter;
-          break;
-        }
+  /* If there is any input, exit the screensaver */
+  if(p1buVal || p1bdVal || p1blVal || p1brVal ||
+      p2buVal || p2bdVal || p2blVal || p2brVal ||
+      (p1ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ax) ||
+      (p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax)) {
+    screensaverTimer = SCREENSAVER_TIMEOUT;
+  }
+
+  /* Decrement the screensaver timer */
+  if(screensaverTimer > 0) {
+    screensaverTimer--;
+    if(screensaverTimer == 0) {
+      /* Clear the field */
+      memset(field, 0, sizeof(field));
     }
-    currentGame->ResetGame(field,1,0);
+  }
+
+  if(screensaverTimer == 0) {
+    /* display screensaver */
+
+    /* Shift leftward */
+    for(x = 0; x < BOARD_SIZE - 1; x++) {
+      for(y = 0; y < BOARD_SIZE; y++) {
+        field[x][y][0] = field[x + 1][y][0];
+        field[x][y][1] = field[x + 1][y][1];
+        field[x][y][2] = field[x + 1][y][2];
+      }
+    }
+
+    /* Draw new rightmost column */
+    if(squareWavePoint < SQUARE_WAVE_SIZE - 1) {
+      /* top bar */
+      SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
+               getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
+               getIntensity(colorStep, BLUE));
+    }
+    else if(squareWavePoint == SQUARE_WAVE_SIZE - 1) {
+      /* falling edge */
+      for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
+          y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
+        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
+                 getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+      }
+    }
+    else if(squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 1) {
+      /* bottom bar */
+      SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
+               getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
+               getIntensity(colorStep, BLUE));
+    }
+    else if(squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 1) {
+      /* rising edge */
+      for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
+          y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
+        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
+                 getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+      }
+    }
+    squareWavePoint = (squareWavePoint + 1) % (SQUARE_WAVE_SIZE * 2);
+    colorStep = (colorStep + 1) % 48;
   }
   else {
-    /* Read new controller input */
-    currentGame->ProcessInput(field,
-                              analogRead(P1_X), analogRead(P1_Y),
-                              !p1bl.read(), !p1br.read(), !p1bu.read(), !p1bd.read(),
-                              analogRead(P2_X), analogRead(P2_Y),
-                              !p2bl.read(), !p2br.read(), !p2bu.read(), !p2bd.read());
-
-    /* Update the game state */
-    currentGame->UpdatePhysics(field);
-
-    /* Write the start sequence to send the frame to the GPU */
-    I2c.write(4,0xFF, StartSeq, 3);
-
-    /* Write each pixel, in buffered block */
-    fieldPtr = &field[0][0][0];
-    for(i=0; i < ((3*256)/I2C_BUFFER_SIZE); i++) {
-      I2c.write(4, fieldPtr[i * I2C_BUFFER_SIZE], &fieldPtr[i * I2C_BUFFER_SIZE + 1],
-                I2C_BUFFER_SIZE);
+    /* Yep, the game mode is being changed */
+    if(downTimer == IRQ_HZ * 2) {
+      downTimer = 0;
+      gameMode = (gameMode+1)%NUM_GAMES;
+      switch(gameMode) {
+        case PONG: {
+            currentGame = &pong;
+            break;
+          }
+        case LIGHTCYCLE: {
+            currentGame = &lightcycle;
+            break;
+          }
+        case TETRIS: {
+            currentGame = &tetris;
+            break;
+          }
+        case SUPER_SQUARE: {
+            currentGame = &superSquare;
+            break;
+          }
+        case SHOOTER: {
+            currentGame = &shooter;
+            break;
+          }
+      }
+      currentGame->ResetGame(field,1,0);
     }
+    else {
+      /* Process new controller input */
+      currentGame->ProcessInput(field,
+                                p1ax, p1ay, !p1blVal, !p1brVal, !p1buVal, !p1bdVal,
+                                p2ax, p2ay, !p2blVal, !p2brVal, !p2buVal, !p2bdVal);
+
+      /* Update the game state */
+      currentGame->UpdatePhysics(field);
+
+      /* Write the start sequence to send the frame to the GPU */
+      I2c.write(4,0xFF, StartSeq, 3);
+
+      /* Write each pixel, in buffered block */
+      fieldPtr = &field[0][0][0];
+      for(i=0; i < ((3*256)/I2C_BUFFER_SIZE); i++) {
+        I2c.write(4, fieldPtr[i * I2C_BUFFER_SIZE], &fieldPtr[i * I2C_BUFFER_SIZE + 1],
+                  I2C_BUFFER_SIZE);
+      }
+    }
+  }
+}
+
+uint8_t getIntensity(uint8_t step, uint8_t color)
+{
+  switch(color) {
+    case RED:
+      if(step < 8) {
+        /* High */
+        return 0x80;
+      }
+      else if(step < 16) {
+        /* fall */
+        return (0x80 >> (step - 8));
+      }
+      else if(step >=40) {
+        /* rise */
+        return (0x01 << (step - 40));
+      }
+      return 0;
+    case GREEN:
+      if(step < 8) {
+        return 0;
+      }
+      else if (step < 16) {
+        /* rise */
+        return (0x01 << (step - 8));
+      }
+      else if (step < 24) {
+        /* High */
+        return 0x80;
+      }
+      else if (step < 32) {
+        /* fall */
+        return (0x80 >> (step - 24));
+      }
+      return 0;
+    case BLUE:
+      if(step >= 40) {
+        /* fall */
+        return (0x80 >> (step - 40));
+      }
+      else if(step >= 32) {
+        /* High */
+        return 0x80;
+      }
+      else if(step >= 24) {
+        /* rise */
+        return (0x01 << (step - 24));
+      }
+      return 0;
   }
 }
 
@@ -339,3 +477,5 @@ void DrawNumber( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t number,
       }
   }
 }
+
+
