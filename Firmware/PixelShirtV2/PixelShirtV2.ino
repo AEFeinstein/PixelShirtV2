@@ -166,8 +166,8 @@ void doEverything()
       /* Leave the screensaver, clear the field & reset the game */
       memset(field, 0, sizeof(field));
       currentGame->ResetGame(field, 1, 0);
-      screensaverTimer = (IRQ_HZ * 30);
     }
+    screensaverTimer = (IRQ_HZ * 30);
   }
 
   /* Decrement the screensaver timer */
