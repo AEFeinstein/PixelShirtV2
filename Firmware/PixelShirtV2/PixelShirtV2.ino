@@ -53,7 +53,6 @@ uint8_t StartSeq[] = {
 
 #define HEARTBEAT_PIN 13
 
-#define SCREENSAVER_TIMEOUT (IRQ_HZ * 30)
 #define SQUARE_WAVE_SIZE  6
 uint16_t screensaverTimer = 1;
 uint8_t squareWavePoint = 0;
@@ -157,18 +156,25 @@ void doEverything()
   }
 
   /* If there is any input, exit the screensaver */
-  if(p1buVal || p1bdVal || p1blVal || p1brVal ||
-      p2buVal || p2bdVal || p2blVal || p2brVal ||
+  if(!p1buVal || !p1bdVal || !p1blVal || !p1brVal ||
+      !p2buVal || !p2bdVal || !p2blVal || !p2brVal ||
       (p1ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ax) ||
-      (p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax)) {
-    screensaverTimer = SCREENSAVER_TIMEOUT;
+      (p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax) ||
+      (p1ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ay) ||
+      (p2ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ay)) {
+    if(screensaverTimer == 0) {
+      /* Leave the screensaver, clear the field & reset the game */
+      memset(field, 0, sizeof(field));
+      currentGame->ResetGame(field, 1, 0);
+      screensaverTimer = (IRQ_HZ * 30);
+    }
   }
 
   /* Decrement the screensaver timer */
   if(screensaverTimer > 0) {
     screensaverTimer--;
     if(screensaverTimer == 0) {
-      /* Clear the field */
+      /* Enter the screensaver, clear the field */
       memset(field, 0, sizeof(field));
     }
   }
@@ -191,14 +197,19 @@ void doEverything()
         }
       }
 
+      /* Clear rightmost column */
+      for(y = 0; y < BOARD_SIZE; y++) {
+        SetPixel(BOARD_SIZE-1, y, 0, 0, 0);
+      }
+
       /* Draw new rightmost column */
-      if(squareWavePoint < SQUARE_WAVE_SIZE - 1) {
+      if(squareWavePoint < SQUARE_WAVE_SIZE - 2) {
         /* top bar */
         SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
                  getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
                  getIntensity(colorStep, BLUE));
       }
-      else if(squareWavePoint == SQUARE_WAVE_SIZE - 1) {
+      else if(squareWavePoint == SQUARE_WAVE_SIZE - 2) {
         /* falling edge */
         for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
             y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
@@ -206,13 +217,13 @@ void doEverything()
                    getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
         }
       }
-      else if(squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 1) {
+      else if(squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 3) {
         /* bottom bar */
         SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
                  getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
                  getIntensity(colorStep, BLUE));
       }
-      else if(squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 1) {
+      else if(squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 3) {
         /* rising edge */
         for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
             y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
@@ -220,8 +231,8 @@ void doEverything()
                    getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
         }
       }
-      squareWavePoint = (squareWavePoint + 1) % (SQUARE_WAVE_SIZE * 2);
-      colorStep = (colorStep + 1) % 48;
+      squareWavePoint = (squareWavePoint + 1) % ((SQUARE_WAVE_SIZE - 1) * 2);
+      colorStep = (colorStep + 1) % 24;
     }
   }
   else {
@@ -261,17 +272,17 @@ void doEverything()
 
       /* Update the game state */
       currentGame->UpdatePhysics(field);
-
-      /* Write the start sequence to send the frame to the GPU */
-      I2c.write(4,0xFF, StartSeq, 3);
-
-      /* Write each pixel, in buffered block */
-      fieldPtr = &field[0][0][0];
-      for(i=0; i < ((3*256)/I2C_BUFFER_SIZE); i++) {
-        I2c.write(4, fieldPtr[i * I2C_BUFFER_SIZE], &fieldPtr[i * I2C_BUFFER_SIZE + 1],
-                  I2C_BUFFER_SIZE);
-      }
     }
+  }
+  /* Write the start sequence to send the frame to the GPU */
+  I2c.write(4,0xFF, StartSeq, 3);
+
+  /* Write each pixel, in buffered block */
+  fieldPtr = &field[0][0][0];
+  for(i=0; i < ((3*256)/I2C_BUFFER_SIZE); i++) {
+    I2c.write(4, fieldPtr[i * I2C_BUFFER_SIZE], &fieldPtr[i * I2C_BUFFER_SIZE + 1],
+              I2C_BUFFER_SIZE);
+
   }
 }
 
@@ -280,50 +291,36 @@ uint8_t getIntensity(uint8_t step, uint8_t color)
   switch(color) {
     case RED:
       if(step < 8) {
-        /* High */
-        return 0x80;
+        /* rise */
+        return (0x01 << (step));
       }
       else if(step < 16) {
         /* fall */
         return (0x80 >> (step - 8));
       }
-      else if(step >=40) {
-        /* rise */
-        return (0x01 << (step - 40));
-      }
       return 0;
     case GREEN:
-      if(step < 8) {
-        return 0;
+      if (step >= 16) {
+        /* fall */
+        return (0x80 >> (step - 16));
       }
-      else if (step < 16) {
+      else if (step >= 8) {
         /* rise */
         return (0x01 << (step - 8));
       }
-      else if (step < 24) {
-        /* High */
-        return 0x80;
-      }
-      else if (step < 32) {
-        /* fall */
-        return (0x80 >> (step - 24));
-      }
       return 0;
     case BLUE:
-      if(step >= 40) {
+      if(step < 8) {
         /* fall */
-        return (0x80 >> (step - 40));
+        return (0x80 >> step);
       }
-      else if(step >= 32) {
-        /* High */
-        return 0x80;
-      }
-      else if(step >= 24) {
+      else if(step >= 16) {
         /* rise */
-        return (0x01 << (step - 24));
+        return (0x01 << (step - 16));
       }
       return 0;
   }
+  return 0;
 }
 
 void DisplayScore( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint16_t score)
@@ -485,5 +482,3 @@ void DrawNumber( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t number,
       }
   }
 }
-
-
