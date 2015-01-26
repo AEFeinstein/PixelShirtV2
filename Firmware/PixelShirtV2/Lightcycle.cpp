@@ -54,16 +54,12 @@ void Lightcycle::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     if(IsPixelLit(p1pos[X], p1pos[Y])) {
       losers |= 0x01;
     }
-    else {
-      SetPixel(p1pos[X], p1pos[Y], 0,0x40,0);
-    }
-
     if(IsPixelLit(p2pos[X], p2pos[Y])) {
       losers |= 0x02;
     }
-    else {
-      SetPixel(p2pos[X], p2pos[Y], 0,0,0x40);
-    }
+
+    SetPixel(p1pos[X], p1pos[Y], 0,0x40,0);
+    SetPixel(p2pos[X], p2pos[Y], 0,0,0x40);
 
     // Check for a new round
     if(losers) {
