@@ -7,11 +7,6 @@
 #define BOARD_SIZE  16 /* In pixels */
 #define IRQ_HZ      32
 
-#define LEFT  1
-#define RIGHT 2
-#define UP    3
-#define DOWN  4
-
 #define FALSE 0
 #define TRUE 1
 
@@ -23,26 +18,7 @@
 #define WRAP(x,y) ( ((x) < 0) ? ((x) + (y)) : ( ((x) >= (y)) ? ((x) - (y)) : (x) ) )
 #define CLAMP(x,y) ((x) > (y) ? (y) : ((x) < 0 ? 0 : (x)))
 
-// Pins!
-
-#define P1_X 1 // Analog
-#define P1_Y 0 // Analog
-#define P1_BD 7 // Digital
-#define P1_BL 6 // Digital
-#define P1_BR 8 // Digital
-#define P1_BU 9 // Digital
-
-#define P2_X 2 // Analog
-#define P2_Y 3 // Analog
-#define P2_BU 2 // Digital
-#define P2_BR 3 // Digital
-#define P2_BL 5 // Digital
-#define P2_BD 4 // Digital
-
 #define RANDOM_PIN   4  // Analog, not connected
-
-#define SetPixel(x,y,r,g,b) {field[x][y][0] = r; field[x][y][1] = g; field[x][y][2] = b;}
-#define IsPixelLit(x,y) (field[x][y][0] | field[x][y][1] | field[x][y][2])
 
 /*
  * Lookup tables!
@@ -78,20 +54,65 @@ class ArduinoGame
 {
  public:
   ArduinoGame() {};
-  ~ArduinoGame() {};
-  virtual void UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3]) = 0;
-  virtual void ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  virtual ~ArduinoGame() {};
+  virtual void UpdatePhysics( ) = 0;
+  virtual void ResetGame( 
                           uint8_t isInit, uint8_t whoWon) = 0;
-  virtual void ProcessInput( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  virtual void ProcessInput( 
                              int32_t p1ax, int32_t p1ay, int8_t p1b0,
                              int8_t p1b1, int8_t p1b2, int8_t p1b3, int32_t p2ax, int32_t p2ay, int8_t p2b0,
                              int8_t p2b1, int8_t p2b2,
                              int8_t p2b3) = 0;
 };
 
-void DisplayScore( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint16_t score);
-void DrawNumber( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t number,
+
+/* Function prototype */
+void SetPixel(int8_t x, int8_t y, uint8_t r, uint8_t g, uint8_t b);
+void SetPixel(int8_t y, int8_t x, uint32_t val);
+uint32_t GetPixel(int8_t x, int8_t y);
+void DisplayScore( uint16_t score);
+void DrawNumber( uint8_t number,
                  uint8_t offsetX, uint8_t offsetY, uint8_t r,
                  uint8_t g, uint8_t b);
+
+#define IsPixelLit(x,y) GetPixel(x, y)
+
+/* NRF controller reading */
+#define UP    0x01
+#define DOWN  0x02
+#define LEFT  0x04
+#define RIGHT 0x08
+#define STICK 0x10
+
+/* Bitfield definitions for a uint32_t which olds all input state */
+#define BUTTON_MASK  0x0000001F
+#define X_AXIS_MASK  0x00007FE0
+#define X_AXIS_SHIFT 5
+#define Y_AXIS_MASK  0x01FF8000
+#define Y_AXIS_SHIFT 15
+
+/* Getter and setter for 5 bit field which holds button presses */
+#define SET_BUTTONS(js, b) { \
+	(js) &= ~BUTTON_MASK; \
+	(js) |= (b); \
+}
+
+#define GET_BUTTONS(js) ((js) & BUTTON_MASK)
+
+/* Getter and setter for 10 bit field which holds the X axis ADC value */
+#define SET_X_AXIS(js, x) { \
+	(js) &= ~X_AXIS_MASK; \
+	(js) |= ((x) << X_AXIS_SHIFT); \
+}
+
+#define GET_X_AXIS(js) (((js) & X_AXIS_MASK) >> X_AXIS_SHIFT)
+
+/* Getter and setter for 10 bit field which holds the Y axis ADC value */
+#define SET_Y_AXIS(js, y) { \
+	(js) &= ~Y_AXIS_MASK; \
+	(js) |= ((y) << Y_AXIS_SHIFT); \
+}
+
+#define GET_Y_AXIS(js) (((js) & Y_AXIS_MASK) >> Y_AXIS_SHIFT)
 
 #endif

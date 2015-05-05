@@ -1,6 +1,6 @@
 #include "Lightcycle.h"
 
-void Lightcycle::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Lightcycle::UpdatePhysics( )
 {
   uint8_t losers = 0;
   uint8_t i;
@@ -63,20 +63,24 @@ void Lightcycle::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
 
     // Check for a new round
     if(losers) {
-      ResetGame(field, 0, losers);
+      ResetGame(0, losers);
     }
   }
 }
 
-void Lightcycle::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
-                            __attribute__((unused)) uint8_t isInit,
+void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
                             uint8_t whoWon)
 {
   uint8_t i;
   movementTimer = IRQ_HZ*3;
   started = 0;
   // Clear the field
-  memset((void*)field, 0, sizeof(uint8_t) * BOARD_SIZE * BOARD_SIZE * 3);
+  uint8_t x, y;
+  for(x = 0; x < BOARD_SIZE; x++) {
+    for(y = 0; y < BOARD_SIZE; y++) {
+      SetPixel(x, y, 0, 0, 0);
+    }
+  }
 
   // Place P1, P2
   p1pos[X] = 3;
@@ -92,7 +96,7 @@ void Lightcycle::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
   SetPixel(p2pos[X], p2pos[Y], 0,0,0x40);
 
   // If there was a winner, draw some lights
-  if(whoWon & 0x01 && whoWon & 0x02) {
+  if((whoWon & 0x01) && (whoWon & 0x02)) {
     ;// everyone loses!
   }
   else if(whoWon & 0x01) {
@@ -110,7 +114,6 @@ void Lightcycle::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
 }
 
 void Lightcycle::ProcessInput(
-  __attribute__((unused))  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
   __attribute__((unused)) int32_t p1ax,
   __attribute__((unused)) int32_t p1ay,
   int8_t p1bl,

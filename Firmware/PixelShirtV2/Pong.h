@@ -28,15 +28,15 @@ class Pong : public ArduinoGame
  public:
   Pong() {};
   ~Pong() {};
-  void UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3]);
-  void ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t isInit,
+  void UpdatePhysics( );
+  void ResetGame(  uint8_t isInit,
                   uint8_t whoWon);
-  void ProcessInput( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], int32_t p1ax,
+  void ProcessInput(  int32_t p1ax,
                      int32_t p1ay, int8_t p1b0, int8_t p1b1,
                      int8_t p1b2, int8_t p1b3, int32_t p2ax, int32_t p2ay, int8_t p2b0, int8_t p2b1,
                      int8_t p2b2, int8_t p2b3);
  private:
-  void DrawField( uint8_t field[BOARD_SIZE][BOARD_SIZE][3]);
+  void DrawField( );
   void IncreaseSpeed(int16_t speedM);
   void RotateBall(int16_t degree);
   int16_t binPaddleLocation(int32_t loc);

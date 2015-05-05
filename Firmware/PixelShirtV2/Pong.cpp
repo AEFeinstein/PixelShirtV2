@@ -6,7 +6,7 @@
  *                         *
  ***************************/
 
-void Pong::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Pong::UpdatePhysics( )
 {
   int16_t diff, rotation;
   if(restartTimer > 0) {
@@ -66,17 +66,17 @@ void Pong::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     }
     // left wall win
     else if (ballLoc[X] < 0 && ballVel[X] < 0) {
-      ResetGame(field, 0, 1);
+      ResetGame(0, 1);
     }
     // right wall win
     else if (ballLoc[X] >= BOARD_SIZE * S_M * V_M && ballVel[X] > 0) {
-      ResetGame(field, 0, 0);
+      ResetGame(0, 0);
     }
   }
-  DrawField(field);
+  DrawField();
 }
 
-void Pong::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t isInit,
+void Pong::ResetGame(  uint8_t isInit,
                       uint8_t whoWon)
 {
   if (isInit) {
@@ -97,7 +97,7 @@ void Pong::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t isInit,
     initY++;
   }
   ballVel[Y] = (initY - 4) * V_M;
-  DrawField(field);
+  DrawField();
 }
 
 // Rotate the ball in degrees (-360 -> 359)
@@ -136,7 +136,7 @@ void Pong::IncreaseSpeed(int16_t speedM)
   }
 }
 
-void Pong::DrawField( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Pong::DrawField( )
 {
   int16_t i, j;
   for (i = 0; i < BOARD_SIZE; i++) {
@@ -160,7 +160,7 @@ void Pong::DrawField( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
 }
 
 void Pong::ProcessInput(
-  __attribute__((unused))  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  __attribute__((unused))  
   __attribute__((unused)) int32_t p1ax,
   int32_t p1ay,
   __attribute__((unused)) int8_t p1bl,

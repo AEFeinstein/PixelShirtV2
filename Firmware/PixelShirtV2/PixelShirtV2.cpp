@@ -5,23 +5,29 @@
 #include "Tetris.h"
 #include "SuperSquare.h"
 #include "Shooter.h"
+#include "Adafruit_NeoPixel.h"
+#include "ScreenSaver.h"
+#include "nrf24.h"
 
-#include "I2C.h"
-#include "DigitalPin.h"
+/* Pixel strip pin connections */
+#define NP_PIN_0            2
+#define NP_PIN_1            3
+#define NP_PIN_2            4
+#define NP_PIN_3            5
 
-/* Digital input buttons */
-DigitalPin<P1_BL> p1bl;
-DigitalPin<P1_BR> p1br;
-DigitalPin<P1_BU> p1bu;
-DigitalPin<P1_BD> p1bd;
-DigitalPin<P2_BL> p2bl;
-DigitalPin<P2_BR> p2br;
-DigitalPin<P2_BU> p2bu;
-DigitalPin<P2_BD> p2bd;
+/* Numbers of pixels per strip */
+#define NUMPIXELS      64
 
-/* LED field, RGB */
-uint8_t field[BOARD_SIZE][BOARD_SIZE][3];
-
+/* Neopixel objects */
+Adafruit_NeoPixel pixels0 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_0,
+                            NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels1 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_1,
+                            NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_2,
+                            NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels3 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_3,
+                            NEO_GRB + NEO_KHZ800);
+                            
 /* Manage the Games */
 #define NUM_GAMES 5
 
@@ -45,63 +51,52 @@ Tetris tetris;
 uint32_t microsCnt = 0;
 uint32_t microsLast = 0;
 
-/* I2C Frame start sequence */
-#define I2C_BUFFER_SIZE 128
-uint8_t StartSeq[] = {
-  0xFF, 0xFF, 0xFF, 0xFF
-};
-
 #define HEARTBEAT_PIN 13
 
-#define SQUARE_WAVE_SIZE  6
-uint16_t screensaverTimer = 1;
-uint8_t squareWavePoint = 0;
-uint8_t colorStep = 0;
-#define RED   0
-#define GREEN 1
-#define BLUE  2
-uint8_t getIntensity(uint8_t step, uint8_t color);
-uint8_t screensaverShiftTimer = IRQ_HZ / 4;
+uint8_t tx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
+uint8_t rx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
+uint32_t p1controller;
+uint32_t p2controller;
+
+void doEverything();
 
 void setup()
 {
   /* Set up hearbeat */
   pinMode(HEARTBEAT_PIN, OUTPUT);
 
-  /* Set up i2c link to GPU */
-  I2c.begin();
-  I2c.setSpeed(1);
-  I2c.pullup(1);
-
   /* Seed the RNG */
   randomSeed(analogRead(RANDOM_PIN));
 
+  /* Initialize the NeoPixel library. */
+  pixels0.begin();
+  pixels1.begin();
+  pixels2.begin();
+  pixels3.begin();
+  
   /* Clear Variables */
-  memset((void*)field, 0, sizeof(field));
+  uint8_t x, y;
+  for(x = 0; x < BOARD_SIZE; x++) {
+    for(y = 0; y < BOARD_SIZE; y++) {
+      SetPixel(x, y, 0, 0, 0);
+    }
+  }
   downTimer = 0;
 
   /* Set the current game */
   gameMode = SUPER_SQUARE;
   currentGame = &superSquare;
-  currentGame->ResetGame(field,1,0);
+  currentGame->ResetGame(1,0);
 
-  /* Set internal pullups */
-  p1bl.mode(INPUT);
-  p1bl.high();
-  p1br.mode(INPUT);
-  p1br.high();
-  p1bu.mode(INPUT);
-  p1bu.high();
-  p1bd.mode(INPUT);
-  p1bd.high();
-  p2bl.mode(INPUT);
-  p2bl.high();
-  p2br.mode(INPUT);
-  p2br.high();
-  p2bu.mode(INPUT);
-  p2bu.high();
-  p2bd.mode(INPUT);
-  p2bd.high();
+  /* init hardware pins */
+  nrf24_init();
+
+  /* Channel #2 , payload length: 5 */
+  nrf24_config(2, 4);
+
+  /* Set the device addresses */
+  nrf24_tx_address(tx_address);
+  nrf24_rx_address(rx_address);
 }
 
 void loop()
@@ -119,8 +114,15 @@ void loop()
   }
   microsLast = currentTime;
 
+  if (nrf24_dataReady())
+  {
+    uint32_t js;
+    nrf24_getData((uint8_t*)&js);
+    p1controller = js;
+  }
+  
   /* Heartbeat */
-  if((millis() / 500) % 2 == 0) {
+  if((millis() / 2000) % 2 == 0) {
     digitalWrite(HEARTBEAT_PIN, HIGH);
   }
   else {
@@ -130,22 +132,19 @@ void loop()
 
 void doEverything()
 {
-  uint8_t i, x, y;
-  uint8_t* fieldPtr;
+  uint8_t p1buVal = GET_BUTTONS(p1controller) & UP;
+  uint8_t p1bdVal = GET_BUTTONS(p1controller) & DOWN;
+  uint8_t p1brVal = GET_BUTTONS(p1controller) & RIGHT;
+  uint8_t p1blVal = GET_BUTTONS(p1controller) & LEFT;
+  int16_t p1ax = GET_X_AXIS(p1controller);
+  int16_t p1ay = GET_Y_AXIS(p1controller);
 
-  uint8_t p1buVal = p1bu.read();
-  uint8_t p1bdVal = p1bd.read();
-  uint8_t p1brVal = p1br.read();
-  uint8_t p1blVal = p1bl.read();
-  int16_t p1ax = analogRead(P1_X);
-  int16_t p1ay = analogRead(P1_Y);
-
-  uint8_t p2buVal = p2bu.read();
-  uint8_t p2bdVal = p2bd.read();
-  uint8_t p2brVal = p2br.read();
-  uint8_t p2blVal = p2bl.read();
-  int16_t p2ax = analogRead(P2_X);
-  int16_t p2ay = analogRead(P2_Y);
+  uint8_t p2buVal = GET_BUTTONS(p2controller) & UP;
+  uint8_t p2bdVal = GET_BUTTONS(p2controller) & DOWN;
+  uint8_t p2brVal = GET_BUTTONS(p2controller) & RIGHT;
+  uint8_t p2blVal = GET_BUTTONS(p2controller) & LEFT;
+  int16_t p2ax = GET_X_AXIS(p2controller);
+  int16_t p2ay = GET_Y_AXIS(p2controller);
 
   /* If both up buttons are held, maybe the game mode is being changed */
   if(!p1buVal && !p2buVal) {
@@ -162,78 +161,14 @@ void doEverything()
       (p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax) ||
       (p1ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ay) ||
       (p2ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ay)) {
-    if(screensaverTimer == 0) {
-      /* Leave the screensaver, clear the field & reset the game */
-      memset(field, 0, sizeof(field));
-      currentGame->ResetGame(field, 1, 0);
-    }
-    screensaverTimer = (IRQ_HZ * 30);
+    ExitScreensaver(currentGame);
   }
 
   /* Decrement the screensaver timer */
-  if(screensaverTimer > 0) {
-    screensaverTimer--;
-    if(screensaverTimer == 0) {
-      /* Enter the screensaver, clear the field */
-      memset(field, 0, sizeof(field));
-    }
-  }
+  HandleScreensaverTimer();
 
-  if(screensaverTimer == 0) {
-    /* display screensaver */
-
-    if(screensaverShiftTimer > 0) {
-      screensaverShiftTimer--;
-    }
-    if(screensaverShiftTimer == 0) {
-      screensaverShiftTimer = IRQ_HZ / 4;
-
-      /* Shift leftward */
-      for(x = 0; x < BOARD_SIZE - 1; x++) {
-        for(y = 0; y < BOARD_SIZE; y++) {
-          field[x][y][0] = field[x + 1][y][0];
-          field[x][y][1] = field[x + 1][y][1];
-          field[x][y][2] = field[x + 1][y][2];
-        }
-      }
-
-      /* Clear rightmost column */
-      for(y = 0; y < BOARD_SIZE; y++) {
-        SetPixel(BOARD_SIZE-1, y, 0, 0, 0);
-      }
-
-      /* Draw new rightmost column */
-      if(squareWavePoint < SQUARE_WAVE_SIZE - 2) {
-        /* top bar */
-        SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
-                 getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
-                 getIntensity(colorStep, BLUE));
-      }
-      else if(squareWavePoint == SQUARE_WAVE_SIZE - 2) {
-        /* falling edge */
-        for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
-            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-          SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
-                   getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
-        }
-      }
-      else if(squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 3) {
-        /* bottom bar */
-        SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
-                 getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
-                 getIntensity(colorStep, BLUE));
-      }
-      else if(squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 3) {
-        /* rising edge */
-        for(y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
-            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-          SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
-                   getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
-        }
-      }
-      squareWavePoint = (squareWavePoint + 1) % ((SQUARE_WAVE_SIZE - 1) * 2);
-      colorStep = (colorStep + 1) % 24;
-    }
+  if(GetScreensaverTimer() == 0) {
+    DisplayScreensaver();
   }
   else {
     /* Yep, the game mode is being changed */
@@ -262,68 +197,26 @@ void doEverything()
             break;
           }
       }
-      currentGame->ResetGame(field,1,0);
+      currentGame->ResetGame(1,0);
     }
     else {
       /* Process new controller input */
-      currentGame->ProcessInput(field,
-                                p1ax, p1ay, !p1blVal, !p1brVal, !p1buVal, !p1bdVal,
+      currentGame->ProcessInput(p1ax, p1ay, !p1blVal, !p1brVal, !p1buVal, !p1bdVal,
                                 p2ax, p2ay, !p2blVal, !p2brVal, !p2buVal, !p2bdVal);
 
       /* Update the game state */
-      currentGame->UpdatePhysics(field);
+      currentGame->UpdatePhysics();
     }
   }
-  /* Write the start sequence to send the frame to the GPU */
-  I2c.write(4,0xFF, StartSeq, 3);
 
-  /* Write each pixel, in buffered block */
-  fieldPtr = &field[0][0][0];
-  for(i=0; i < ((3*256)/I2C_BUFFER_SIZE); i++) {
-    I2c.write(4, fieldPtr[i * I2C_BUFFER_SIZE], &fieldPtr[i * I2C_BUFFER_SIZE + 1],
-              I2C_BUFFER_SIZE);
-
-  }
+  /* Display the frame */
+  pixels0.show();
+  pixels1.show();
+  pixels2.show();
+  pixels3.show();
 }
 
-uint8_t getIntensity(uint8_t step, uint8_t color)
-{
-  switch(color) {
-    case RED:
-      if(step < 8) {
-        /* rise */
-        return (0x01 << (step));
-      }
-      else if(step < 16) {
-        /* fall */
-        return (0x80 >> (step - 8));
-      }
-      return 0;
-    case GREEN:
-      if (step >= 16) {
-        /* fall */
-        return (0x80 >> (step - 16));
-      }
-      else if (step >= 8) {
-        /* rise */
-        return (0x01 << (step - 8));
-      }
-      return 0;
-    case BLUE:
-      if(step < 8) {
-        /* fall */
-        return (0x80 >> step);
-      }
-      else if(step >= 16) {
-        /* rise */
-        return (0x01 << (step - 16));
-      }
-      return 0;
-  }
-  return 0;
-}
-
-void DisplayScore( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint16_t score)
+void DisplayScore(  uint16_t score)
 {
   uint8_t i, j;
   for(i = 0; i < BOARD_SIZE; i++) {
@@ -334,18 +227,18 @@ void DisplayScore( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint16_t score)
 
   // draw "score" on the field
   if(score > 999) {
-    DrawNumber(field, (score / 1000) % 10, 0 , 5, 0,0x40,0);
+    DrawNumber((score / 1000) % 10, 0 , 5, 0,0x40,0);
   }
   if(score > 99) {
-    DrawNumber(field, (score / 100 ) % 10, 4 , 5, 0,0x40,0);
+    DrawNumber((score / 100 ) % 10, 4 , 5, 0,0x40,0);
   }
   if(score > 9) {
-    DrawNumber(field, (score / 10  ) % 10, 8 , 5, 0,0x40,0);
+    DrawNumber((score / 10  ) % 10, 8 , 5, 0,0x40,0);
   }
-  DrawNumber(field, (score / 1   ) % 10, 12, 5, 0,0x40,0);
+  DrawNumber((score / 1   ) % 10, 12, 5, 0,0x40,0);
 }
 
-void DrawNumber( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t number,
+void DrawNumber( uint8_t number,
                  uint8_t offsetX, uint8_t offsetY, uint8_t r,
                  uint8_t g, uint8_t b)
 {
@@ -482,3 +375,67 @@ void DrawNumber( uint8_t field[BOARD_SIZE][BOARD_SIZE][3], uint8_t number,
       }
   }
 }
+
+/* Sets a pixel in the matrix */
+void SetPixel(int8_t y, int8_t x, uint8_t r, uint8_t g, uint8_t b)
+{
+  uint8_t index = (-16 * (x%4)) + 63 - y;
+
+  switch(x / 4) {
+    case 0:
+      pixels0.setPixelColor(index, r, g, b);
+      break;
+    case 1:
+      pixels1.setPixelColor(index, r, g, b);
+      break;
+    case 2:
+      pixels2.setPixelColor(index, r, g, b);
+      break;
+    case 3:
+      pixels3.setPixelColor(index, r, g, b);
+      break;
+  }
+}
+
+/* Sets a pixel in the matrix */
+void SetPixel(int8_t y, int8_t x, uint32_t val)
+{
+  uint8_t index = (-16 * (x%4)) + 63 - y;
+
+  switch(x / 4) {
+    case 0:
+      pixels0.setPixelColor(index, val);
+      break;
+    case 1:
+      pixels1.setPixelColor(index, val);
+      break;
+    case 2:
+      pixels2.setPixelColor(index, val);
+      break;
+    case 3:
+      pixels3.setPixelColor(index, val);
+      break;
+  }
+}
+
+uint32_t GetPixel(int8_t y, int8_t x)
+{
+  uint8_t index = (-16 * (x%4)) + 63 - y;
+
+  switch(x / 4) {
+    case 0:
+      return pixels0.getPixelColor(index);
+      break;
+    case 1:
+      return pixels1.getPixelColor(index);
+      break;
+    case 2:
+      return pixels2.getPixelColor(index);
+      break;
+    case 3:
+      return pixels3.getPixelColor(index);
+      break;
+  }
+  return 0;
+}
+

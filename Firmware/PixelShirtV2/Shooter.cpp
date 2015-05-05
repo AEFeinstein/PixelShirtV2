@@ -3,15 +3,15 @@
 int8_t shipShape[4][2] = {{-1,BOARD_SIZE-1},{0,BOARD_SIZE-1},{1,BOARD_SIZE-1},{0,BOARD_SIZE-2}};
 #define PLAYER_SCALAR 16
 
-void Shooter::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::UpdatePhysics( )
 {
   uint8_t i;
 
   if(resetTimer > 0) {
     resetTimer--;
-    DisplayScore(field, score);
+    DisplayScore(score);
     if(resetTimer == 0) {
-      ResetGame(field, 0, 0);
+      ResetGame(0, 0);
     }
   }
   else {
@@ -29,7 +29,7 @@ void Shooter::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     moveTimer--;
     if(moveTimer == 0) {
       moveTimer = currentMovementSpeed;
-      ShiftBoard(field);
+      ShiftBoard();
     }
 
     /* Cooldown for shooting */
@@ -55,10 +55,10 @@ void Shooter::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     /* Draw bullets, checking for collisions */
     for (i = 0; i < NUM_BULLETS; i++) {
       if(p1.bullets[i][1] != -1) {
-        if(field[p1.bullets[i][0]][p1.bullets[i][1]][0] == 0x40) {
+        if(GetPixel(p1.bullets[i][0], p1.bullets[i][1]) == 0x40) { /* TODO color check (red) */
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
           SetPixel(p1.bullets[i][0], p1.bullets[i][1], 0,0,0);
-          KillEnemy(field);
+          KillEnemy();
           p1.bullets[i][1] = -1;
         }
         else {
@@ -66,10 +66,10 @@ void Shooter::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
         }
       }
       if(p2.bullets[i][1] != -1) {
-        if(field[p2.bullets[i][0]][p2.bullets[i][1]][0] == 0x40) {
+        if(GetPixel(p2.bullets[i][0], p2.bullets[i][1]) == 0x40) { /* TODO color check (red) */
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
           SetPixel(p2.bullets[i][0], p2.bullets[i][1], 0,0,0);
-          KillEnemy(field);
+          KillEnemy();
           p2.bullets[i][1] = -1;
         }
         else {
@@ -80,25 +80,25 @@ void Shooter::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-void Shooter::KillEnemy(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::KillEnemy()
 {
   score++;
   if(score == 250) {
-    GameOver(field);
+    GameOver();
   }
 
   /* For each row killed, make dudes go faster */
-  uint8_t enemies = NumEnemies(field);
+  uint8_t enemies = NumEnemies();
   if(enemies % 5 == 0 && currentMovementSpeed > 3) {
     currentMovementSpeed--;
   }
   if(enemies == 0) {
-    SpawnWave(field);
+    SpawnWave();
   }
 }
 
 void Shooter::ResetGame(
-  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  
   __attribute__((unused)) uint8_t isInit,
   __attribute__((unused)) uint8_t whoWon)
 {
@@ -106,7 +106,7 @@ void Shooter::ResetGame(
 
   currentMovementSpeed = IRQ_HZ;
   score = 0; /* wave speed depends on score */
-  SpawnWave(field);
+  SpawnWave();
 
   moveTimer = IRQ_HZ;
   activeDirection = RIGHT;
@@ -122,14 +122,14 @@ void Shooter::ResetGame(
     p2.bullets[i][1] = -1;
   }
 
-  if(FALSE == DrawPlayers(field)) {
-    GameOver(field);
+  if(FALSE == DrawPlayers()) {
+    GameOver();
   }
 
   resetTimer = 0;
 }
 
-void Shooter::SpawnWave(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::SpawnWave()
 {
   uint8_t x, y;
 
@@ -147,7 +147,7 @@ void Shooter::SpawnWave(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
 }
 
 void Shooter::ProcessInput(
-  __attribute__((unused))  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  __attribute__((unused))  
   int32_t p1ax,
   __attribute__((unused)) int32_t p1ay,
   __attribute__((unused)) int8_t p1bl,
@@ -164,7 +164,7 @@ void Shooter::ProcessInput(
   uint8_t i;
 
   if(resetTimer == 0) {
-    ClearPlayers(field);
+    ClearPlayers();
 
     /* Handle position */
     if(p1ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ax) {
@@ -187,8 +187,8 @@ void Shooter::ProcessInput(
       }
     }
 
-    if(FALSE == DrawPlayers(field)) {
-      GameOver(field);
+    if(FALSE == DrawPlayers()) {
+      GameOver();
     }
 
     /* Handle bullets */
@@ -222,7 +222,7 @@ void Shooter::ProcessInput(
   }
 }
 
-void Shooter::ShiftBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::ShiftBoard()
 {
   uint8_t canMove = TRUE;
   uint8_t x, y;
@@ -230,33 +230,31 @@ void Shooter::ShiftBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   switch(activeDirection) {
     case LEFT : {
         /* Check for left side boundry condition */
-        ClearPlayers(field);
+        ClearPlayers();
         for(y = 0; y < BOARD_SIZE; y++) {
           if(IsPixelLit(0, y)) {
             canMove = FALSE;
           }
         }
-        if(FALSE == DrawPlayers(field)) {
-          GameOver(field);
+        if(FALSE == DrawPlayers()) {
+          GameOver();
         }
 
         if(!canMove) {
           activeDirection = RIGHT; /* Reverse direction, for next time */
-          ClearPlayers(field);
-          DropBoard(field);
+          ClearPlayers();
+          DropBoard();
           /* Try to redraw the player, if it intersects with a ship, game over */
-          if(FALSE == DrawPlayers(field)) {
-            GameOver(field);
+          if(FALSE == DrawPlayers()) {
+            GameOver();
           }
         }
         else {
-          ClearPlayers(field);
+          ClearPlayers();
           /* Shift the columns leftward */
           for(x = 0; x < BOARD_SIZE - 1; x++) {
             for(y = 0; y < BOARD_SIZE; y++) {
-              field[x][y][0] = field[x+1][y][0];
-              field[x][y][1] = field[x+1][y][1];
-              field[x][y][2] = field[x+1][y][2];
+              SetPixel(x, y, GetPixel(x+1, y));
             }
           }
           /* Clear the last column */
@@ -264,41 +262,39 @@ void Shooter::ShiftBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
             SetPixel(BOARD_SIZE-1, y, 0, 0, 0);
           }
           /* Try to redraw the player, if it intersects with a ship, game over */
-          if(FALSE == DrawPlayers(field)) {
-            GameOver(field);
+          if(FALSE == DrawPlayers()) {
+            GameOver();
           }
         }
         break;
       }
     case RIGHT : {
         /* Check for right side boundry condition */
-        ClearPlayers(field);
+        ClearPlayers();
         for(y = 0; y < BOARD_SIZE; y++) {
           if(IsPixelLit(BOARD_SIZE - 1, y)) {
             canMove = FALSE;
           }
         }
-        if(FALSE == DrawPlayers(field)) {
-          GameOver(field);
+        if(FALSE == DrawPlayers()) {
+          GameOver();
         }
 
         if(!canMove) {
           activeDirection = LEFT; /* Reverse direction, for next time */
-          ClearPlayers(field);
-          DropBoard(field);
+          ClearPlayers();
+          DropBoard();
           /* Try to redraw the player, if it intersects with a ship, game over */
-          if(FALSE == DrawPlayers(field)) {
-            GameOver(field);
+          if(FALSE == DrawPlayers()) {
+            GameOver();
           }
         }
         else {
-          ClearPlayers(field);
+          ClearPlayers();
           /* Shift the columns rightward */
           for(x = BOARD_SIZE - 1; x > 0; x--) {
             for(y = 0; y < BOARD_SIZE; y++) {
-              field[x][y][0] = field[x-1][y][0];
-              field[x][y][1] = field[x-1][y][1];
-              field[x][y][2] = field[x-1][y][2];
+              SetPixel(x, y , GetPixel(x-1, y));
             }
           }
           /* Clear the last column */
@@ -306,8 +302,8 @@ void Shooter::ShiftBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
             SetPixel(0, y, 0, 0, 0);
           }
           /* Try to redraw the player, if it intersects with a ship, game over */
-          if(FALSE == DrawPlayers(field)) {
-            GameOver(field);
+          if(FALSE == DrawPlayers()) {
+            GameOver();
           }
         }
         break;
@@ -315,14 +311,12 @@ void Shooter::ShiftBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-void Shooter::DropBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::DropBoard()
 {
   uint8_t x, y;
   for(y = BOARD_SIZE - 1; y > 0; y--) {
     for(x = 0; x < BOARD_SIZE; x++) {
-      field[x][y][0] = field[x][y-1][0];
-      field[x][y][1] = field[x][y-1][1];
-      field[x][y][2] = field[x][y-1][2];
+      SetPixel(x, y, GetPixel(x, y-1));
     }
   }
   for(x = 0; x < BOARD_SIZE; x++) {
@@ -330,7 +324,7 @@ void Shooter::DropBoard(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-void Shooter::ClearPlayers(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::ClearPlayers()
 {
   uint8_t i;
 
@@ -354,7 +348,7 @@ void Shooter::ClearPlayers(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-uint8_t Shooter::DrawPlayers(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+uint8_t Shooter::DrawPlayers()
 {
   uint8_t i;
 
@@ -364,13 +358,11 @@ uint8_t Shooter::DrawPlayers(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit, i.e. touched by an enemy */
-      if(field[(p1.position / PLAYER_SCALAR) + shipShape[i][0]][shipShape[i][1]][0] >
-          0) {
+      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) > 0) { /* TODO color check (red) */
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      field[(p1.position / PLAYER_SCALAR) + shipShape[i][0]][shipShape[i][1]][1] =
-        0x40;
+      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0, 0x40);
     }
   }
 
@@ -380,34 +372,31 @@ uint8_t Shooter::DrawPlayers(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit, i.e. touched by an enemy */
-      if(field[(p2.position / PLAYER_SCALAR) + shipShape[i][0]][shipShape[i][1]][0] >
-          0) {
+      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) > 0) { /* TODO color check (red) */
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      field[(p2.position / PLAYER_SCALAR) + shipShape[i][0]][shipShape[i][1]][2] =
-        0x40;
+      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0, 0x40);
     }
   }
 
   return TRUE;
 }
 
-void Shooter::GameOver(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Shooter::GameOver()
 {
   resetTimer = IRQ_HZ * 5;
 }
 
-uint8_t Shooter::NumEnemies(uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+uint8_t Shooter::NumEnemies()
 {
   uint8_t x, y, enemies = 0;
   for(x = 0; x < BOARD_SIZE; x++) {
     for(y = 0; y < BOARD_SIZE; y++) {
-      if(field[x][y][0] == 0x40) {
+      if(GetPixel(x, y) == 0x40) { /* TODO color check (red)*/
         enemies++;
       }
     }
   }
   return enemies;
-  return 0;
 }

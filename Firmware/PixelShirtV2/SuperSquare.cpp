@@ -1,20 +1,20 @@
 #include "SuperSquare.h"
 
-void SuperSquare::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void SuperSquare::UpdatePhysics( )
 {
   int16_t i;
 
   if(resetTimer > 0) {
     resetTimer--;
     if(resetTimer == 0) {
-      ResetGame(field, 0, 0);
+      ResetGame(0, 0);
     }
     return;
   }
 
   /* Clear all line drawings */
   for(i = 0; i < NUM_LINES; i++) {
-    DrawLine(field, lines[i], 0,0,0);
+    DrawLine(lines[i], 0,0,0);
   }
 
   /* Update line positions */
@@ -67,14 +67,14 @@ void SuperSquare::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   /* Draw all lines */
   for(i = 0; i < NUM_LINES; i++) {
     /* If there is a collision, display the score and start the reset timer */
-    if(FALSE == DrawLine(field, lines[i], 0x40,0,0)) {
+    if(FALSE == DrawLine(lines[i], 0x40,0,0)) {
 
       /* Clear all lines */
       for(i = 0; i < NUM_LINES; i++) {
         INVALIDATE_LINE(lines[i]);
       }
 
-      DisplayScore(field, score);
+      DisplayScore(score);
       resetTimer = IRQ_HZ * 5;
     }
   }
@@ -82,7 +82,7 @@ void SuperSquare::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
 }
 
 void SuperSquare::ResetGame(
-  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  
   __attribute__((unused)) uint8_t isInit,
   __attribute__((unused)) uint8_t whoWon)
 {
@@ -114,7 +114,7 @@ void SuperSquare::ResetGame(
 }
 
 void SuperSquare::ProcessInput(
-  __attribute__((unused))  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  __attribute__((unused))  
   int32_t p1ax,
   __attribute__((unused)) int32_t p1ay,
   __attribute__((unused)) int8_t p1bl,
@@ -157,7 +157,7 @@ void SuperSquare::ProcessInput(
       INVALIDATE_LINE(lines[i]);
     }
 
-    DisplayScore(field, score);
+    DisplayScore(score);
     resetTimer = IRQ_HZ * 5;
   }
   else {
@@ -219,8 +219,7 @@ void SuperSquare::PlacePlayerPixel(uint8_t position[])
   }
 }
 
-uint8_t SuperSquare::DrawLine( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
-                               Line line, uint8_t r, uint8_t g, uint8_t b)
+uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
 {
   int16_t i;
 
@@ -236,7 +235,7 @@ uint8_t SuperSquare::DrawLine( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
   switch(line.direction) {
     case UP: {
         for(i = position + 1; i < (BOARD_SIZE - position); i++) {
-          if(field[i][15-position][2] == 0x40 && (r|g|b) > 0) {
+          if(GetPixel(i, 15-position) == 0x400000 && (r|g|b) > 0) { /* TODO check color (blue) */
             return FALSE;
           }
           SetPixel(i, 15-position, r, g, b);
@@ -245,7 +244,7 @@ uint8_t SuperSquare::DrawLine( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
       }
     case DOWN: {
         for(i = position; i < (BOARD_SIZE - 1 - position); i++) {
-          if(field[i][position][2] == 0x40 && (r|g|b) > 0) {
+          if(GetPixel(i, position) == 0x400000 && (r|g|b) > 0) {/* TODO check color (blue) */
             return FALSE;
           }
           SetPixel(i, position, r, g, b);
@@ -254,7 +253,7 @@ uint8_t SuperSquare::DrawLine( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
       }
     case LEFT: {
         for(i = position; i < (BOARD_SIZE - 1 - position); i++) {
-          if(field[15 - position][i][2] == 0x40 && (r|g|b) > 0) {
+          if(GetPixel(15 - position, i) == 0x400000 && (r|g|b) > 0) {/* TODO check color (blue) */
             return FALSE;
           }
           SetPixel(15 - position, i, r, g, b);
@@ -263,7 +262,7 @@ uint8_t SuperSquare::DrawLine( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
       }
     case RIGHT: {
         for(i = position + 1; i < (BOARD_SIZE - position); i++) {
-          if(field[position][i][2] == 0x40 && (r|g|b) > 0) {
+          if(GetPixel(position, i) == 0x400000 && (r|g|b) > 0) {/* TODO check color (blue) */
             return FALSE;
           }
           SetPixel(position, i, r, g, b);

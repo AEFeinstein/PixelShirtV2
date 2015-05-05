@@ -5,22 +5,27 @@ Tetris::Tetris()
   multiplayer = 1;
 }
 
-void Tetris::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+void Tetris::ResetGame( 
                         uint8_t isInit,
                         __attribute__((unused)) uint8_t whoWon)
 {
   uint8_t i;
-  memset((void*)field, 0, sizeof(uint8_t) * BOARD_SIZE * BOARD_SIZE * 3);
-
+  uint8_t x, y;
+  for(x = 0; x < BOARD_SIZE; x++) {
+    for(y = 0; y < BOARD_SIZE; y++) {
+      SetPixel(x, y, 0, 0, 0);
+    }
+  }
+      
   if (isInit) {
     gameOver = 1;
   }
   else {
     gameOver = 0;
-    NewActiveTetromino(field, 1); // ignore return, it will always be placed
-    NewActiveTetromino(field, 0); // ignore return, it will always be placed
-    DrawActiveTetromino(field);
-    DrawNextTetromino(field);
+    NewActiveTetromino( 1); // ignore return, it will always be placed
+    NewActiveTetromino( 0); // ignore return, it will always be placed
+    DrawActiveTetromino();
+    DrawNextTetromino();
   }
   for(i=0; i < BOARD_SIZE; i++) {
     SetPixel(3,i,0,0,0x40);
@@ -37,7 +42,7 @@ void Tetris::ResetGame( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
   downTimer = 0;
 }
 
-void Tetris::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Tetris::UpdatePhysics( )
 {
   if(gameOver) {
     return;
@@ -51,7 +56,7 @@ void Tetris::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
     dropTimer--;
   }
   else {
-    DropActiveTetromino(field);
+    DropActiveTetromino();
 
     dropTimer = IRQ_HZ/2 - rowsCleared;
     if(turboMode) {
@@ -61,7 +66,7 @@ void Tetris::UpdatePhysics( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
 }
 
 void Tetris::ProcessInput(
-  uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+  
   int32_t p1ax,
   int32_t p1ay,
   int8_t p1bl,
@@ -86,19 +91,19 @@ void Tetris::ProcessInput(
   }
   if(downTimer == IRQ_HZ * 2) {
     multiplayer = (multiplayer+1)%2;
-    ResetGame(field, 1, 0);
+    ResetGame(1, 0);
     return;
   }
 
   if(gameOver) {
     if(multiplayer) {
       if(p1bd && p2bd) {
-        ResetGame(field, 0, 0);
+        ResetGame(0, 0);
       }
     }
     else {
       if(p1bd) {
-        ResetGame(field, 0, 0);
+        ResetGame(0, 0);
       }
     }
     return;
@@ -129,11 +134,11 @@ void Tetris::ProcessInput(
   }
 
   if(bl && !rotatedYet) {
-    RotateActiveTetromino(field, CLOCKWISE);
+    RotateActiveTetromino( CLOCKWISE);
     rotatedYet = 1;
   }
   else if(br && !rotatedYet) {
-    RotateActiveTetromino(field, COUNTERCLOCKWISE);
+    RotateActiveTetromino( COUNTERCLOCKWISE);
     rotatedYet = 1;
   }
   else if(br == 0 && bl == 0) {
@@ -141,7 +146,7 @@ void Tetris::ProcessInput(
   }
 
   if(bu && !hardDroppedYet) {
-    while(DropActiveTetromino(field)) {
+    while(DropActiveTetromino()) {
       ;
     }
     hardDroppedYet = 1;
@@ -160,13 +165,13 @@ void Tetris::ProcessInput(
 
   if(ax > 768) {
     if(cursorTimer == 0) {
-      SlideActiveTetromino(field, T_RIGHT);
+      SlideActiveTetromino( T_RIGHT);
       cursorTimer = IRQ_HZ/8;
     }
   }
   else if(ax < 256) {
     if(cursorTimer == 0) {
-      SlideActiveTetromino(field, T_LEFT);
+      SlideActiveTetromino( T_LEFT);
       cursorTimer = IRQ_HZ/8;
     }
   }
@@ -176,7 +181,7 @@ void Tetris::ProcessInput(
   }
 }
 
-uint8_t Tetris::NewActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+uint8_t Tetris::NewActiveTetromino( 
                                     uint8_t isFirst)
 {
   uint8_t i;
@@ -318,7 +323,7 @@ uint8_t Tetris::NewActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
   return 0;
 }
 
-void Tetris::ClearActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Tetris::ClearActiveTetromino( )
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -331,7 +336,7 @@ void Tetris::ClearActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-void Tetris::DrawActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Tetris::DrawActiveTetromino( )
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -346,7 +351,7 @@ void Tetris::DrawActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-void Tetris::ClearNextTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Tetris::ClearNextTetromino( )
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -354,7 +359,7 @@ void Tetris::ClearNextTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   }
 }
 
-void Tetris::DrawNextTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+void Tetris::DrawNextTetromino( )
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -366,10 +371,10 @@ void Tetris::DrawNextTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
 /**
  * Returns 1 if the piece dropped or 0 if the piece was blocked
  */
-uint8_t Tetris::DropActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
+uint8_t Tetris::DropActiveTetromino( )
 {
   uint8_t i, j, k, rowFull, isBlocked = 0, rc = 0;
-  ClearActiveTetromino(field);
+  ClearActiveTetromino();
 
   // Check to see if the tetromino can be moved down
   for(i=0; i < 4; i++) {
@@ -384,10 +389,10 @@ uint8_t Tetris::DropActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
   // If the piece is not blocked, move it downward
   if(!isBlocked) {
     activeOffset[Y]++;
-    DrawActiveTetromino(field);
+    DrawActiveTetromino();
     return 1;
   }
-  // Otherwise set the piece in the field, clear lines, and try to spawn a new piece
+  // Otherwise set the piece in the  clear lines, and try to spawn a new piece
   else {
     leadPlayer = (leadPlayer+1)%2; // whenever a piece is set, swap the controls
     // Set the piece
@@ -410,9 +415,7 @@ uint8_t Tetris::DropActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
         // drop row
         for(j = i; j > 0; j--) {
           for(k=4; k < 14; k++) {
-            field[k][j][0] = field[k][j-1][0];
-            field[k][j][1] = field[k][j-1][1];
-            field[k][j][2] = field[k][j-1][2];
+            SetPixel(k, j, GetPixel(k, j-1));
           }
         }
         for(k=4; k < 14; k++) {
@@ -437,51 +440,51 @@ uint8_t Tetris::DropActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3])
       }
     }
 
-    ClearNextTetromino(field);
-    if(NewActiveTetromino(field, 0)) {
+    ClearNextTetromino();
+    if(NewActiveTetromino( 0)) {
       gameOver = 1; // the new tetromino spawned and intersected
     }
-    DrawActiveTetromino(field);
-    DrawNextTetromino(field);
+    DrawActiveTetromino();
+    DrawNextTetromino();
     return 0;
   }
 }
 
-void Tetris::SlideActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+void Tetris::SlideActiveTetromino( 
                                    int8_t direction)
 {
   uint8_t i;
 
-  ClearActiveTetromino(field);
+  ClearActiveTetromino();
 
   // Check to see if the tetromino can be moved laterally
   for(i=0; i < 4; i++) {
     // 3 is a wall, 2 is a set piece
     if(IsPixelLit(activeTetromino[i][X] + activeOffset[X] + direction,
                   activeTetromino[i][Y] + activeOffset[Y]) ) { /* Used to be == 2 or 3 */
-      DrawActiveTetromino(field);
+      DrawActiveTetromino();
       return; // can't slide :(
     }
   }
 
   // If the piece is not blocked, move it downward
   activeOffset[X] += direction;
-  DrawActiveTetromino(field);
+  DrawActiveTetromino();
 }
 
-void Tetris::RotateActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
+void Tetris::RotateActiveTetromino( 
                                     int8_t direction)
 {
   uint8_t newRotation[4][2];
   uint8_t i;
   uint8_t oldRotation = activeRotation;
 
-  ClearActiveTetromino(field);
+  ClearActiveTetromino();
 
   switch(activeType) {
     case O_TET:
       // no rotation
-      DrawActiveTetromino(field);
+      DrawActiveTetromino();
       return;
     case I_TET:
       activeRotation = WRAP(activeRotation + direction, 2);
@@ -534,7 +537,7 @@ void Tetris::RotateActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
         newRotation[i][Y] + activeOffset[Y] < 0  ||
         newRotation[i][Y] + activeOffset[Y] > 15) {
       activeRotation = oldRotation; // undo
-      DrawActiveTetromino(field);
+      DrawActiveTetromino();
       return; // can't rotate :(
     }
   }
@@ -544,7 +547,7 @@ void Tetris::RotateActiveTetromino( uint8_t field[BOARD_SIZE][BOARD_SIZE][3],
     activeTetromino[i][X] = newRotation[i][X];
     activeTetromino[i][Y] = newRotation[i][Y];
   }
-  DrawActiveTetromino(field);
+  DrawActiveTetromino();
 }
 
 
