@@ -10,10 +10,10 @@
 #include "nrf24.h"
 
 /* Pixel strip pin connections */
-#define NP_PIN_0            2
-#define NP_PIN_1            3
-#define NP_PIN_2            4
-#define NP_PIN_3            5
+#define NP_PIN_0            8
+#define NP_PIN_1            10
+#define NP_PIN_2            9
+#define NP_PIN_3            11
 
 /* Numbers of pixels per strip */
 #define NUMPIXELS      64
@@ -97,6 +97,14 @@ void setup()
   /* Set the device addresses */
   nrf24_tx_address(tx_address);
   nrf24_rx_address(rx_address);
+
+  /* Init controller state */
+  p1controller = 0;
+  p2controller = 0;
+  SET_X_AXIS(p1controller, 512);
+  SET_Y_AXIS(p1controller, 512);
+  SET_X_AXIS(p2controller, 512);
+  SET_Y_AXIS(p2controller, 512);
 }
 
 void loop()
@@ -122,7 +130,7 @@ void loop()
   }
   
   /* Heartbeat */
-  if((millis() / 2000) % 2 == 0) {
+  if((millis() / 1000) % 2 == 0) {
     digitalWrite(HEARTBEAT_PIN, HIGH);
   }
   else {
@@ -147,7 +155,7 @@ void doEverything()
   int16_t p2ay = GET_Y_AXIS(p2controller);
 
   /* If both up buttons are held, maybe the game mode is being changed */
-  if(!p1buVal && !p2buVal) {
+  if(p1buVal && p2buVal) {
     downTimer++;
   }
   else {
@@ -155,8 +163,8 @@ void doEverything()
   }
 
   /* If there is any input, exit the screensaver */
-  if(!p1buVal || !p1bdVal || !p1blVal || !p1brVal ||
-      !p2buVal || !p2bdVal || !p2blVal || !p2brVal ||
+  if(p1buVal || p1bdVal || p1blVal || p1brVal ||
+      p2buVal || p2bdVal || p2blVal || p2brVal ||
       (p1ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ax) ||
       (p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax) ||
       (p1ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ay) ||
@@ -201,8 +209,8 @@ void doEverything()
     }
     else {
       /* Process new controller input */
-      currentGame->ProcessInput(p1ax, p1ay, !p1blVal, !p1brVal, !p1buVal, !p1bdVal,
-                                p2ax, p2ay, !p2blVal, !p2brVal, !p2buVal, !p2bdVal);
+      currentGame->ProcessInput(p1ax, p1ay, p1blVal, p1brVal, p1buVal, p1bdVal,
+                                p2ax, p2ay, p2blVal, p2brVal, p2buVal, p2bdVal);
 
       /* Update the game state */
       currentGame->UpdatePhysics();
@@ -377,7 +385,7 @@ void DrawNumber( uint8_t number,
 }
 
 /* Sets a pixel in the matrix */
-void SetPixel(int8_t y, int8_t x, uint8_t r, uint8_t g, uint8_t b)
+void SetPixel(int8_t x, int8_t y, uint8_t r, uint8_t g, uint8_t b)
 {
   uint8_t index = (-16 * (x%4)) + 63 - y;
 
@@ -398,7 +406,7 @@ void SetPixel(int8_t y, int8_t x, uint8_t r, uint8_t g, uint8_t b)
 }
 
 /* Sets a pixel in the matrix */
-void SetPixel(int8_t y, int8_t x, uint32_t val)
+void SetPixel(int8_t x, int8_t y, uint32_t val)
 {
   uint8_t index = (-16 * (x%4)) + 63 - y;
 
@@ -418,7 +426,7 @@ void SetPixel(int8_t y, int8_t x, uint32_t val)
   }
 }
 
-uint32_t GetPixel(int8_t y, int8_t x)
+uint32_t GetPixel(int8_t x, int8_t y)
 {
   uint8_t index = (-16 * (x%4)) + 63 - y;
 
