@@ -144,13 +144,13 @@ We've spent an enormous amount of time creating and checking these footprints an
 You are welcome to use this library for commercial purposes. For attribution, we ask that when you begin to sell your device using our footprint, you email us with a link to the product being sold. We want bragging rights that we helped (in a very small part) to create your 8th world wonder. We would like the opportunity to feature your device on our homepage.</description>
 <packages>
 <package name="RJ45-8">
-<wire x1="-7.62" y1="10" x2="7.62" y2="10" width="0.2032" layer="21"/>
-<wire x1="-7.62" y1="-3" x2="-7.62" y2="10" width="0.2032" layer="21"/>
-<wire x1="-7.62" y1="-3" x2="7.62" y2="-3" width="0.2032" layer="21"/>
-<wire x1="7.62" y1="10" x2="7.62" y2="-3" width="0.2032" layer="21"/>
-<wire x1="-7.62" y1="-3" x2="-7.62" y2="-10.8" width="0.2032" layer="51"/>
-<wire x1="-7.62" y1="-10.8" x2="7.62" y2="-10.8" width="0.2032" layer="51"/>
-<wire x1="7.62" y1="-10.8" x2="7.62" y2="-3" width="0.2032" layer="51"/>
+<wire x1="-7.62" y1="10" x2="7.62" y2="10" width="0.2032" layer="48"/>
+<wire x1="-7.62" y1="-3" x2="-7.62" y2="10" width="0.2032" layer="48"/>
+<wire x1="-7.62" y1="-3" x2="7.62" y2="-3" width="0.2032" layer="48"/>
+<wire x1="7.62" y1="10" x2="7.62" y2="-3" width="0.2032" layer="48"/>
+<wire x1="-7.62" y1="-3" x2="-7.62" y2="-10.8" width="0.2032" layer="48"/>
+<wire x1="-7.62" y1="-10.8" x2="7.62" y2="-10.8" width="0.2032" layer="48"/>
+<wire x1="7.62" y1="-10.8" x2="7.62" y2="-3" width="0.2032" layer="48"/>
 <pad name="8" x="4.445" y="8.89" drill="1" diameter="1.8796"/>
 <pad name="7" x="3.175" y="6.35" drill="1" diameter="1.8796"/>
 <pad name="6" x="1.905" y="8.89" drill="1" diameter="1.8796"/>
@@ -161,6 +161,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <pad name="1" x="-4.445" y="6.35" drill="1" diameter="1.8796" shape="square"/>
 <hole x="-5.715" y="0" drill="3.2"/>
 <hole x="5.715" y="0" drill="3.2"/>
+<text x="8.89" y="5.08" size="1.27" layer="25">&gt;NAME</text>
 </package>
 </packages>
 <symbols>
@@ -267,6 +268,76 @@ Simple RJ45, 8-pin connection - connector for common Cat5, Cat5e, and Cat6 Ether
 <pad name="VIN" x="16.51" y="36.83" drill="0.9"/>
 <pad name="MISO" x="16.51" y="39.37" drill="0.9"/>
 <pad name="SCK" x="16.51" y="41.91" drill="0.9"/>
+<wire x1="0" y1="-2.54" x2="17.78" y2="-2.54" width="0.127" layer="48"/>
+<wire x1="17.78" y1="-2.54" x2="17.78" y2="45.72" width="0.127" layer="48"/>
+<wire x1="17.78" y1="45.72" x2="0" y2="45.72" width="0.127" layer="48"/>
+<wire x1="0" y1="45.72" x2="0" y2="-2.54" width="0.127" layer="48"/>
+<text x="0.9525" y="46.4185" size="1.27" layer="25">&gt;NAME</text>
+<text x="0.1905" y="-5.08" size="1.27" layer="27">&gt;VALUE</text>
+<text x="2.54" y="41.275" size="1.27" layer="51">MOSI</text>
+<text x="2.54" y="38.735" size="1.27" layer="51">SS</text>
+<text x="2.54" y="36.195" size="1.27" layer="51">1/TX</text>
+<text x="2.54" y="33.655" size="1.27" layer="51">0/RX</text>
+<text x="2.54" y="31.115" size="1.27" layer="51">RESET</text>
+<text x="2.54" y="28.575" size="1.27" layer="51">GND</text>
+<text x="2.54" y="26.035" size="1.27" layer="51">2/SDA</text>
+<text x="2.54" y="23.495" size="1.27" layer="51">3/SCL</text>
+<text x="2.54" y="20.955" size="1.27" layer="51">4/A6</text>
+<text x="2.54" y="18.415" size="1.27" layer="51">5</text>
+<text x="2.54" y="15.875" size="1.27" layer="51">6/A7</text>
+<text x="2.54" y="13.335" size="1.27" layer="51">7</text>
+<text x="2.54" y="10.795" size="1.27" layer="51">8/A8</text>
+<text x="2.54" y="8.255" size="1.27" layer="51">9/A9</text>
+<text x="2.54" y="5.715" size="1.27" layer="51">10/A10</text>
+<text x="2.54" y="3.175" size="1.27" layer="51">11</text>
+<text x="2.54" y="0.635" size="1.27" layer="51">12/A11</text>
+<text x="15.24" y="42.545" size="1.27" layer="51" align="top-right">SCK</text>
+<text x="15.24" y="40.005" size="1.27" layer="51" align="top-right">MISO</text>
+<text x="15.24" y="37.465" size="1.27" layer="51" align="top-right">VIN</text>
+<text x="15.24" y="34.925" size="1.27" layer="51" align="top-right">GND</text>
+<text x="15.24" y="32.385" size="1.27" layer="51" align="top-right">RESET</text>
+<text x="15.24" y="29.845" size="1.27" layer="51" align="top-right">+5V</text>
+<text x="15.24" y="22.225" size="1.27" layer="51" align="top-right">A5</text>
+<text x="15.24" y="19.685" size="1.27" layer="51" align="top-right">A4</text>
+<text x="15.24" y="17.145" size="1.27" layer="51" align="top-right">A3</text>
+<text x="15.24" y="14.605" size="1.27" layer="51" align="top-right">A2</text>
+<text x="15.24" y="12.065" size="1.27" layer="51" align="top-right">A1</text>
+<text x="15.24" y="9.525" size="1.27" layer="51" align="top-right">A0</text>
+<text x="15.24" y="6.985" size="1.27" layer="51" align="top-right">AREF</text>
+<text x="15.24" y="4.445" size="1.27" layer="51" align="top-right">3.3V</text>
+<text x="15.24" y="1.905" size="1.27" layer="51" align="top-right">13</text>
+<text x="2.54" y="41.275" size="1.27" layer="52" rot="MR0" align="bottom-right">MOSI</text>
+<text x="2.54" y="38.735" size="1.27" layer="52" rot="MR0" align="bottom-right">SS</text>
+<text x="2.54" y="36.195" size="1.27" layer="52" rot="MR0" align="bottom-right">1/TX</text>
+<text x="2.54" y="33.655" size="1.27" layer="52" rot="MR0" align="bottom-right">0/RX</text>
+<text x="2.54" y="31.115" size="1.27" layer="52" font="vector" rot="MR0" align="bottom-right">RESET</text>
+<text x="2.54" y="28.575" size="1.27" layer="52" rot="MR0" align="bottom-right">GND</text>
+<text x="2.54" y="26.035" size="1.27" layer="52" rot="MR0" align="bottom-right">2/SDA</text>
+<text x="2.54" y="23.495" size="1.27" layer="52" rot="MR0" align="bottom-right">3/SCL</text>
+<text x="2.54" y="20.955" size="1.27" layer="52" rot="MR0" align="bottom-right">4/A6</text>
+<text x="2.54" y="18.415" size="1.27" layer="52" rot="MR0" align="bottom-right">5</text>
+<text x="2.54" y="15.875" size="1.27" layer="52" rot="MR0" align="bottom-right">6/A7</text>
+<text x="2.54" y="13.335" size="1.27" layer="52" rot="MR0" align="bottom-right">7</text>
+<text x="2.54" y="10.795" size="1.27" layer="52" rot="MR0" align="bottom-right">8/A8</text>
+<text x="2.54" y="8.255" size="1.27" layer="52" rot="MR0" align="bottom-right">9/A9</text>
+<text x="2.54" y="5.715" size="1.27" layer="52" rot="MR0" align="bottom-right">10/A10</text>
+<text x="2.54" y="3.175" size="1.27" layer="52" rot="MR0" align="bottom-right">11</text>
+<text x="2.54" y="0.635" size="1.27" layer="52" rot="MR0" align="bottom-right">12/A11</text>
+<text x="15.24" y="42.545" size="1.27" layer="52" rot="MR0" align="top-left">SCK</text>
+<text x="15.24" y="40.005" size="1.27" layer="52" rot="MR0" align="top-left">MISO</text>
+<text x="15.24" y="37.465" size="1.27" layer="52" rot="MR0" align="top-left">VIN</text>
+<text x="15.24" y="34.925" size="1.27" layer="52" rot="MR0" align="top-left">GND</text>
+<text x="15.24" y="32.385" size="1.27" layer="52" rot="MR0" align="top-left">RESET</text>
+<text x="15.24" y="29.845" size="1.27" layer="52" rot="MR0" align="top-left">+5V</text>
+<text x="15.24" y="22.225" size="1.27" layer="52" rot="MR0" align="top-left">A5</text>
+<text x="15.24" y="19.685" size="1.27" layer="52" rot="MR0" align="top-left">A4</text>
+<text x="15.24" y="17.145" size="1.27" layer="52" rot="MR0" align="top-left">A3</text>
+<text x="15.24" y="14.605" size="1.27" layer="52" rot="MR0" align="top-left">A2</text>
+<text x="15.24" y="12.065" size="1.27" layer="52" rot="MR0" align="top-left">A1</text>
+<text x="15.24" y="9.525" size="1.27" layer="52" rot="MR0" align="top-left">A0</text>
+<text x="15.24" y="6.985" size="1.27" layer="52" rot="MR0" align="top-left">AREF</text>
+<text x="15.24" y="4.445" size="1.27" layer="52" rot="MR0" align="top-left">3.3V</text>
+<text x="15.24" y="1.905" size="1.27" layer="52" rot="MR0" align="top-left">13</text>
 </package>
 </packages>
 <symbols>
@@ -469,7 +540,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <wire x1="14.605" y1="1.905" x2="9.525" y2="1.905" width="0.127" layer="51"/>
 <wire x1="7.62" y1="1.905" x2="9.525" y2="1.905" width="0.127" layer="51"/>
 <wire x1="9.525" y1="1.905" x2="9.525" y2="-5.715" width="0.127" layer="51"/>
-<text x="14.605" y="4.445" size="1.27" layer="48" rot="R180">NRF24L01+</text>
+<text x="14.605" y="4.445" size="1.27" layer="51" rot="R180">NRF24L01+</text>
 <wire x1="5.08" y1="0.635" x2="5.08" y2="-4.445" width="0.127" layer="51" curve="-126.869898"/>
 <wire x1="4.445" y1="0" x2="4.445" y2="-3.81" width="0.127" layer="51" curve="-126.869898"/>
 <wire x1="3.81" y1="-0.635" x2="3.81" y2="-3.175" width="0.127" layer="51" curve="-146.309932"/>
@@ -483,6 +554,14 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <text x="-6.985" y="-4.445" size="0.762" layer="21">MISO</text>
 <text x="-3.81" y="-4.445" size="0.762" layer="21">IRQ</text>
 <text x="-13.4112" y="6.2738" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="-4.445" y="3.175" size="0.762" layer="22" rot="MR0">GND</text>
+<text x="-1.27" y="3.175" size="0.762" layer="22" rot="MR0">VCC</text>
+<text x="-4.445" y="0.635" size="0.762" layer="22" rot="MR0">CE</text>
+<text x="-1.27" y="0.635" size="0.762" layer="22" rot="MR0">CSN</text>
+<text x="-4.445" y="-1.905" size="0.762" layer="22" rot="MR0">SCK</text>
+<text x="-1.27" y="-1.905" size="0.762" layer="22" rot="MR0">MOSI</text>
+<text x="-4.445" y="-4.445" size="0.762" layer="22" rot="MR0">MISO</text>
+<text x="-1.27" y="-4.445" size="0.762" layer="22" rot="MR0">IRQ</text>
 </package>
 <package name="NRF24L01+MINI">
 <wire x1="-5.715" y1="10.287" x2="6.35" y2="10.287" width="0.127" layer="51"/>
@@ -656,15 +735,20 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <smd name="VCC@1" x="-1.3" y="2.675" dx="0.4" dy="1.35" layer="1"/>
 <smd name="ID" x="0.65" y="2.675" dx="0.4" dy="1.35" layer="1"/>
 <smd name="GND@1" x="1.3" y="2.675" dx="0.4" dy="1.35" layer="1"/>
-<smd name="GND@3" x="3.2" y="2.425" dx="1.6" dy="1.4" layer="1"/>
-<smd name="GND@2" x="-3.2" y="2.425" dx="1.6" dy="1.4" layer="1"/>
+<smd name="GND@3" x="3.2" y="2.45" dx="1.6" dy="1.4" layer="1"/>
+<smd name="GND@2" x="-3.2" y="2.45" dx="1.6" dy="1.4" layer="1"/>
 <smd name="GNF@4" x="-1.05" y="0" dx="1.6" dy="1.9" layer="1"/>
 <smd name="GND@5" x="1.05" y="0" dx="1.6" dy="1.9" layer="1" rot="R180"/>
 <pad name="GND@6" x="-3.3" y="0" drill="1.1" diameter="1.5"/>
 <pad name="GND@7" x="3.3" y="0" drill="1.1" diameter="1.5"/>
-<wire x1="-4.1" y1="-1.45" x2="4.1" y2="-1.45" width="0.05" layer="20" style="shortdash"/>
-<pad name="VCC@2" x="-1.3" y="4.5" drill="0.8"/>
-<wire x1="-1.3" y1="4.5" x2="-1.3" y2="2.675" width="0.4" layer="1"/>
+<wire x1="-3.75" y1="-1.45" x2="3.75" y2="-1.45" width="0.05" layer="49"/>
+<wire x1="-3.75" y1="-1.45" x2="-3.75" y2="3.65" width="0.05" layer="49"/>
+<wire x1="3.75" y1="-1.45" x2="3.75" y2="3.65" width="0.05" layer="49"/>
+<wire x1="-3.75" y1="3.65" x2="3.75" y2="3.65" width="0.05" layer="49"/>
+<wire x1="-3.9" y1="-1.9" x2="3.9" y2="-1.9" width="0.05" layer="49"/>
+<wire x1="-3.9" y1="-1.9" x2="-3.75" y2="-1.45" width="0.05" layer="49"/>
+<wire x1="3.75" y1="-1.45" x2="3.9" y2="-1.9" width="0.05" layer="49"/>
+<wire x1="-5" y1="-2.1" x2="5" y2="-2.1" width="0.05" layer="49"/>
 </package>
 <package name="CAP-CUSTOM">
 <pad name="VCC" x="2.5" y="0" drill="0.8"/>
@@ -684,6 +768,8 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <rectangle x1="-0.75" y1="-1" x2="-0.25" y2="1" layer="21"/>
 <wire x1="-0.635" y1="0" x2="-1.5875" y2="0" width="0.127" layer="21"/>
 <wire x1="1.5875" y1="0" x2="0.762" y2="0" width="0.127" layer="21"/>
+<text x="5.08" y="3.81" size="1.27" layer="25">&gt;NAME</text>
+<text x="5.08" y="-3.81" size="1.27" layer="27">&gt;VALUE</text>
 </package>
 </packages>
 <symbols>
@@ -705,6 +791,8 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <wire x1="-2.54" y1="1.27" x2="2.54" y2="1.27" width="0.254" layer="94"/>
 <wire x1="2.54" y1="2.54" x2="4.064" y2="2.54" width="0.254" layer="94"/>
 <wire x1="3.302" y1="1.778" x2="3.302" y2="3.302" width="0.254" layer="94"/>
+<text x="5.08" y="5.08" size="1.27" layer="94">&gt;VALUE</text>
+<text x="5.08" y="2.54" size="1.27" layer="94">&gt;NAME</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -719,7 +807,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <connect gate="G$1" pin="D-" pad="D-"/>
 <connect gate="G$1" pin="GND" pad="GND@1 GND@2 GND@3 GND@5 GND@6 GND@7 GNF@4"/>
 <connect gate="G$1" pin="ID" pad="ID"/>
-<connect gate="G$1" pin="VCC" pad="VCC@1 VCC@2"/>
+<connect gate="G$1" pin="VCC" pad="VCC@1"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -727,7 +815,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </device>
 </devices>
 </deviceset>
-<deviceset name="CAP-CUSTOM">
+<deviceset name="CAP-CUSTOM" uservalue="yes">
 <gates>
 <gate name="G$1" symbol="CAP-CUSTOM" x="0" y="0"/>
 </gates>
@@ -756,21 +844,21 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </classes>
 <parts>
 <part name="JP1" library="SparkFun-Connectors" deviceset="RJ45-8" device="PTH" value="RJ45"/>
-<part name="U$1" library="arduino-micro" deviceset="ARDUINO_MICRO" device="FOOTPRINT"/>
-<part name="U$2" library="nrf24L01%2B" deviceset="NRF24L01+" device=""/>
+<part name="U1" library="arduino-micro" deviceset="ARDUINO_MICRO" device="FOOTPRINT"/>
+<part name="U2" library="nrf24L01%2B" deviceset="NRF24L01+" device=""/>
 <part name="P+3" library="supply1" deviceset="VCC" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="P+4" library="supply1" deviceset="VCC" device=""/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" deviceset="VCC" device=""/>
-<part name="U$3" library="usb" deviceset="USB-MICRO-B" device=""/>
-<part name="U$4" library="usb" deviceset="USB-MICRO-B" device=""/>
+<part name="JP4" library="usb" deviceset="USB-MICRO-B" device=""/>
+<part name="JP3" library="usb" deviceset="USB-MICRO-B" device=""/>
 <part name="P+6" library="supply1" deviceset="VCC" device=""/>
 <part name="P+7" library="supply1" deviceset="VCC" device=""/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
-<part name="C1" library="usb" deviceset="CAP-CUSTOM" device=""/>
+<part name="C1" library="usb" deviceset="CAP-CUSTOM" device="" value="1000µF"/>
 <part name="GND1" library="supply1" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" deviceset="VCC" device=""/>
 <part name="GND2" library="supply1" deviceset="GND" device=""/>
@@ -784,16 +872,16 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </plain>
 <instances>
 <instance part="JP1" gate="JP1" x="58.42" y="43.18" rot="R180"/>
-<instance part="U$1" gate="G$1" x="104.14" y="58.42"/>
-<instance part="U$2" gate="G$1" x="101.6" y="102.87"/>
+<instance part="U1" gate="G$1" x="104.14" y="58.42"/>
+<instance part="U2" gate="G$1" x="101.6" y="102.87"/>
 <instance part="P+3" gate="VCC" x="132.08" y="76.2"/>
-<instance part="GND3" gate="1" x="81.28" y="63.5"/>
-<instance part="GND4" gate="1" x="78.74" y="101.6"/>
+<instance part="GND3" gate="1" x="81.28" y="66.04"/>
+<instance part="GND4" gate="1" x="81.28" y="104.14"/>
 <instance part="P+4" gate="VCC" x="86.36" y="104.14"/>
 <instance part="GND5" gate="1" x="71.12" y="50.8"/>
 <instance part="P+5" gate="VCC" x="66.04" y="55.88"/>
-<instance part="U$3" gate="G$1" x="35.56" y="109.22" rot="R90"/>
-<instance part="U$4" gate="G$1" x="60.96" y="109.22" rot="R90"/>
+<instance part="JP4" gate="G$1" x="35.56" y="109.22" rot="R90"/>
+<instance part="JP3" gate="G$1" x="60.96" y="109.22" rot="R90"/>
 <instance part="P+6" gate="VCC" x="27.94" y="101.6"/>
 <instance part="P+7" gate="VCC" x="53.34" y="101.6"/>
 <instance part="GND6" gate="1" x="27.94" y="116.84"/>
@@ -811,12 +899,12 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <nets>
 <net name="VCC" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="VIN"/>
+<pinref part="U1" gate="G$1" pin="VIN"/>
 <pinref part="P+3" gate="VCC" pin="VCC"/>
 <wire x1="132.08" y1="73.66" x2="121.92" y2="73.66" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="VCC"/>
+<pinref part="U2" gate="G$1" pin="VCC"/>
 <pinref part="P+4" gate="VCC" pin="VCC"/>
 <wire x1="86.36" y1="101.6" x2="88.9" y2="101.6" width="0.1524" layer="91"/>
 </segment>
@@ -825,12 +913,12 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <pinref part="P+5" gate="VCC" pin="VCC"/>
 </segment>
 <segment>
-<pinref part="U$3" gate="G$1" pin="VCC"/>
+<pinref part="JP4" gate="G$1" pin="VCC"/>
 <pinref part="P+6" gate="VCC" pin="VCC"/>
 <wire x1="27.94" y1="99.06" x2="30.48" y2="99.06" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="VCC"/>
+<pinref part="JP3" gate="G$1" pin="VCC"/>
 <pinref part="P+7" gate="VCC" pin="VCC"/>
 <wire x1="53.34" y1="99.06" x2="55.88" y2="99.06" width="0.1524" layer="91"/>
 </segment>
@@ -846,14 +934,14 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="GND" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="GND"/>
+<pinref part="U1" gate="G$1" pin="GND"/>
 <pinref part="GND3" gate="1" pin="GND"/>
-<wire x1="81.28" y1="66.04" x2="86.36" y2="66.04" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="68.58" x2="86.36" y2="66.04" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$2" gate="G$1" pin="GND"/>
+<pinref part="U2" gate="G$1" pin="GND"/>
 <pinref part="GND4" gate="1" pin="GND"/>
-<wire x1="78.74" y1="104.14" x2="88.9" y2="104.14" width="0.1524" layer="91"/>
+<wire x1="81.28" y1="106.68" x2="88.9" y2="104.14" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="JP1" gate="JP1" pin="7"/>
@@ -861,12 +949,12 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <wire x1="71.12" y1="53.34" x2="66.04" y2="50.8" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$3" gate="G$1" pin="GND"/>
+<pinref part="JP4" gate="G$1" pin="GND"/>
 <pinref part="GND6" gate="1" pin="GND"/>
 <wire x1="27.94" y1="119.38" x2="30.48" y2="119.38" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U$4" gate="G$1" pin="GND"/>
+<pinref part="JP3" gate="G$1" pin="GND"/>
 <pinref part="GND7" gate="1" pin="GND"/>
 <wire x1="53.34" y1="119.38" x2="55.88" y2="119.38" width="0.1524" layer="91"/>
 </segment>
@@ -875,7 +963,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <pinref part="GND1" gate="1" pin="GND"/>
 </segment>
 <segment>
-<pinref part="U$1" gate="G$1" pin="GND1"/>
+<pinref part="U1" gate="G$1" pin="GND1"/>
 <pinref part="GND2" gate="1" pin="GND"/>
 <wire x1="132.08" y1="71.12" x2="121.92" y2="71.12" width="0.1524" layer="91"/>
 </segment>
@@ -888,35 +976,35 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <net name="N$1" class="0">
 <segment>
 <wire x1="124.46" y1="99.06" x2="124.46" y2="76.2" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="MISO"/>
+<pinref part="U1" gate="G$1" pin="MISO"/>
 <wire x1="124.46" y1="76.2" x2="121.92" y2="76.2" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="MISO"/>
+<pinref part="U2" gate="G$1" pin="MISO"/>
 <wire x1="124.46" y1="99.06" x2="116.84" y2="99.06" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$2" class="0">
 <segment>
 <wire x1="127" y1="104.14" x2="127" y2="78.74" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="SCK"/>
+<pinref part="U1" gate="G$1" pin="SCK"/>
 <wire x1="127" y1="78.74" x2="121.92" y2="78.74" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="SCK"/>
+<pinref part="U2" gate="G$1" pin="SCK"/>
 <wire x1="127" y1="104.14" x2="116.84" y2="104.14" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
 <segment>
-<pinref part="U$2" gate="G$1" pin="CSN"/>
+<pinref part="U2" gate="G$1" pin="CSN"/>
 <wire x1="76.2" y1="96.52" x2="88.9" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="76.2" y1="53.34" x2="76.2" y2="96.52" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="D6*"/>
+<pinref part="U1" gate="G$1" pin="D6*"/>
 <wire x1="76.2" y1="53.34" x2="86.36" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$4" class="0">
 <segment>
-<pinref part="U$2" gate="G$1" pin="CE"/>
+<pinref part="U2" gate="G$1" pin="CE"/>
 <wire x1="73.66" y1="99.06" x2="88.9" y2="99.06" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="D5*"/>
+<pinref part="U1" gate="G$1" pin="D5*"/>
 <wire x1="86.36" y1="55.88" x2="73.66" y2="55.88" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="55.88" x2="73.66" y2="99.06" width="0.1524" layer="91"/>
 </segment>
@@ -924,10 +1012,10 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <net name="N$5" class="0">
 <segment>
 <wire x1="121.92" y1="101.6" x2="121.92" y2="83.82" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="MOSI"/>
+<pinref part="U1" gate="G$1" pin="MOSI"/>
 <wire x1="121.92" y1="83.82" x2="86.36" y2="83.82" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="83.82" x2="86.36" y2="78.74" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="MOSI"/>
+<pinref part="U2" gate="G$1" pin="MOSI"/>
 <wire x1="121.92" y1="101.6" x2="116.84" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -935,15 +1023,15 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <segment>
 <wire x1="116.84" y1="86.36" x2="78.74" y2="86.36" width="0.1524" layer="91"/>
 <wire x1="78.74" y1="86.36" x2="78.74" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="D7"/>
+<pinref part="U1" gate="G$1" pin="D7"/>
 <wire x1="78.74" y1="50.8" x2="86.36" y2="50.8" width="0.1524" layer="91"/>
-<pinref part="U$2" gate="G$1" pin="IRQ"/>
+<pinref part="U2" gate="G$1" pin="IRQ"/>
 <wire x1="116.84" y1="96.52" x2="116.84" y2="86.36" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$10" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="IO12*"/>
+<pinref part="U1" gate="G$1" pin="IO12*"/>
 <wire x1="86.36" y1="38.1" x2="83.82" y2="38.1" width="0.1524" layer="91"/>
 <wire x1="83.82" y1="38.1" x2="83.82" y2="35.56" width="0.1524" layer="91"/>
 <pinref part="JP1" gate="JP1" pin="1"/>
@@ -952,7 +1040,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$11" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="A0"/>
+<pinref part="U1" gate="G$1" pin="A0"/>
 <wire x1="121.92" y1="45.72" x2="127" y2="45.72" width="0.1524" layer="91"/>
 <wire x1="127" y1="45.72" x2="127" y2="33.02" width="0.1524" layer="91"/>
 <wire x1="127" y1="33.02" x2="68.58" y2="33.02" width="0.1524" layer="91"/>
@@ -963,7 +1051,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$7" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="IO11*"/>
+<pinref part="U1" gate="G$1" pin="IO11*"/>
 <wire x1="86.36" y1="40.64" x2="81.28" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="40.64" x2="81.28" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="JP1" gate="JP1" pin="2"/>
@@ -972,7 +1060,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$8" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="IO10*"/>
+<pinref part="U1" gate="G$1" pin="IO10*"/>
 <wire x1="86.36" y1="43.18" x2="78.74" y2="43.18" width="0.1524" layer="91"/>
 <wire x1="78.74" y1="43.18" x2="78.74" y2="40.64" width="0.1524" layer="91"/>
 <pinref part="JP1" gate="JP1" pin="3"/>
@@ -981,7 +1069,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$9" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="IO9*"/>
+<pinref part="U1" gate="G$1" pin="IO9*"/>
 <wire x1="86.36" y1="45.72" x2="76.2" y2="45.72" width="0.1524" layer="91"/>
 <wire x1="76.2" y1="45.72" x2="76.2" y2="43.18" width="0.1524" layer="91"/>
 <pinref part="JP1" gate="JP1" pin="4"/>
@@ -990,7 +1078,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$12" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="IO8"/>
+<pinref part="U1" gate="G$1" pin="IO8"/>
 <wire x1="86.36" y1="48.26" x2="73.66" y2="48.26" width="0.1524" layer="91"/>
 <wire x1="73.66" y1="48.26" x2="73.66" y2="45.72" width="0.1524" layer="91"/>
 <pinref part="JP1" gate="JP1" pin="5"/>
@@ -999,7 +1087,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$13" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="D2/SDA"/>
+<pinref part="U1" gate="G$1" pin="D2/SDA"/>
 <wire x1="86.36" y1="63.5" x2="71.12" y2="63.5" width="0.1524" layer="91"/>
 <wire x1="71.12" y1="63.5" x2="71.12" y2="78.74" width="0.1524" layer="91"/>
 <pinref part="JP2" gate="JP1" pin="5"/>
@@ -1008,7 +1096,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$14" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="D3/SCL"/>
+<pinref part="U1" gate="G$1" pin="D3/SCL"/>
 <wire x1="86.36" y1="60.96" x2="68.58" y2="60.96" width="0.1524" layer="91"/>
 <wire x1="68.58" y1="60.96" x2="68.58" y2="76.2" width="0.1524" layer="91"/>
 <pinref part="JP2" gate="JP1" pin="4"/>
@@ -1017,7 +1105,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$15" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="D4*"/>
+<pinref part="U1" gate="G$1" pin="D4*"/>
 <wire x1="86.36" y1="58.42" x2="66.04" y2="58.42" width="0.1524" layer="91"/>
 <wire x1="66.04" y1="58.42" x2="66.04" y2="73.66" width="0.1524" layer="91"/>
 <pinref part="JP2" gate="JP1" pin="3"/>
@@ -1026,7 +1114,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 </net>
 <net name="N$16" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="D0/RX"/>
+<pinref part="U1" gate="G$1" pin="D0/RX"/>
 <wire x1="86.36" y1="71.12" x2="81.28" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="71.12" x2="81.28" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="JP2" gate="JP1" pin="6"/>
@@ -1041,7 +1129,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <wire x1="40.64" y1="63.5" x2="40.64" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="40.64" y1="27.94" x2="132.08" y2="27.94" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="27.94" x2="132.08" y2="48.26" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="A1"/>
+<pinref part="U1" gate="G$1" pin="A1"/>
 <wire x1="132.08" y1="48.26" x2="121.92" y2="48.26" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -1054,7 +1142,7 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <wire x1="43.18" y1="60.96" x2="43.18" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="43.18" y1="30.48" x2="129.54" y2="30.48" width="0.1524" layer="91"/>
 <wire x1="129.54" y1="30.48" x2="129.54" y2="38.1" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="IO13*"/>
+<pinref part="U1" gate="G$1" pin="IO13*"/>
 <wire x1="129.54" y1="38.1" x2="121.92" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 </net>
