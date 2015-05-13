@@ -15,8 +15,8 @@ void Lightcycle::UpdatePhysics( )
 
     if(showingWinningLEDs) {
       for(i=0; i < BOARD_SIZE; i++) {
-        SetPixel(0,i, 0,0,0 );
-        SetPixel(BOARD_SIZE-1,i, 0,0,0 );
+        SetPixel(0,i, EMPTY_COLOR);
+        SetPixel(BOARD_SIZE-1,i, EMPTY_COLOR);
       }
       showingWinningLEDs = 0;
     }
@@ -58,8 +58,8 @@ void Lightcycle::UpdatePhysics( )
       losers |= 0x02;
     }
 
-    SetPixel(p1pos[X], p1pos[Y], 0,0x40,0);
-    SetPixel(p2pos[X], p2pos[Y], 0,0,0x40);
+    SetPixel(p1pos[X], p1pos[Y], P1_COLOR);
+    SetPixel(p2pos[X], p2pos[Y], P2_COLOR);
 
     // Check for a new round
     if(losers) {
@@ -78,7 +78,7 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
   uint8_t x, y;
   for(x = 0; x < BOARD_SIZE; x++) {
     for(y = 0; y < BOARD_SIZE; y++) {
-      SetPixel(x, y, 0, 0, 0);
+      SetPixel(x, y, EMPTY_COLOR);
     }
   }
 
@@ -92,8 +92,8 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
   p2dir = LEFT;
 
   // Draw the initial cycles
-  SetPixel(p1pos[X], p1pos[Y], 0,0x40,0);
-  SetPixel(p2pos[X], p2pos[Y], 0,0,0x40);
+  SetPixel(p1pos[X], p1pos[Y], P1_COLOR);
+  SetPixel(p2pos[X], p2pos[Y], P2_COLOR);
 
   // If there was a winner, draw some lights
   if((whoWon & 0x01) && (whoWon & 0x02)) {
@@ -101,13 +101,13 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
   }
   else if(whoWon & 0x01) {
     for(i=0; i < BOARD_SIZE; i++) {
-      SetPixel(BOARD_SIZE-1, i, 0,0,0x40);
+      SetPixel(BOARD_SIZE-1, i, P2_COLOR);
       showingWinningLEDs = 1;
     }
   }
   else if(whoWon & 0x02) {
     for(i=0; i < BOARD_SIZE; i++) {
-      SetPixel(0, i, 0,0x40,0);
+      SetPixel(0, i, P1_COLOR);
       showingWinningLEDs = 1;
     }
   }

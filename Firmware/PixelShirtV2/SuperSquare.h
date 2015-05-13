@@ -29,8 +29,7 @@ class SuperSquare : public ArduinoGame
                      int8_t p2b2, int8_t p2b3);
  private:
   void PlacePlayerPixel(uint8_t position[]);
-  uint8_t DrawLine(  Line line,
-                    uint8_t r, uint8_t g, uint8_t b);
+  uint8_t DrawLine( Line line, uint32_t rgb);
   void AddLine(uint8_t direction, uint16_t velocity);
 
   int16_t playerPosition;

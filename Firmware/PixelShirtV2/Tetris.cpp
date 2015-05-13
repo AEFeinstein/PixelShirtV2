@@ -1,5 +1,7 @@
 #include "Tetris.h"
 
+#define WALL_COLOR  0x000040
+
 Tetris::Tetris()
 {
   multiplayer = 1;
@@ -13,7 +15,7 @@ void Tetris::ResetGame(
   uint8_t x, y;
   for(x = 0; x < BOARD_SIZE; x++) {
     for(y = 0; y < BOARD_SIZE; y++) {
-      SetPixel(x, y, 0, 0, 0);
+      SetPixel(x, y, EMPTY_COLOR);
     }
   }
       
@@ -28,8 +30,8 @@ void Tetris::ResetGame(
     DrawNextTetromino();
   }
   for(i=0; i < BOARD_SIZE; i++) {
-    SetPixel(3,i,0,0,0x40);
-    SetPixel(14,i,0,0,0x40);
+    SetPixel(3,i,WALL_COLOR);
+    SetPixel(14,i,WALL_COLOR);
   }
 
   rotatedYet = 0;
@@ -195,18 +197,14 @@ uint8_t Tetris::NewActiveTetromino(
     r = (0x40 * r) / sum;
     g = (0x40 * g) / sum;
     b = (0x40 * b) / sum;
-    nextTetrominoColor[0] = r;
-    nextTetrominoColor[1] = g;
-    nextTetrominoColor[2] = b;
+    nextTetrominoColor = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
     return 0;
   }
   else {
     activeType = nextType;
     nextType = (tetromino)random(7);
 
-    activeTetrominoColor[0] = nextTetrominoColor[0];
-    activeTetrominoColor[1] = nextTetrominoColor[1];
-    activeTetrominoColor[2] = nextTetrominoColor[2];
+    activeTetrominoColor = nextTetrominoColor;
     uint8_t r = random(0xFF);
     uint8_t g = random(0xFF);
     uint8_t b = random(0xFF);
@@ -214,9 +212,7 @@ uint8_t Tetris::NewActiveTetromino(
     r = (0x40 * r) / sum;
     g = (0x40 * g) / sum;
     b = (0x40 * b) / sum;
-    nextTetrominoColor[0] = r;
-    nextTetrominoColor[1] = g;
-    nextTetrominoColor[2] = b;
+    nextTetrominoColor = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
   }
 
   switch(nextType) {
@@ -331,7 +327,7 @@ void Tetris::ClearActiveTetromino( )
       SetPixel(
         activeTetromino[i][X] + activeOffset[X],
         activeTetromino[i][Y] + activeOffset[Y],
-        0,0,0);
+        EMPTY_COLOR);
     }
   }
 }
@@ -344,9 +340,7 @@ void Tetris::DrawActiveTetromino( )
       SetPixel(
         activeTetromino[i][X] + activeOffset[X],
         activeTetromino[i][Y] + activeOffset[Y],
-        activeTetrominoColor[0],
-        activeTetrominoColor[1],
-        activeTetrominoColor[2]);
+        activeTetrominoColor);
     }
   }
 }
@@ -355,7 +349,7 @@ void Tetris::ClearNextTetromino( )
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
-    SetPixel(nextTetromino[i][X], nextTetromino[i][Y], 0,0,0);
+    SetPixel(nextTetromino[i][X], nextTetromino[i][Y], EMPTY_COLOR);
   }
 }
 
@@ -363,8 +357,7 @@ void Tetris::DrawNextTetromino( )
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
-    SetPixel(nextTetromino[i][X], nextTetromino[i][Y], nextTetrominoColor[0],
-             nextTetrominoColor[1], nextTetrominoColor[2]);
+    SetPixel(nextTetromino[i][X], nextTetromino[i][Y], nextTetrominoColor);
   }
 }
 
@@ -398,8 +391,7 @@ uint8_t Tetris::DropActiveTetromino( )
     // Set the piece
     for(i=0; i < 4; i++) {
       SetPixel(activeTetromino[i][X] + activeOffset[X],
-               activeTetromino[i][Y] + activeOffset[Y], activeTetrominoColor[0],
-               activeTetrominoColor[1], activeTetrominoColor[2]);
+               activeTetromino[i][Y] + activeOffset[Y], activeTetrominoColor);
     }
 
     // check for rows to clear, clear them
@@ -419,7 +411,7 @@ uint8_t Tetris::DropActiveTetromino( )
           }
         }
         for(k=4; k < 14; k++) {
-          SetPixel(k, 0,0,0, 0);
+          SetPixel(k, 0,EMPTY_COLOR);
         }
       }
     }
@@ -430,7 +422,7 @@ uint8_t Tetris::DropActiveTetromino( )
 
       for(i=0; i < rowsCleared; i++) {
         if(BOARD_SIZE-1-i >= 0) {
-          SetPixel(BOARD_SIZE-1, BOARD_SIZE-1-i, 0,0x40,0);
+          SetPixel(BOARD_SIZE-1, BOARD_SIZE-1-i, SCORE_COLOR);
         }
       }
 

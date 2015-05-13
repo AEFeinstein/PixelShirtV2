@@ -20,6 +20,11 @@
 
 #define RANDOM_PIN   4  // Analog, not connected
 
+#define EMPTY_COLOR 0x000000
+#define SCORE_COLOR 0x004000
+#define P1_COLOR    0x000040
+#define P2_COLOR    0x400000
+
 /*
  * Lookup tables!
  */
@@ -67,13 +72,10 @@ class ArduinoGame
 
 
 /* Function prototype */
-void SetPixel(int8_t x, int8_t y, uint8_t r, uint8_t g, uint8_t b);
 void SetPixel(int8_t y, int8_t x, uint32_t val);
 uint32_t GetPixel(int8_t x, int8_t y);
-void DisplayScore( uint16_t score);
-void DrawNumber( uint8_t number,
-                 uint8_t offsetX, uint8_t offsetY, uint8_t r,
-                 uint8_t g, uint8_t b);
+void DisplayScore( uint16_t score, uint32_t rgb);
+void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb);
 
 #define IsPixelLit(x,y) GetPixel(x, y)
 

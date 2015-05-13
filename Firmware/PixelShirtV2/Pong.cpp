@@ -6,6 +6,8 @@
  *                         *
  ***************************/
 
+#define BALL_COLOR 0x004000
+
 void Pong::UpdatePhysics( )
 {
   int16_t diff, rotation;
@@ -143,17 +145,17 @@ void Pong::DrawField( )
     for (j = 0; j < BOARD_SIZE; j++) {
       if ((j == 0) && ((paddleLocL / (S_M * V_M)) <= i
                        && i < (paddleLocL / (S_M * V_M)) + PADDLE_SIZE / (V_M * S_M))) {
-        SetPixel(j, i, 0x40,0,0);
+        SetPixel(j, i, P1_COLOR);
       }
       else if ((j == (BOARD_SIZE - 1)) && ((paddleLocR / (S_M * V_M)) <= i
                                            && i < (paddleLocR / (S_M * V_M)) + PADDLE_SIZE / (V_M * S_M))) {
-        SetPixel(j, i, 0,0,0x40);
+        SetPixel(j, i, P2_COLOR);
       }
       else if (j == (ballLoc[X] / (S_M * V_M)) && i == (ballLoc[Y] / (S_M * V_M))) {
-        SetPixel(j, i, 0,0x40,0);
+        SetPixel(j, i, BALL_COLOR);
       }
       else {
-        SetPixel(j, i, 0,0,0);
+        SetPixel(j, i, EMPTY_COLOR);
       }
     }
   }

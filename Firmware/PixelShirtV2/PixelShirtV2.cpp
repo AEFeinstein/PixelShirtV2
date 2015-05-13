@@ -78,14 +78,14 @@ void setup()
   uint8_t x, y;
   for(x = 0; x < BOARD_SIZE; x++) {
     for(y = 0; y < BOARD_SIZE; y++) {
-      SetPixel(x, y, 0, 0, 0);
+      SetPixel(x, y, EMPTY_COLOR);
     }
   }
   downTimer = 0;
 
   /* Set the current game */
-  gameMode = SUPER_SQUARE;
-  currentGame = &superSquare;
+  gameMode = SHOOTER;
+  currentGame = &shooter;
   currentGame->ResetGame(1,0);
 
   /* init hardware pins */
@@ -224,184 +224,161 @@ void doEverything()
   pixels3.show();
 }
 
-void DisplayScore(  uint16_t score)
+void DisplayScore(  uint16_t score, uint32_t rgb)
 {
   uint8_t i, j;
   for(i = 0; i < BOARD_SIZE; i++) {
     for(j = 0; j < BOARD_SIZE; j++) {
-      SetPixel(i, j, 0,0,0);
+      SetPixel(i, j, EMPTY_COLOR);
     }
   }
 
   // draw "score" on the field
   if(score > 999) {
-    DrawNumber((score / 1000) % 10, 0 , 5, 0,0x40,0);
+    DrawNumber((score / 1000) % 10, 0 , 5, rgb);
   }
   if(score > 99) {
-    DrawNumber((score / 100 ) % 10, 4 , 5, 0,0x40,0);
+    DrawNumber((score / 100 ) % 10, 4 , 5, rgb);
   }
   if(score > 9) {
-    DrawNumber((score / 10  ) % 10, 8 , 5, 0,0x40,0);
+    DrawNumber((score / 10  ) % 10, 8 , 5, rgb);
   }
-  DrawNumber((score / 1   ) % 10, 12, 5, 0,0x40,0);
+  DrawNumber((score / 1   ) % 10, 12, 5, rgb);
 }
 
-void DrawNumber( uint8_t number,
-                 uint8_t offsetX, uint8_t offsetY, uint8_t r,
-                 uint8_t g, uint8_t b)
+void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
 {
   switch(number) {
     case 0: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 0, offsetY + 1, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 0, offsetY + 3, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 0, offsetY + 4, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 1: {
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 2: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 0, offsetY + 3, rgb);
+        SetPixel(offsetX + 0, offsetY + 4, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 3: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 0, offsetY + 4, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 4: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 0, offsetY + 1, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 5: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 0, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 0, offsetY + 4, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 6: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 0, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 0, offsetY + 3, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 0, offsetY + 4, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 7: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 3, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
         break;
       }
     case 8: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 4, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 0, offsetY + 1, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 0, offsetY + 3, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 0, offsetY + 4, rgb);
+        SetPixel(offsetX + 1, offsetY + 4, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
     case 9: {
-        SetPixel(offsetX + 0, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 0, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 1, r, g, b);
-        SetPixel(offsetX + 0, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 1, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 2, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 3, r, g, b);
-        SetPixel(offsetX + 2, offsetY + 4, r, g, b);
+        SetPixel(offsetX + 0, offsetY + 0, rgb);
+        SetPixel(offsetX + 1, offsetY + 0, rgb);
+        SetPixel(offsetX + 2, offsetY + 0, rgb);
+        SetPixel(offsetX + 0, offsetY + 1, rgb);
+        SetPixel(offsetX + 2, offsetY + 1, rgb);
+        SetPixel(offsetX + 0, offsetY + 2, rgb);
+        SetPixel(offsetX + 1, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 2, rgb);
+        SetPixel(offsetX + 2, offsetY + 3, rgb);
+        SetPixel(offsetX + 2, offsetY + 4, rgb);
         break;
       }
-  }
-}
-
-/* Sets a pixel in the matrix */
-void SetPixel(int8_t x, int8_t y, uint8_t r, uint8_t g, uint8_t b)
-{
-  uint8_t index = (-16 * (x%4)) + 63 - y;
-
-  switch(x / 4) {
-    case 0:
-      pixels0.setPixelColor(index, r, g, b);
-      break;
-    case 1:
-      pixels1.setPixelColor(index, r, g, b);
-      break;
-    case 2:
-      pixels2.setPixelColor(index, r, g, b);
-      break;
-    case 3:
-      pixels3.setPixelColor(index, r, g, b);
-      break;
   }
 }
 

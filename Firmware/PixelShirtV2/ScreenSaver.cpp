@@ -8,7 +8,7 @@ uint8_t colorStep = 0;
 #define RED   0
 #define GREEN 1
 #define BLUE  2
-uint8_t getIntensity(uint8_t step, uint8_t color);
+uint32_t getIntensity(uint8_t step);
 uint8_t screensaverShiftTimer = IRQ_HZ / 4;
 
 void ExitScreensaver(ArduinoGame * currentGame) {
@@ -17,7 +17,7 @@ void ExitScreensaver(ArduinoGame * currentGame) {
     uint8_t x, y;
     for (x = 0; x < BOARD_SIZE; x++) {
       for (y = 0; y < BOARD_SIZE; y++) {
-        SetPixel(x, y, 0, 0, 0);
+        SetPixel(x, y, EMPTY_COLOR);
       }
     }
     currentGame->ResetGame(1, 0);
@@ -33,7 +33,7 @@ void HandleScreensaverTimer() {
       uint8_t x, y;
       for (x = 0; x < BOARD_SIZE; x++) {
         for (y = 0; y < BOARD_SIZE; y++) {
-          SetPixel(x, y, 0, 0, 0);
+          SetPixel(x, y, EMPTY_COLOR);
         }
       }
     }
@@ -63,36 +63,32 @@ void DisplayScreensaver() {
 
     /* Clear rightmost column */
     for (y = 0; y < BOARD_SIZE; y++) {
-      SetPixel(BOARD_SIZE - 1, y, 0, 0, 0);
+      SetPixel(BOARD_SIZE - 1, y, EMPTY_COLOR);
     }
 
     /* Draw new rightmost column */
     if (squareWavePoint < SQUARE_WAVE_SIZE - 2) {
       /* top bar */
       SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
-               getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
-               getIntensity(colorStep, BLUE));
+               getIntensity(colorStep));
     }
     else if (squareWavePoint == SQUARE_WAVE_SIZE - 2) {
       /* falling edge */
       for (y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
-                 getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep));
       }
     }
     else if (squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 3) {
       /* bottom bar */
       SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
-               getIntensity(colorStep, RED), getIntensity(colorStep, GREEN),
-               getIntensity(colorStep, BLUE));
+    		  getIntensity(colorStep));
     }
     else if (squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 3) {
       /* rising edge */
       for (y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep, RED),
-                 getIntensity(colorStep, GREEN), getIntensity(colorStep, BLUE));
+        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep));
       }
     }
     squareWavePoint = (squareWavePoint + 1) % ((SQUARE_WAVE_SIZE - 1) * 2);
@@ -100,39 +96,32 @@ void DisplayScreensaver() {
   }
 }
 
-uint8_t getIntensity(uint8_t step, uint8_t color)
+uint32_t getIntensity(uint8_t step)
 {
-  switch (color) {
-    case RED:
-      if (step < 8) {
+    uint8_t red = 0, green = 0, blue = 0;
+	if (step < 8) {
         /* rise */
-        return (0x01 << (step));
+        red = (0x01 << (step));
       }
       else if (step < 16) {
         /* fall */
-        return (0x80 >> (step - 8));
+    	  red =  (0x80 >> (step - 8));
       }
-      return 0;
-    case GREEN:
       if (step >= 16) {
         /* fall */
-        return (0x80 >> (step - 16));
+        green = (0x80 >> (step - 16));
       }
       else if (step >= 8) {
         /* rise */
-        return (0x01 << (step - 8));
+        green = (0x01 << (step - 8));
       }
-      return 0;
-    case BLUE:
       if (step < 8) {
         /* fall */
-        return (0x80 >> step);
+        blue = (0x80 >> step);
       }
       else if (step >= 16) {
         /* rise */
-        return (0x01 << (step - 16));
+        blue = (0x01 << (step - 16));
       }
-      return 0;
-  }
-  return 0;
+      return ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue;
 }

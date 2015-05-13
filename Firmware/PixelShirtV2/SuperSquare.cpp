@@ -1,5 +1,8 @@
 #include "SuperSquare.h"
 
+#define CENTER_COLOR 0x004000
+#define LINE_COLOR   0x400000
+
 void SuperSquare::UpdatePhysics( )
 {
   int16_t i;
@@ -14,7 +17,7 @@ void SuperSquare::UpdatePhysics( )
 
   /* Clear all line drawings */
   for(i = 0; i < NUM_LINES; i++) {
-    DrawLine(lines[i], 0,0,0);
+    DrawLine(lines[i], EMPTY_COLOR);
   }
 
   /* Update line positions */
@@ -67,14 +70,14 @@ void SuperSquare::UpdatePhysics( )
   /* Draw all lines */
   for(i = 0; i < NUM_LINES; i++) {
     /* If there is a collision, display the score and start the reset timer */
-    if(FALSE == DrawLine(lines[i], 0x40,0,0)) {
+    if(FALSE == DrawLine(lines[i], LINE_COLOR)) {
 
       /* Clear all lines */
       for(i = 0; i < NUM_LINES; i++) {
         INVALIDATE_LINE(lines[i]);
       }
 
-      DisplayScore(score);
+      DisplayScore(score, SCORE_COLOR);
       resetTimer = IRQ_HZ * 5;
     }
   }
@@ -97,15 +100,15 @@ void SuperSquare::ResetGame(
   /* Clear the board */
   for(i = 0; i < BOARD_SIZE; i++) {
     for(j = 0; j < BOARD_SIZE; j++) {
-      SetPixel(i, j, 0,0,0);
+      SetPixel(i, j, EMPTY_COLOR);
     }
   }
 
   /* Draw the center square */
-  SetPixel(7, 7, 0,0x40,0);
-  SetPixel(7, 8, 0,0x40,0);
-  SetPixel(8, 7, 0,0x40,0);
-  SetPixel(8, 8, 0,0x40,0);
+  SetPixel(7, 7, CENTER_COLOR);
+  SetPixel(7, 8, CENTER_COLOR);
+  SetPixel(8, 7, CENTER_COLOR);
+  SetPixel(8, 8, CENTER_COLOR);
 
   /* Clear all lines */
   for(i = 0; i < NUM_LINES; i++) {
@@ -137,7 +140,7 @@ void SuperSquare::ProcessInput(
 
   /* Clear the old player pixel */
   PlacePlayerPixel(newPos);
-  SetPixel(newPos[0], newPos[1], 0,0,0);
+  SetPixel(newPos[0], newPos[1], EMPTY_COLOR);
 
   /* Update the player position */
   playerPosition = (playerPosition + ((p1ax - 512) / 25));
@@ -157,11 +160,11 @@ void SuperSquare::ProcessInput(
       INVALIDATE_LINE(lines[i]);
     }
 
-    DisplayScore(score);
+    DisplayScore(score, SCORE_COLOR);
     resetTimer = IRQ_HZ * 5;
   }
   else {
-    SetPixel(newPos[0], newPos[1], 0,0,0x40);
+    SetPixel(newPos[0], newPos[1], P1_COLOR);
   }
 }
 
@@ -219,7 +222,7 @@ void SuperSquare::PlacePlayerPixel(uint8_t position[])
   }
 }
 
-uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
+uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
 {
   int16_t i;
 
@@ -235,37 +238,37 @@ uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
   switch(line.direction) {
     case UP: {
         for(i = position + 1; i < (BOARD_SIZE - position); i++) {
-          if(GetPixel(i, 15-position) == 0x000040 && (r|g|b) > 0) {
+          if(GetPixel(i, 15-position) == P1_COLOR && rgb > 0) {
             return FALSE;
           }
-          SetPixel(i, 15-position, r, g, b);
+          SetPixel(i, 15-position, rgb);
         }
         break;
       }
     case DOWN: {
         for(i = position; i < (BOARD_SIZE - 1 - position); i++) {
-          if(GetPixel(i, position) == 0x000040 && (r|g|b) > 0) {
+          if(GetPixel(i, position) == P1_COLOR && rgb > 0) {
             return FALSE;
           }
-          SetPixel(i, position, r, g, b);
+          SetPixel(i, position, rgb);
         }
         break;
       }
     case LEFT: {
         for(i = position; i < (BOARD_SIZE - 1 - position); i++) {
-          if(GetPixel(15 - position, i) == 0x000040 && (r|g|b) > 0) {
+          if(GetPixel(15 - position, i) == P1_COLOR && rgb > 0) {
             return FALSE;
           }
-          SetPixel(15 - position, i, r, g, b);
+          SetPixel(15 - position, i, rgb);
         }
         break;
       }
     case RIGHT: {
         for(i = position + 1; i < (BOARD_SIZE - position); i++) {
-          if(GetPixel(position, i) == 0x000040 && (r|g|b) > 0) {
+          if(GetPixel(position, i) == P1_COLOR && rgb > 0) {
             return FALSE;
           }
-          SetPixel(position, i, r, g, b);
+          SetPixel(position, i, rgb);
         }
         break;
       }

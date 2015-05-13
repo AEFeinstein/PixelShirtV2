@@ -3,13 +3,16 @@
 int8_t shipShape[4][2] = {{-1,BOARD_SIZE-1},{0,BOARD_SIZE-1},{1,BOARD_SIZE-1},{0,BOARD_SIZE-2}};
 #define PLAYER_SCALAR 16
 
+#define BULLET_COLOR 0x151515
+#define ENEMY_COLOR  0x004000
+
 void Shooter::UpdatePhysics( )
 {
   uint8_t i;
 
   if(resetTimer > 0) {
     resetTimer--;
-    DisplayScore(score);
+    DisplayScore(score, SCORE_COLOR);
     if(resetTimer == 0) {
       ResetGame(0, 0);
     }
@@ -18,10 +21,10 @@ void Shooter::UpdatePhysics( )
     /* Clear bullets */
     for (i = 0; i < NUM_BULLETS; i++) {
       if(p1.bullets[i][1] != -1 && p1.bullets[i][1] != BOARD_SIZE - 2) {
-        SetPixel(p1.bullets[i][0], p1.bullets[i][1], 0, 0, 0);
+        SetPixel(p1.bullets[i][0], p1.bullets[i][1], EMPTY_COLOR);
       }
       if(p2.bullets[i][1] != -1 && p2.bullets[i][1] != BOARD_SIZE - 2) {
-        SetPixel(p2.bullets[i][0], p2.bullets[i][1], 0, 0, 0);
+        SetPixel(p2.bullets[i][0], p2.bullets[i][1], EMPTY_COLOR);
       }
     }
 
@@ -55,25 +58,25 @@ void Shooter::UpdatePhysics( )
     /* Draw bullets, checking for collisions */
     for (i = 0; i < NUM_BULLETS; i++) {
       if(p1.bullets[i][1] != -1) {
-        if(GetPixel(p1.bullets[i][0], p1.bullets[i][1]) == 0x400000) {
+        if(GetPixel(p1.bullets[i][0], p1.bullets[i][1]) == ENEMY_COLOR) {
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
-          SetPixel(p1.bullets[i][0], p1.bullets[i][1], 0,0,0);
+          SetPixel(p1.bullets[i][0], p1.bullets[i][1], EMPTY_COLOR);
           KillEnemy();
           p1.bullets[i][1] = -1;
         }
         else {
-          SetPixel(p1.bullets[i][0], p1.bullets[i][1], 0x15, 0x15, 0x15);
+          SetPixel(p1.bullets[i][0], p1.bullets[i][1], BULLET_COLOR);
         }
       }
       if(p2.bullets[i][1] != -1) {
-        if(GetPixel(p2.bullets[i][0], p2.bullets[i][1]) == 0x400000) {
+        if(GetPixel(p2.bullets[i][0], p2.bullets[i][1]) == ENEMY_COLOR) {
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
-          SetPixel(p2.bullets[i][0], p2.bullets[i][1], 0,0,0);
+          SetPixel(p2.bullets[i][0], p2.bullets[i][1], EMPTY_COLOR);
           KillEnemy();
           p2.bullets[i][1] = -1;
         }
         else {
-          SetPixel(p2.bullets[i][0], p2.bullets[i][1], 0x15, 0x15, 0x15);
+          SetPixel(p2.bullets[i][0], p2.bullets[i][1], BULLET_COLOR);
         }
       }
     }
@@ -135,13 +138,13 @@ void Shooter::SpawnWave()
 
   for(x=0; x < BOARD_SIZE; x++) {
     for(y=0; y < BOARD_SIZE; y++) {
-      SetPixel(x, y, 0, 0, 0);
+      SetPixel(x, y, EMPTY_COLOR);
     }
   }
 
   for(x = 2; x < BOARD_SIZE - 2; x += 2) {
     for(y = 0; y < BOARD_SIZE - 6; y += 2) {
-      SetPixel(x + ((y%4==2) ? 1 : 0),y,0x40, 0x0, 0x0);
+      SetPixel(x + ((y%4==2) ? 1 : 0),y, ENEMY_COLOR);
     }
   }
 }
@@ -259,7 +262,7 @@ void Shooter::ShiftBoard()
           }
           /* Clear the last column */
           for(y = 0; y < BOARD_SIZE; y++) {
-            SetPixel(BOARD_SIZE-1, y, 0, 0, 0);
+            SetPixel(BOARD_SIZE-1, y, EMPTY_COLOR);
           }
           /* Try to redraw the player, if it intersects with a ship, game over */
           if(FALSE == DrawPlayers()) {
@@ -299,7 +302,7 @@ void Shooter::ShiftBoard()
           }
           /* Clear the last column */
           for(y = 0; y < BOARD_SIZE; y++) {
-            SetPixel(0, y, 0, 0, 0);
+            SetPixel(0, y, EMPTY_COLOR);
           }
           /* Try to redraw the player, if it intersects with a ship, game over */
           if(FALSE == DrawPlayers()) {
@@ -320,7 +323,7 @@ void Shooter::DropBoard()
     }
   }
   for(x = 0; x < BOARD_SIZE; x++) {
-    SetPixel(x, 0, 0, 0, 0);
+    SetPixel(x, 0, EMPTY_COLOR);
   }
 }
 
@@ -334,16 +337,14 @@ void Shooter::ClearPlayers()
     if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0,
-               0);
+      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], EMPTY_COLOR);
     }
 
     /* And then again, for P2. If the pixel is in bounds */
     if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
-      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0,
-               0);
+      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], EMPTY_COLOR);
     }
   }
 }
@@ -358,11 +359,11 @@ uint8_t Shooter::DrawPlayers()
     if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit red, i.e. touched by an enemy */
-      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == 0x400000) {
+      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == ENEMY_COLOR) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0x40, 0);
+      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], P1_COLOR);
     }
   }
 
@@ -372,11 +373,11 @@ uint8_t Shooter::DrawPlayers()
     if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit red, i.e. touched by an enemy */
-      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == 0x400000) {
+      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == ENEMY_COLOR) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0, 0x40);
+      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], P2_COLOR);
     }
   }
 
@@ -393,7 +394,7 @@ uint8_t Shooter::NumEnemies()
   uint8_t x, y, enemies = 0;
   for(x = 0; x < BOARD_SIZE; x++) {
     for(y = 0; y < BOARD_SIZE; y++) {
-      if(GetPixel(x, y) == 0x400000) {
+      if(GetPixel(x, y) == ENEMY_COLOR) {
         enemies++;
       }
     }
