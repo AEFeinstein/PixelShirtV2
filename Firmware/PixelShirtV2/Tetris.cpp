@@ -157,11 +157,11 @@ void Tetris::ProcessInput(
     hardDroppedYet = 0;
   }
 
-  if(ay < 256 && !turboMode) {
+  if(ay > 768 && !turboMode) {
     turboMode = 1;
     dropTimer = 0;
   }
-  else if(ay >= 256) {
+  else if(ay <= 768) {
     turboMode = 0;
   }
 
@@ -183,8 +183,7 @@ void Tetris::ProcessInput(
   }
 }
 
-uint8_t Tetris::NewActiveTetromino( 
-                                    uint8_t isFirst)
+uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 {
   uint8_t i;
 

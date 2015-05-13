@@ -177,7 +177,7 @@ void Pong::ProcessInput(
   __attribute__((unused)) int8_t p2bd)
 {
   if(p1ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ay) {
-    paddleLocL += ((512 - p1ay) * 3);
+    paddleLocL -= ((512 - p1ay) * 3);
     if(paddleLocL < 0) {
       paddleLocL = 0;
     }
@@ -187,7 +187,7 @@ void Pong::ProcessInput(
   }
 
   if(p2ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ay) {
-    paddleLocR += ((512 - p2ay) * 3);
+    paddleLocR -= ((512 - p2ay) * 3);
     if(paddleLocR < 0) {
       paddleLocR = 0;
     }

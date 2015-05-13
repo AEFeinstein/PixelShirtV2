@@ -64,13 +64,10 @@ class Tetris : public ArduinoGame
   void ClearNextTetromino( );
   void DrawNextTetromino( );
   // Moving
-  uint8_t NewActiveTetromino( 
-                              uint8_t isFirst);
-  void RotateActiveTetromino( 
-                              int8_t direction);
+  uint8_t NewActiveTetromino(uint8_t isFirst);
+  void RotateActiveTetromino(int8_t direction);
   uint8_t DropActiveTetromino( );
-  void SlideActiveTetromino( 
-                             int8_t direction);
+  void SlideActiveTetromino(int8_t direction);
   // Timers
   uint8_t dropTimer;
   uint8_t rotatedYet;
