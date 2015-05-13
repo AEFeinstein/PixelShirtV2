@@ -55,7 +55,7 @@ void Shooter::UpdatePhysics( )
     /* Draw bullets, checking for collisions */
     for (i = 0; i < NUM_BULLETS; i++) {
       if(p1.bullets[i][1] != -1) {
-        if(GetPixel(p1.bullets[i][0], p1.bullets[i][1]) == 0x40) { /* TODO color check (red) */
+        if(GetPixel(p1.bullets[i][0], p1.bullets[i][1]) == 0x400000) {
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
           SetPixel(p1.bullets[i][0], p1.bullets[i][1], 0,0,0);
           KillEnemy();
@@ -66,7 +66,7 @@ void Shooter::UpdatePhysics( )
         }
       }
       if(p2.bullets[i][1] != -1) {
-        if(GetPixel(p2.bullets[i][0], p2.bullets[i][1]) == 0x40) { /* TODO color check (red) */
+        if(GetPixel(p2.bullets[i][0], p2.bullets[i][1]) == 0x400000) {
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
           SetPixel(p2.bullets[i][0], p2.bullets[i][1], 0,0,0);
           KillEnemy();
@@ -357,12 +357,12 @@ uint8_t Shooter::DrawPlayers()
     /* If the pixel is in bounds */
     if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
-      /* If the pixel is already lit, i.e. touched by an enemy */
-      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) > 0) { /* TODO color check (red) */
+      /* If the pixel is already lit red, i.e. touched by an enemy */
+      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == 0x400000) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0, 0x40);
+      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], 0, 0x40, 0);
     }
   }
 
@@ -371,8 +371,8 @@ uint8_t Shooter::DrawPlayers()
     /* If the pixel is in bounds */
     if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
-      /* If the pixel is already lit, i.e. touched by an enemy */
-      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) > 0) { /* TODO color check (red) */
+      /* If the pixel is already lit red, i.e. touched by an enemy */
+      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == 0x400000) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
@@ -393,7 +393,7 @@ uint8_t Shooter::NumEnemies()
   uint8_t x, y, enemies = 0;
   for(x = 0; x < BOARD_SIZE; x++) {
     for(y = 0; y < BOARD_SIZE; y++) {
-      if(GetPixel(x, y) == 0x40) { /* TODO color check (red)*/
+      if(GetPixel(x, y) == 0x400000) {
         enemies++;
       }
     }
