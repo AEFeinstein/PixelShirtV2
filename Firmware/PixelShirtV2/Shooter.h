@@ -14,7 +14,7 @@ typedef struct {
 class Shooter : public ArduinoGame
 {
  public:
-  Shooter() {};
+  Shooter();
   ~Shooter() {};
   void UpdatePhysics( );
   void ResetGame(  uint8_t isInit,

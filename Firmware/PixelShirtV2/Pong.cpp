@@ -8,6 +8,11 @@
 
 #define BALL_COLOR 0x004000
 
+Pong::Pong()
+{
+	ResetGame(1, 0);
+}
+
 void Pong::UpdatePhysics( )
 {
   int16_t diff, rotation;

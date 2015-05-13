@@ -3,6 +3,11 @@
 #define CENTER_COLOR 0x004000
 #define LINE_COLOR   0x400000
 
+SuperSquare::SuperSquare()
+{
+	ResetGame(1, 0);
+}
+
 void SuperSquare::UpdatePhysics( )
 {
   int16_t i;

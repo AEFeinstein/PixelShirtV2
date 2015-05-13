@@ -18,7 +18,7 @@ typedef struct {
 class SuperSquare : public ArduinoGame
 {
  public:
-  SuperSquare() {};
+  SuperSquare();
   ~SuperSquare() {};
   void UpdatePhysics( );
   void ResetGame(  uint8_t isInit,

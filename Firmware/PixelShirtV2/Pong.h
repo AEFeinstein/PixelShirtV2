@@ -26,7 +26,7 @@
 class Pong : public ArduinoGame
 {
  public:
-  Pong() {};
+  Pong();
   ~Pong() {};
   void UpdatePhysics( );
   void ResetGame(  uint8_t isInit,

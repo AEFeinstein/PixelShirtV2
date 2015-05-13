@@ -5,6 +5,7 @@
 Tetris::Tetris()
 {
   multiplayer = 1;
+  ResetGame(1, 0);
 }
 
 void Tetris::ResetGame( 

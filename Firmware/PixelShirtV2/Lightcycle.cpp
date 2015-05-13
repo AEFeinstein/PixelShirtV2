@@ -1,5 +1,10 @@
 #include "Lightcycle.h"
 
+Lightcycle::Lightcycle()
+{
+	ResetGame(1, 0);
+}
+
 void Lightcycle::UpdatePhysics( )
 {
   uint8_t losers = 0;

@@ -6,6 +6,11 @@ int8_t shipShape[4][2] = {{-1,BOARD_SIZE-1},{0,BOARD_SIZE-1},{1,BOARD_SIZE-1},{0
 #define BULLET_COLOR 0x151515
 #define ENEMY_COLOR  0x004000
 
+Shooter::Shooter()
+{
+	ResetGame(1, 0);
+}
+
 void Shooter::UpdatePhysics( )
 {
   uint8_t i;

@@ -6,7 +6,7 @@
 class Lightcycle : public ArduinoGame
 {
  public:
-  Lightcycle() {};
+  Lightcycle();
   ~Lightcycle() {};
   void UpdatePhysics( );
   void ResetGame( uint8_t isInit,
