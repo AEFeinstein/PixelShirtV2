@@ -11,7 +11,8 @@ uint8_t colorStep = 0;
 uint32_t getIntensity(uint8_t step);
 uint8_t screensaverShiftTimer = IRQ_HZ / 4;
 
-void ExitScreensaver(ArduinoGame * currentGame) {
+void ExitScreensaver(ArduinoGame* currentGame)
+{
   if (screensaverTimer == 0) {
     /* Leave the screensaver, clear the field & reset the game */
     uint8_t x, y;
@@ -25,7 +26,8 @@ void ExitScreensaver(ArduinoGame * currentGame) {
   screensaverTimer = (IRQ_HZ * 30);
 }
 
-void HandleScreensaverTimer() {
+void HandleScreensaverTimer()
+{
   if (screensaverTimer > 0) {
     screensaverTimer--;
     if (screensaverTimer == 0) {
@@ -40,11 +42,13 @@ void HandleScreensaverTimer() {
   }
 }
 
-uint16_t GetScreensaverTimer() {
+uint16_t GetScreensaverTimer()
+{
   return screensaverTimer;
 }
 
-void DisplayScreensaver() {
+void DisplayScreensaver()
+{
   /* display screensaver */
 
   if (screensaverShiftTimer > 0) {
@@ -82,7 +86,7 @@ void DisplayScreensaver() {
     else if (squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 3) {
       /* bottom bar */
       SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
-    		  getIntensity(colorStep));
+               getIntensity(colorStep));
     }
     else if (squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 3) {
       /* rising edge */
@@ -98,30 +102,30 @@ void DisplayScreensaver() {
 
 uint32_t getIntensity(uint8_t step)
 {
-    uint8_t red = 0, green = 0, blue = 0;
-	if (step < 8) {
-        /* rise */
-        red = (0x01 << (step));
-      }
-      else if (step < 16) {
-        /* fall */
-    	  red =  (0x80 >> (step - 8));
-      }
-      if (step >= 16) {
-        /* fall */
-        green = (0x80 >> (step - 16));
-      }
-      else if (step >= 8) {
-        /* rise */
-        green = (0x01 << (step - 8));
-      }
-      if (step < 8) {
-        /* fall */
-        blue = (0x80 >> step);
-      }
-      else if (step >= 16) {
-        /* rise */
-        blue = (0x01 << (step - 16));
-      }
-      return ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue;
+  uint8_t red = 0, green = 0, blue = 0;
+  if (step < 8) {
+    /* rise */
+    red = (0x01 << (step));
+  }
+  else if (step < 16) {
+    /* fall */
+    red =  (0x80 >> (step - 8));
+  }
+  if (step >= 16) {
+    /* fall */
+    green = (0x80 >> (step - 16));
+  }
+  else if (step >= 8) {
+    /* rise */
+    green = (0x01 << (step - 8));
+  }
+  if (step < 8) {
+    /* fall */
+    blue = (0x80 >> step);
+  }
+  else if (step >= 16) {
+    /* rise */
+    blue = (0x01 << (step - 16));
+  }
+  return ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue;
 }

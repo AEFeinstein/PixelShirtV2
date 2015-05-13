@@ -18,63 +18,55 @@
 /* ------------------------------------------------------------------------- */
 void nrf24_setupPins()
 {
-    set_bit(DDRC,6); // CE output, digital pin 5
-    set_bit(DDRD,7); // CSN output, digital pin 6
-    set_bit(DDRB,1); // SCK output
-    set_bit(DDRB,2); // MOSI output
-    clr_bit(DDRB,3); // MISO input
+  set_bit(DDRC,6); // CE output, digital pin 5
+  set_bit(DDRD,7); // CSN output, digital pin 6
+  set_bit(DDRB,1); // SCK output
+  set_bit(DDRB,2); // MOSI output
+  clr_bit(DDRB,3); // MISO input
 }
 /* ------------------------------------------------------------------------- */
 void nrf24_ce_digitalWrite(uint8_t state)
 {
-    if(state)
-    {
-        set_bit(PORTC,PORTC6);
-    }
-    else
-    {
-        clr_bit(PORTC,PORTC6);
-    }
+  if(state) {
+    set_bit(PORTC,PORTC6);
+  }
+  else {
+    clr_bit(PORTC,PORTC6);
+  }
 }
 /* ------------------------------------------------------------------------- */
 void nrf24_csn_digitalWrite(uint8_t state)
 {
-    if(state)
-    {
-        set_bit(PORTD,PORTD7);
-    }
-    else
-    {
-        clr_bit(PORTD,PORTD7);
-    }
+  if(state) {
+    set_bit(PORTD,PORTD7);
+  }
+  else {
+    clr_bit(PORTD,PORTD7);
+  }
 }
 /* ------------------------------------------------------------------------- */
 void nrf24_sck_digitalWrite(uint8_t state)
 {
-    if(state)
-    {
-        set_bit(PORTB,PORTB1);
-    }
-    else
-    {
-        clr_bit(PORTB,PORTB1);
-    }
+  if(state) {
+    set_bit(PORTB,PORTB1);
+  }
+  else {
+    clr_bit(PORTB,PORTB1);
+  }
 }
 /* ------------------------------------------------------------------------- */
 void nrf24_mosi_digitalWrite(uint8_t state)
 {
-    if(state)
-    {
-        set_bit(PORTB,PORTB2);
-    }
-    else
-    {
-        clr_bit(PORTB,PORTB2);
-    }
+  if(state) {
+    set_bit(PORTB,PORTB2);
+  }
+  else {
+    clr_bit(PORTB,PORTB2);
+  }
 }
 /* ------------------------------------------------------------------------- */
 uint8_t nrf24_miso_digitalRead()
 {
-    return check_bit(PINB,PINB3);
+  return check_bit(PINB,PINB3);
 }
 /* ------------------------------------------------------------------------- */

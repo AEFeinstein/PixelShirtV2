@@ -5,7 +5,7 @@
 
 SuperSquare::SuperSquare()
 {
-	ResetGame(1, 0);
+  ResetGame(1, 0);
 }
 
 void SuperSquare::UpdatePhysics( )
@@ -90,7 +90,7 @@ void SuperSquare::UpdatePhysics( )
 }
 
 void SuperSquare::ResetGame(
-  
+
   __attribute__((unused)) uint8_t isInit,
   __attribute__((unused)) uint8_t whoWon)
 {
@@ -122,7 +122,7 @@ void SuperSquare::ResetGame(
 }
 
 void SuperSquare::ProcessInput(
-  __attribute__((unused))  
+  __attribute__((unused))
   int32_t p1ax,
   __attribute__((unused)) int32_t p1ay,
   __attribute__((unused)) int8_t p1bl,

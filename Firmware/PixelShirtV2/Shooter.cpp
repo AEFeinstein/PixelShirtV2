@@ -8,7 +8,7 @@ int8_t shipShape[4][2] = {{-1,BOARD_SIZE-1},{0,BOARD_SIZE-1},{1,BOARD_SIZE-1},{0
 
 Shooter::Shooter()
 {
-	ResetGame(1, 0);
+  ResetGame(1, 0);
 }
 
 void Shooter::UpdatePhysics( )
@@ -106,7 +106,7 @@ void Shooter::KillEnemy()
 }
 
 void Shooter::ResetGame(
-  
+
   __attribute__((unused)) uint8_t isInit,
   __attribute__((unused)) uint8_t whoWon)
 {
@@ -155,7 +155,7 @@ void Shooter::SpawnWave()
 }
 
 void Shooter::ProcessInput(
-  __attribute__((unused))  
+  __attribute__((unused))
   int32_t p1ax,
   __attribute__((unused)) int32_t p1ay,
   __attribute__((unused)) int8_t p1bl,
@@ -342,14 +342,16 @@ void Shooter::ClearPlayers()
     if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], EMPTY_COLOR);
+      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+               EMPTY_COLOR);
     }
 
     /* And then again, for P2. If the pixel is in bounds */
     if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
-      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], EMPTY_COLOR);
+      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+               EMPTY_COLOR);
     }
   }
 }
@@ -364,11 +366,13 @@ uint8_t Shooter::DrawPlayers()
     if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit red, i.e. touched by an enemy */
-      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == ENEMY_COLOR) {
+      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0],
+                  shipShape[i][1]) == ENEMY_COLOR) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], P1_COLOR);
+      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+               P1_COLOR);
     }
   }
 
@@ -378,11 +382,13 @@ uint8_t Shooter::DrawPlayers()
     if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
         && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit red, i.e. touched by an enemy */
-      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1]) == ENEMY_COLOR) {
+      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0],
+                  shipShape[i][1]) == ENEMY_COLOR) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1], P2_COLOR);
+      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+               P2_COLOR);
     }
   }
 

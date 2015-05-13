@@ -4,6 +4,6 @@
 void DisplayScreensaver();
 uint16_t GetScreensaverTimer();
 void HandleScreensaverTimer();
-void ExitScreensaver(ArduinoGame * currentGame);
+void ExitScreensaver(ArduinoGame* currentGame);
 
 #endif /* _SCREENSAVER_H_ */

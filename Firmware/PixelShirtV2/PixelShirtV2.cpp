@@ -27,7 +27,7 @@ Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_2,
                             NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel pixels3 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_3,
                             NEO_GRB + NEO_KHZ800);
-                            
+
 /* Manage the Games */
 #define NUM_GAMES 5
 
@@ -73,7 +73,7 @@ void setup()
   pixels1.begin();
   pixels2.begin();
   pixels3.begin();
-  
+
   /* Clear Variables */
   uint8_t x, y;
   for(x = 0; x < BOARD_SIZE; x++) {
@@ -84,8 +84,8 @@ void setup()
   downTimer = 0;
 
   /* Set the current game */
-  gameMode = SHOOTER;
-  currentGame = &shooter;
+  gameMode = TETRIS;
+  currentGame = &tetris;
   currentGame->ResetGame(1,0);
 
   /* init hardware pins */
@@ -122,13 +122,12 @@ void loop()
   }
   microsLast = currentTime;
 
-  if (nrf24_dataReady())
-  {
+  if (nrf24_dataReady()) {
     uint32_t js;
     nrf24_getData((uint8_t*)&js);
     p1controller = js;
   }
-  
+
   /* Heartbeat */
   if((millis() / 1000) % 2 == 0) {
     digitalWrite(HEARTBEAT_PIN, HIGH);

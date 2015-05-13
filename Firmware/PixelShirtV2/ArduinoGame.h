@@ -61,13 +61,13 @@ class ArduinoGame
   ArduinoGame() {};
   virtual ~ArduinoGame() {};
   virtual void UpdatePhysics( ) = 0;
-  virtual void ResetGame( 
-                          uint8_t isInit, uint8_t whoWon) = 0;
-  virtual void ProcessInput( 
-                             int32_t p1ax, int32_t p1ay, int8_t p1b0,
-                             int8_t p1b1, int8_t p1b2, int8_t p1b3, int32_t p2ax, int32_t p2ay, int8_t p2b0,
-                             int8_t p2b1, int8_t p2b2,
-                             int8_t p2b3) = 0;
+  virtual void ResetGame(
+    uint8_t isInit, uint8_t whoWon) = 0;
+  virtual void ProcessInput(
+    int32_t p1ax, int32_t p1ay, int8_t p1b0,
+    int8_t p1b1, int8_t p1b2, int8_t p1b3, int32_t p2ax, int32_t p2ay, int8_t p2b0,
+    int8_t p2b1, int8_t p2b2,
+    int8_t p2b3) = 0;
 };
 
 
@@ -75,7 +75,8 @@ class ArduinoGame
 void SetPixel(int8_t y, int8_t x, uint32_t val);
 uint32_t GetPixel(int8_t x, int8_t y);
 void DisplayScore( uint16_t score, uint32_t rgb);
-void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb);
+void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY,
+                 uint32_t rgb);
 
 #define IsPixelLit(x,y) GetPixel(x, y)
 
@@ -95,25 +96,25 @@ void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
 
 /* Getter and setter for 5 bit field which holds button presses */
 #define SET_BUTTONS(js, b) { \
-	(js) &= ~BUTTON_MASK; \
-	(js) |= (b); \
-}
+    (js) &= ~BUTTON_MASK; \
+    (js) |= (b); \
+  }
 
 #define GET_BUTTONS(js) ((js) & BUTTON_MASK)
 
 /* Getter and setter for 10 bit field which holds the X axis ADC value */
 #define SET_X_AXIS(js, x) { \
-	(js) &= ~X_AXIS_MASK; \
-	(js) |= ((x) << X_AXIS_SHIFT); \
-}
+    (js) &= ~X_AXIS_MASK; \
+    (js) |= ((x) << X_AXIS_SHIFT); \
+  }
 
 #define GET_X_AXIS(js) (((js) & X_AXIS_MASK) >> X_AXIS_SHIFT)
 
 /* Getter and setter for 10 bit field which holds the Y axis ADC value */
 #define SET_Y_AXIS(js, y) { \
-	(js) &= ~Y_AXIS_MASK; \
-	(js) |= ((y) << Y_AXIS_SHIFT); \
-}
+    (js) &= ~Y_AXIS_MASK; \
+    (js) |= ((y) << Y_AXIS_SHIFT); \
+  }
 
 #define GET_Y_AXIS(js) (((js) & Y_AXIS_MASK) >> Y_AXIS_SHIFT)
 

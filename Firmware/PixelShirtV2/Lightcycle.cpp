@@ -2,7 +2,7 @@
 
 Lightcycle::Lightcycle()
 {
-	ResetGame(1, 0);
+  ResetGame(1, 0);
 }
 
 void Lightcycle::UpdatePhysics( )

@@ -52,11 +52,11 @@ class Tetris : public ArduinoGame
   ~Tetris() {};
   void UpdatePhysics( );
   void ResetGame(  uint8_t isInit,
-                  uint8_t whoWon);
+                   uint8_t whoWon);
   void ProcessInput(  int32_t p1ax,
-                     int32_t p1ay, int8_t p1b0, int8_t p1b1,
-                     int8_t p1b2, int8_t p1b3, int32_t p2ax, int32_t p2ay, int8_t p2b0, int8_t p2b1,
-                     int8_t p2b2, int8_t p2b3);
+                      int32_t p1ay, int8_t p1b0, int8_t p1b1,
+                      int8_t p1b2, int8_t p1b3, int32_t p2ax, int32_t p2ay, int8_t p2b0, int8_t p2b1,
+                      int8_t p2b2, int8_t p2b3);
  private:
   // Drawing
   void ClearActiveTetromino( );

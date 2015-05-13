@@ -5,9 +5,9 @@
 * can do whatever you want with this stuff. If we meet some day, and you think
 * this stuff is worth it, you can buy me a coffee in return.
 * -----------------------------------------------------------------------------
-* This library is based on this library: 
+* This library is based on this library:
 *   https://github.com/aaronds/arduino-nrf24l01
-* Which is based on this library: 
+* Which is based on this library:
 *   http://www.tinkerer.eu/AVRLib/nRF24L01
 * -----------------------------------------------------------------------------
 */

@@ -8,9 +8,9 @@ Tetris::Tetris()
   ResetGame(1, 0);
 }
 
-void Tetris::ResetGame( 
-                        uint8_t isInit,
-                        __attribute__((unused)) uint8_t whoWon)
+void Tetris::ResetGame(
+  uint8_t isInit,
+  __attribute__((unused)) uint8_t whoWon)
 {
   uint8_t i;
   uint8_t x, y;
@@ -19,7 +19,7 @@ void Tetris::ResetGame(
       SetPixel(x, y, EMPTY_COLOR);
     }
   }
-      
+
   if (isInit) {
     gameOver = 1;
   }
@@ -69,7 +69,7 @@ void Tetris::UpdatePhysics( )
 }
 
 void Tetris::ProcessInput(
-  
+
   int32_t p1ax,
   int32_t p1ay,
   int8_t p1bl,
@@ -442,8 +442,8 @@ uint8_t Tetris::DropActiveTetromino( )
   }
 }
 
-void Tetris::SlideActiveTetromino( 
-                                   int8_t direction)
+void Tetris::SlideActiveTetromino(
+  int8_t direction)
 {
   uint8_t i;
 
@@ -464,8 +464,8 @@ void Tetris::SlideActiveTetromino(
   DrawActiveTetromino();
 }
 
-void Tetris::RotateActiveTetromino( 
-                                    int8_t direction)
+void Tetris::RotateActiveTetromino(
+  int8_t direction)
 {
   uint8_t newRotation[4][2];
   uint8_t i;

@@ -10,7 +10,7 @@
 
 Pong::Pong()
 {
-	ResetGame(1, 0);
+  ResetGame(1, 0);
 }
 
 void Pong::UpdatePhysics( )
@@ -84,7 +84,7 @@ void Pong::UpdatePhysics( )
 }
 
 void Pong::ResetGame(  uint8_t isInit,
-                      uint8_t whoWon)
+                       uint8_t whoWon)
 {
   if (isInit) {
     paddleLocL = (V_M * S_M * BOARD_SIZE / 2) - (PADDLE_SIZE / 2);
@@ -167,7 +167,7 @@ void Pong::DrawField( )
 }
 
 void Pong::ProcessInput(
-  __attribute__((unused))  
+  __attribute__((unused))
   __attribute__((unused)) int32_t p1ax,
   int32_t p1ay,
   __attribute__((unused)) int8_t p1bl,

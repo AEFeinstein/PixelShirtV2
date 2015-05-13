@@ -34,19 +34,19 @@
 #include "Adafruit_NeoPixel.h"
 
 Adafruit_NeoPixel::Adafruit_NeoPixel(
-		uint16_t n,
-		uint8_t p,
-		uint8_t t) :
-		numLEDs(n),
-		numBytes(n * 3),
-		pin(p),
-		brightness(0),
-		pixels(NULL),
-		type(t),
-		endTime(0)
+  uint16_t n,
+  uint8_t p,
+  uint8_t t) :
+  numLEDs(n),
+  numBytes(n * 3),
+  pin(p),
+  brightness(0),
+  pixels(NULL),
+  type(t),
+  endTime(0)
   #ifdef __AVR__
-		,port(portOutputRegister(digitalPinToPort(p))),
-		pinMask(digitalPinToBitMask(p))
+  ,port(portOutputRegister(digitalPinToPort(p))),
+  pinMask(digitalPinToBitMask(p))
   #endif
 {
   if((pixels = (uint8_t*)malloc(numBytes))) {
