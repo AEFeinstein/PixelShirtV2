@@ -36,20 +36,20 @@ void SuperSquare::UpdatePhysics( )
     /* How many lines to generate? */
     switch(linesDrawn / 6) {
       case 0: {
-          AddLine(random(4) + 1, currentVelocity);
+          AddLine(random(4), currentVelocity);
           break;
         }
       case 1: {
           uint8_t newLinePosition = random(4);
-          uint8_t otherNewLinePosition = (newLinePosition + random(3) + 1) % 4;
-          AddLine(newLinePosition + 1, currentVelocity);
-          AddLine(otherNewLinePosition + 1, currentVelocity);
+          uint8_t otherNewLinePosition = (newLinePosition + (random(3) + 1)) % 4;
+          AddLine(newLinePosition, currentVelocity);
+          AddLine(otherNewLinePosition, currentVelocity);
           break;
         }
       default: {
           uint8_t newLinePosition = random(4);
           for(i = 0; i < 3; i++) {
-            AddLine(newLinePosition + 1, currentVelocity);
+            AddLine(newLinePosition, currentVelocity);
             newLinePosition = (newLinePosition + 1) % 4;
           }
           break;
@@ -235,7 +235,7 @@ uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
   switch(line.direction) {
     case UP: {
         for(i = position + 1; i < (BOARD_SIZE - position); i++) {
-          if(GetPixel(i, 15-position) == 0x400000 && (r|g|b) > 0) { /* TODO check color (blue) */
+          if(GetPixel(i, 15-position) == 0x000040 && (r|g|b) > 0) {
             return FALSE;
           }
           SetPixel(i, 15-position, r, g, b);
@@ -244,7 +244,7 @@ uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
       }
     case DOWN: {
         for(i = position; i < (BOARD_SIZE - 1 - position); i++) {
-          if(GetPixel(i, position) == 0x400000 && (r|g|b) > 0) {/* TODO check color (blue) */
+          if(GetPixel(i, position) == 0x000040 && (r|g|b) > 0) {
             return FALSE;
           }
           SetPixel(i, position, r, g, b);
@@ -253,7 +253,7 @@ uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
       }
     case LEFT: {
         for(i = position; i < (BOARD_SIZE - 1 - position); i++) {
-          if(GetPixel(15 - position, i) == 0x400000 && (r|g|b) > 0) {/* TODO check color (blue) */
+          if(GetPixel(15 - position, i) == 0x000040 && (r|g|b) > 0) {
             return FALSE;
           }
           SetPixel(15 - position, i, r, g, b);
@@ -262,7 +262,7 @@ uint8_t SuperSquare::DrawLine( Line line, uint8_t r, uint8_t g, uint8_t b)
       }
     case RIGHT: {
         for(i = position + 1; i < (BOARD_SIZE - position); i++) {
-          if(GetPixel(position, i) == 0x400000 && (r|g|b) > 0) {/* TODO check color (blue) */
+          if(GetPixel(position, i) == 0x000040 && (r|g|b) > 0) {
             return FALSE;
           }
           SetPixel(position, i, r, g, b);
@@ -278,7 +278,7 @@ void SuperSquare::AddLine(uint8_t direction, uint16_t velocity)
   int16_t i;
   for(i = 0; i < NUM_LINES; i++) {
     if(!IS_LINE_VALID(lines[i])) {
-      lines[i].direction = direction;
+      lines[i].direction = 1 << direction;
       lines[i].position = 0;
       lines[i].velocity = velocity;
       return;
