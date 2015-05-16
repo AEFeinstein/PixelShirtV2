@@ -84,8 +84,8 @@ void setup()
   downTimer = 0;
 
   /* Set the current game */
-  gameMode = TETRIS;
-  currentGame = &tetris;
+  gameMode = PONG;
+  currentGame = &pong;
   currentGame->ResetGame(1,0);
 
   /* init hardware pins */
@@ -109,6 +109,7 @@ void setup()
 
 void loop()
 {
+  uint32_t jsTmp;
   uint32_t currentTime = micros();
 
   /* Run the code at 32Hz (every 31250 microseconds) */
@@ -123,9 +124,17 @@ void loop()
   microsLast = currentTime;
 
   if (nrf24_dataReady()) {
-    uint32_t js;
-    nrf24_getData((uint8_t*)&js);
-    p1controller = js;
+    nrf24_getData((uint8_t*)&jsTmp);
+    switch(GET_PLAYER(jsTmp)) {
+      case 0: {
+        p1controller = jsTmp;
+        break;
+      }
+      case 1: {
+        p2controller = jsTmp;
+        break;
+      }
+    }
   }
 
   /* Heartbeat */

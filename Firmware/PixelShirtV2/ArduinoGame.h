@@ -93,6 +93,8 @@ void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY,
 #define X_AXIS_SHIFT 5
 #define Y_AXIS_MASK  0x01FF8000
 #define Y_AXIS_SHIFT 15
+#define PLAYER_MASK  0x06000000ul
+#define PLAYER_SHIFT 25
 
 /* Getter and setter for 5 bit field which holds button presses */
 #define SET_BUTTONS(js, b) { \
@@ -117,5 +119,13 @@ void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY,
   }
 
 #define GET_Y_AXIS(js) (((js) & Y_AXIS_MASK) >> Y_AXIS_SHIFT)
+
+/* Getter and setter for 2 bit field which holds the player value */
+#define SET_PLAYER(js, pl) { \
+    (js) &= ~PLAYER_MASK; \
+    (js) |= (((uint32_t)pl) << PLAYER_SHIFT); \
+  }
+
+#define GET_PLAYER(js) (((js) & PLAYER_MASK) >> PLAYER_SHIFT)
 
 #endif
