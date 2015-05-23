@@ -849,7 +849,6 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <part name="P+3" library="supply1" deviceset="VCC" device=""/>
 <part name="GND3" library="supply1" deviceset="GND" device=""/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
-<part name="P+4" library="supply1" deviceset="VCC" device=""/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="P+5" library="supply1" deviceset="VCC" device=""/>
 <part name="JP4" library="usb" deviceset="USB-MICRO-B" device=""/>
@@ -877,7 +876,6 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <instance part="P+3" gate="VCC" x="132.08" y="76.2"/>
 <instance part="GND3" gate="1" x="81.28" y="66.04"/>
 <instance part="GND4" gate="1" x="81.28" y="104.14"/>
-<instance part="P+4" gate="VCC" x="86.36" y="104.14"/>
 <instance part="GND5" gate="1" x="71.12" y="50.8"/>
 <instance part="P+5" gate="VCC" x="66.04" y="55.88"/>
 <instance part="JP4" gate="G$1" x="35.56" y="109.22" rot="R90"/>
@@ -902,11 +900,6 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <pinref part="U1" gate="G$1" pin="VIN"/>
 <pinref part="P+3" gate="VCC" pin="VCC"/>
 <wire x1="132.08" y1="73.66" x2="121.92" y2="73.66" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="U2" gate="G$1" pin="VCC"/>
-<pinref part="P+4" gate="VCC" pin="VCC"/>
-<wire x1="86.36" y1="101.6" x2="88.9" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="JP1" gate="JP1" pin="8"/>
@@ -1144,6 +1137,17 @@ http://www.s6z.de&lt;br&gt;&lt;br&gt;
 <wire x1="129.54" y1="30.48" x2="129.54" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="U1" gate="G$1" pin="IO13*"/>
 <wire x1="129.54" y1="38.1" x2="121.92" y2="38.1" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$19" class="0">
+<segment>
+<pinref part="U2" gate="G$1" pin="VCC"/>
+<wire x1="88.9" y1="101.6" x2="86.36" y2="101.6" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="101.6" x2="86.36" y2="114.3" width="0.1524" layer="91"/>
+<wire x1="86.36" y1="114.3" x2="137.16" y2="114.3" width="0.1524" layer="91"/>
+<wire x1="137.16" y1="114.3" x2="137.16" y2="40.64" width="0.1524" layer="91"/>
+<pinref part="U1" gate="G$1" pin="3V"/>
+<wire x1="137.16" y1="40.64" x2="121.92" y2="40.64" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

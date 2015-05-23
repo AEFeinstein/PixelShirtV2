@@ -10,10 +10,10 @@
 #include "nrf24.h"
 
 /* Pixel strip pin connections */
-#define NP_PIN_0            8
-#define NP_PIN_1            10
-#define NP_PIN_2            9
-#define NP_PIN_3            11
+#define NP_PIN_0            11
+#define NP_PIN_1            12
+#define NP_PIN_2            8
+#define NP_PIN_3            9
 
 /* Numbers of pixels per strip */
 #define NUMPIXELS      64
