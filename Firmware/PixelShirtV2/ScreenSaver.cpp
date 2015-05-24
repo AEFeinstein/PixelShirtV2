@@ -61,7 +61,7 @@ void DisplayScreensaver()
     uint8_t x, y;
     for (x = 0; x < BOARD_SIZE - 1; x++) {
       for (y = 0; y < BOARD_SIZE; y++) {
-        SetPixel(y, x, GetPixel(y, x + 1));
+        SetPixel(x, y, GetPixel(x + 1, y));
       }
     }
 
