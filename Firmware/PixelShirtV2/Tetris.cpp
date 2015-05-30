@@ -2,6 +2,16 @@
 
 #define WALL_COLOR  0x000040
 
+uint32_t tetrominoColors[7] = {
+  0x003F0000,
+  0x00241B00,
+  0x00093600,
+  0x00002D12,
+  0x0000122D,
+  0x00090036,
+  0x0024001B
+};
+
 Tetris::Tetris()
 {
   multiplayer = 1;
@@ -190,14 +200,7 @@ uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 
   if(isFirst) {
     nextType = (tetromino)random(7);
-    uint8_t r = random(0xFF);
-    uint8_t g = random(0xFF);
-    uint8_t b = random(0xFF);
-    uint16_t sum = (r + g + b);
-    r = (0x40 * r) / sum;
-    g = (0x40 * g) / sum;
-    b = (0x40 * b) / sum;
-    nextTetrominoColor = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+    nextTetrominoColor = tetrominoColors[nextType];
     return 0;
   }
   else {
@@ -205,14 +208,7 @@ uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
     nextType = (tetromino)random(7);
 
     activeTetrominoColor = nextTetrominoColor;
-    uint8_t r = random(0xFF);
-    uint8_t g = random(0xFF);
-    uint8_t b = random(0xFF);
-    uint16_t sum = (r + g + b);
-    r = (0x40 * r) / sum;
-    g = (0x40 * g) / sum;
-    b = (0x40 * b) / sum;
-    nextTetrominoColor = ((uint32_t)r << 16) | ((uint32_t)g << 8) | (uint32_t)b;
+    nextTetrominoColor = tetrominoColors[nextType];
   }
 
   switch(nextType) {

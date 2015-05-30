@@ -127,13 +127,13 @@ void loop()
     nrf24_getData((uint8_t*)&jsTmp);
     switch(GET_PLAYER(jsTmp)) {
       case 0: {
-        p1controller = jsTmp;
-        break;
-      }
+          p1controller = jsTmp;
+          break;
+        }
       case 1: {
-        p2controller = jsTmp;
-        break;
-      }
+          p2controller = jsTmp;
+          break;
+        }
     }
   }
 
