@@ -4,11 +4,11 @@
 #define SQUARE_WAVE_SIZE  6
 uint16_t screensaverTimer = 1;
 uint8_t squareWavePoint = 0;
-uint8_t colorStep = 0;
+uint16_t colorStep = 0;
 #define RED   0
 #define GREEN 1
 #define BLUE  2
-uint32_t getIntensity(uint8_t step);
+uint32_t getRGB(uint16_t polar, uint8_t brightness);
 uint8_t screensaverShiftTimer = IRQ_HZ / 4;
 
 void ExitScreensaver(ArduinoGame* currentGame)
@@ -55,7 +55,7 @@ void DisplayScreensaver()
     screensaverShiftTimer--;
   }
   if (screensaverShiftTimer == 0) {
-    screensaverShiftTimer = IRQ_HZ / 4;
+    screensaverShiftTimer = IRQ_HZ / 8;
 
     /* Shift leftward */
     uint8_t x, y;
@@ -74,58 +74,87 @@ void DisplayScreensaver()
     if (squareWavePoint < SQUARE_WAVE_SIZE - 2) {
       /* top bar */
       SetPixel(BOARD_SIZE - 1, (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2,
-               getIntensity(colorStep));
+               getRGB(colorStep, 0x40));
     }
     else if (squareWavePoint == SQUARE_WAVE_SIZE - 2) {
       /* falling edge */
       for (y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep));
+        SetPixel(BOARD_SIZE - 1, y, getRGB(colorStep, 0x40));
       }
     }
     else if (squareWavePoint < (SQUARE_WAVE_SIZE * 2) - 3) {
       /* bottom bar */
       SetPixel(BOARD_SIZE - 1, ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1,
-               getIntensity(colorStep));
+               getRGB(colorStep, 0x40));
     }
     else if (squareWavePoint == (SQUARE_WAVE_SIZE * 2) - 3) {
       /* rising edge */
       for (y = (BOARD_SIZE - SQUARE_WAVE_SIZE) / 2;
            y <= ((BOARD_SIZE + SQUARE_WAVE_SIZE) / 2) - 1; y++) {
-        SetPixel(BOARD_SIZE - 1, y, getIntensity(colorStep));
+        SetPixel(BOARD_SIZE - 1, y, getRGB(colorStep, 0x40));
       }
     }
     squareWavePoint = (squareWavePoint + 1) % ((SQUARE_WAVE_SIZE - 1) * 2);
-    colorStep = (colorStep + 1) % 24;
+    colorStep = (colorStep + 2) % 360;
   }
 }
 
-uint32_t getIntensity(uint8_t step)
+uint32_t getRGB(uint16_t polar, uint8_t brightness)
 {
-  uint8_t red = 0, green = 0, blue = 0;
-  if (step < 8) {
-    /* rise */
-    red = (0x01 << (step));
+  uint32_t r = 0, g = 0, b = 0;
+
+  polar = polar % 360;
+
+  if (300 <= polar || polar <= 60) {
+    r = 0xFF;
   }
-  else if (step < 16) {
-    /* fall */
-    red =  (0x80 >> (step - 8));
+  else if (60 < polar && polar < 120) {
+    // down slope
+    r = ((120 - polar) * 0xFF) / 60;
   }
-  if (step >= 16) {
-    /* fall */
-    green = (0x80 >> (step - 16));
+  else if (120 <= polar && polar <= 240) {
+    r = 0;
   }
-  else if (step >= 8) {
-    /* rise */
-    green = (0x01 << (step - 8));
+  else if (240 < polar && polar < 300) {
+    // up slope
+    r = ((polar - 240) * 0xFF) / 60;
   }
-  if (step < 8) {
-    /* fall */
-    blue = (0x80 >> step);
+
+  if (0 < polar && polar < 60) {
+    // up slope
+    g = ((polar) * 0xFF) / 60;
   }
-  else if (step >= 16) {
-    /* rise */
-    blue = (0x01 << (step - 16));
+  else if (60 <= polar && polar <= 180) {
+    g = 0xFF;
   }
-  return ((uint32_t)red << 16) | ((uint32_t)green << 8) | blue;
+  else if (180 < polar && polar < 240) {
+    // down slope
+    g = ((240 - polar) * 0xFF) / 60;
+  }
+  else if ((240 <= polar && polar <= 360) || polar == 0) {
+    g = 0;
+  }
+
+  if (polar <= 120) {
+    b = 0;
+  }
+  else if (120 < polar && polar < 180) {
+    // up slope
+    b = ((polar - 120) * 0xFF) / 60;
+  }
+  else if (180 <= polar && polar <= 300) {
+    b = 0xFF;
+  }
+  else if (300 < polar && polar < 360) {
+    // down slope
+    b = ((360 - polar) * 0xFF) / 60;
+  }
+
+  /* Normalize brightness */
+  uint32_t sum = r + g + b;
+  r = (((r * brightness)) / sum);
+  g = (((g * brightness)) / sum);
+  b = (((b * brightness)) / sum);
+  return (r << 16) | (g << 8) | (b);
 }
