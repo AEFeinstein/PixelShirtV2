@@ -12,7 +12,7 @@
 typedef enum {O_TET, I_TET, S_TET, Z_TET, L_TET, J_TET, T_TET} tetromino;
 
 const uint8_t o_tet[1][4][2] = {
-  {{1,1},{1,2},{2,1},{2,2}}, // square
+  {{1,1},{1,2},{2,1},{2,2}}, /* square */
 };
 const uint8_t i_tet[2][4][2] = {
   {{0,1},{1,1},{2,1},{3,1}},
@@ -55,23 +55,23 @@ class Tetris : public ArduinoGame
                    uint8_t whoWon);
   void ProcessInput( int32_t p1, int32_t p2);
  private:
-  // Drawing
+  /* Drawing */
   void ClearActiveTetromino( );
   void DrawActiveTetromino( );
   void ClearNextTetromino( );
   void DrawNextTetromino( );
-  // Moving
+  /* Moving */
   uint8_t NewActiveTetromino(uint8_t isFirst);
   void RotateActiveTetromino(int8_t direction);
   uint8_t DropActiveTetromino( );
   void SlideActiveTetromino(int8_t direction);
-  // Timers
+  /* Timers */
   uint8_t dropTimer;
   uint8_t rotatedYet;
   uint8_t hardDroppedYet;
   uint8_t cursorTimer;
   uint8_t turboMode;
-  // State
+  /* State */
   int8_t nextTetromino[4][2];
   int8_t activeTetromino[4][2];
   int8_t activeOffset[2];

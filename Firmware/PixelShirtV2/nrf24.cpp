@@ -30,39 +30,39 @@ void nrf24_config(uint8_t channel, uint8_t pay_length)
   /* Use static payload length ... */
   payload_len = pay_length;
 
-  // Set RF channel
+  /* Set RF channel */
   nrf24_configRegister(RF_CH,channel);
 
-  // Set length of incoming payload
-  nrf24_configRegister(RX_PW_P0, 0x00); // Auto-ACK pipe ...
-  nrf24_configRegister(RX_PW_P1, payload_len); // Data payload pipe
-  nrf24_configRegister(RX_PW_P2, 0x00); // Pipe not used
-  nrf24_configRegister(RX_PW_P3, 0x00); // Pipe not used
-  nrf24_configRegister(RX_PW_P4, 0x00); // Pipe not used
-  nrf24_configRegister(RX_PW_P5, 0x00); // Pipe not used
+  /* Set length of incoming payload */
+  nrf24_configRegister(RX_PW_P0, 0x00); /* Auto-ACK pipe ... */
+  nrf24_configRegister(RX_PW_P1, payload_len); /* Data payload pipe */
+  nrf24_configRegister(RX_PW_P2, 0x00); /* Pipe not used */
+  nrf24_configRegister(RX_PW_P3, 0x00); /* Pipe not used */
+  nrf24_configRegister(RX_PW_P4, 0x00); /* Pipe not used */
+  nrf24_configRegister(RX_PW_P5, 0x00); /* Pipe not used */
 
-  // 1 Mbps, TX gain: 0dbm
+  /* 1 Mbps, TX gain: 0dbm */
   nrf24_configRegister(RF_SETUP, (0<<RF_DR)|((0x03)<<RF_PWR));
 
-  // CRC enable, 1 byte CRC length
+  /* CRC enable, 1 byte CRC length */
   nrf24_configRegister(CONFIG,nrf24_CONFIG);
 
-  // Auto Acknowledgment
+  /* Auto Acknowledgment */
   nrf24_configRegister(EN_AA,
                        (1<<ENAA_P0)|(1<<ENAA_P1)|(0<<ENAA_P2)|(0<<ENAA_P3)|(0<<ENAA_P4)|(0<<ENAA_P5));
 
-  // Enable RX addresses
+  /* Enable RX addresses */
   nrf24_configRegister(EN_RXADDR,
                        (1<<ERX_P0)|(1<<ERX_P1)|(0<<ERX_P2)|(0<<ERX_P3)|(0<<ERX_P4)|(0<<ERX_P5));
 
-  // Auto retransmit delay: 1000 us and Up to 15 retransmit trials
+  /* Auto retransmit delay: 1000 us and Up to 15 retransmit trials */
   nrf24_configRegister(SETUP_RETR,(0x04<<ARD)|(0x0F<<ARC));
 
-  // Dynamic length configurations: No dynamic length
+  /* Dynamic length configurations: No dynamic length */
   nrf24_configRegister(DYNPD,
                        (0<<DPL_P0)|(0<<DPL_P1)|(0<<DPL_P2)|(0<<DPL_P3)|(0<<DPL_P4)|(0<<DPL_P5));
 
-  // Start listening
+  /* Start listening */
   nrf24_powerUpRx();
 }
 
@@ -92,11 +92,11 @@ void nrf24_tx_address(uint8_t* adr)
 /* Returns 1 if data is ready ... */
 uint8_t nrf24_dataReady()
 {
-  // See note in getData() function - just checking RX_DR isn't good enough
+  /* See note in getData() function - just checking RX_DR isn't good enough */
   uint8_t status = nrf24_getStatus();
 
-  // We can short circuit on RX_DR, but if it's not set, we still need
-  // to check the FIFO for any pending packets
+  /* We can short circuit on RX_DR, but if it's not set, we still need */
+  /* to check the FIFO for any pending packets */
   if ( status & (1 << RX_DR) ) {
     return 1;
   }
@@ -153,8 +153,8 @@ uint8_t nrf24_retransmissionCount()
   return rv;
 }
 
-// Sends a data package to the default address. Be sure to send the correct
-// amount of bytes as configured as payload on the receiver.
+/* Sends a data package to the default address. Be sure to send the correct */
+/* amount of bytes as configured as payload on the receiver. */
 void nrf24_send(uint8_t* value)
 {
   /* Go to Standby-I first */

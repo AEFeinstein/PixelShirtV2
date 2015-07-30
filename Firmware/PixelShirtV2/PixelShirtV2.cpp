@@ -148,19 +148,18 @@ void loop()
 
 void doEverything()
 {
-  //  uint8_t (GET_BUTTONS(p1) & UP) = GET_BUTTONS(p1controller) & UP;
-  //  uint8_t (GET_BUTTONS(p1) & DOWN) = GET_BUTTONS(p1controller) & DOWN;
-  //  uint8_t (GET_BUTTONS(p1) & RIGHT) = GET_BUTTONS(p1controller) & RIGHT;
-  //  uint8_t (GET_BUTTONS(p1) & LEFT) = GET_BUTTONS(p1controller) & LEFT;
-  //  int16_t (GET_X_AXIS(p1)) = GET_X_AXIS(p1controller);
-  //  int16_t (GET_Y_AXIS(p1)) = GET_Y_AXIS(p1controller);
-  //
-  //  uint8_t (GET_BUTTONS(p2) & UP) = GET_BUTTONS(p2controller) & UP;
-  //  uint8_t (GET_BUTTONS(p2) & DOWN) = GET_BUTTONS(p2controller) & DOWN;
-  //  uint8_t (GET_BUTTONS(p2) & RIGHT) = GET_BUTTONS(p2controller) & RIGHT;
-  //  uint8_t (GET_BUTTONS(p2) & LEFT) = GET_BUTTONS(p2controller) & LEFT;
-  //  int16_t (GET_X_AXIS(p2)) = GET_X_AXIS(p2controller);
-  //  int16_t (GET_Y_AXIS(p2)) = GET_Y_AXIS(p2controller);
+  /* uint8_t (GET_BUTTONS(p1) & UP) = GET_BUTTONS(p1controller) & UP; */
+  /* uint8_t (GET_BUTTONS(p1) & DOWN) = GET_BUTTONS(p1controller) & DOWN; */
+  /* uint8_t (GET_BUTTONS(p1) & RIGHT) = GET_BUTTONS(p1controller) & RIGHT; */
+  /* uint8_t (GET_BUTTONS(p1) & LEFT) = GET_BUTTONS(p1controller) & LEFT; */
+  /* int16_t (GET_X_AXIS(p1)) = GET_X_AXIS(p1controller); */
+  /* int16_t (GET_Y_AXIS(p1)) = GET_Y_AXIS(p1controller); */
+  /* //  uint8_t (GET_BUTTONS(p2) & UP) = GET_BUTTONS(p2controller) & UP; */
+  /* uint8_t (GET_BUTTONS(p2) & DOWN) = GET_BUTTONS(p2controller) & DOWN; */
+  /* uint8_t (GET_BUTTONS(p2) & RIGHT) = GET_BUTTONS(p2controller) & RIGHT; */
+  /* uint8_t (GET_BUTTONS(p2) & LEFT) = GET_BUTTONS(p2controller) & LEFT; */
+  /* int16_t (GET_X_AXIS(p2)) = GET_X_AXIS(p2controller); */
+  /* int16_t (GET_Y_AXIS(p2)) = GET_Y_AXIS(p2controller); */
 
   /* If both up buttons are held, maybe the game mode is being changed */
   if((GET_BUTTONS(p1controller) & UP) && (GET_BUTTONS(p2controller) & UP)) {
@@ -246,7 +245,7 @@ void DisplayScore(  uint16_t score, uint32_t rgb)
     }
   }
 
-  // draw "score" on the field
+  /* draw "score" on the field */
   if(score > 999) {
     DrawNumber((score / 1000) % 10, 0 , 5, rgb);
   }

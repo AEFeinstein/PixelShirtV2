@@ -18,7 +18,7 @@
 #define WRAP(x,y) ( ((x) < 0) ? ((x) + (y)) : ( ((x) >= (y)) ? ((x) - (y)) : (x) ) )
 #define CLAMP(x,y) ((x) > (y) ? (y) : ((x) < 0 ? 0 : (x)))
 
-#define RANDOM_PIN   4  // Analog, not connected
+#define RANDOM_PIN   4  /* Analog, not connected */
 
 #define EMPTY_COLOR 0x000000
 #define SCORE_COLOR 0x004000

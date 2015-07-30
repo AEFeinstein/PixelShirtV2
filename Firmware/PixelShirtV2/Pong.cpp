@@ -20,62 +20,62 @@ void Pong::UpdatePhysics( )
     restartTimer--;
   }
   else {
-    // Physics!
-    // Update the ball's position
+    /* Physics! */
+    /* Update the ball's position */
     ballLoc[X] += (ballVel[X] * TIME_STEP);
     ballLoc[Y] += (ballVel[Y] * TIME_STEP);
 
-    // Check for collisions, win conditions. Nudge the ball if necessary
-    // Top wall collision
+    /* Check for collisions, win conditions. Nudge the ball if necessary */
+    /* Top wall collision */
     if (ballLoc[Y] < 0 && ballVel[Y] < 0) {
       ballVel[Y] = -ballVel[Y];
       ballLoc[Y] = 0;
     }
-    // Bottom wall collision
+    /* Bottom wall collision */
     else if (ballLoc[Y] >= BOARD_SIZE * S_M * V_M && ballVel[Y] > 0) {
       ballVel[Y] = -ballVel[Y];
       ballLoc[Y] = (BOARD_SIZE) * S_M * V_M - 1;
     }
-    // left paddle collision
+    /* left paddle collision */
     else if (ballLoc[X] < 1 * S_M * V_M && ballVel[X] < 0
              && (paddleLocL <= ballLoc[Y]
                  && ballLoc[Y] < paddleLocL + PADDLE_SIZE)) {
       ballVel[X] = -ballVel[X];
-      ballLoc[X] = 1 * S_M * V_M; // right on the edge of the paddle
+      ballLoc[X] = 1 * S_M * V_M; /* right on the edge of the paddle */
 
       //Increase speed on collision
-      IncreaseSpeed(37); // remember, divided by V_M
+      IncreaseSpeed(37); /* remember, divided by V_M */
 
-      // Apply extra rotation depending on part of the paddle hit
-      // range of diff is -PADDLE_SIZE/2 to PADDLE_SIZE/2 (+/- 8192)
+      /* Apply extra rotation depending on part of the paddle hit */
+      /* range of diff is -PADDLE_SIZE/2 to PADDLE_SIZE/2 (+/- 8192) */
       diff = ballLoc[Y] - (paddleLocL + PADDLE_SIZE / 2);
       rotation = (EXTRA_ROTATION_ON_EDGE * diff) / (PADDLE_SIZE /
-                 2); // rotate 45deg at edge of paddle, 0deg in middle, linear in between
+                 2); /* rotate 45deg at edge of paddle, 0deg in middle, linear in between */
       RotateBall(rotation);
     }
-    // right paddle collision
+    /* right paddle collision */
     else if (ballLoc[X] >= (BOARD_SIZE - 1) * S_M * V_M && ballVel[X] > 0
              && (paddleLocR <= ballLoc[Y]
                  && ballLoc[Y] < paddleLocR + PADDLE_SIZE)) {
       ballVel[X] = -ballVel[X];
       ballLoc[X] = (BOARD_SIZE - 1) * S_M * V_M -
-                   1; // right on the edge of the paddle
+                   1; /* right on the edge of the paddle */
 
       //Increase speed on collision
-      IncreaseSpeed(37); // remember, divided by V_M
+      IncreaseSpeed(37); /* remember, divided by V_M */
 
-      // Apply extra rotation depending on part of the paddle hit
-      // range of diff is -PADDLE_SIZE/2 to PADDLE_SIZE/2 (+/- 8192)
+      /* Apply extra rotation depending on part of the paddle hit */
+      /* range of diff is -PADDLE_SIZE/2 to PADDLE_SIZE/2 (+/- 8192) */
       diff = ballLoc[Y] - (paddleLocR + PADDLE_SIZE / 2);
       rotation = (EXTRA_ROTATION_ON_EDGE * diff) / (PADDLE_SIZE /
-                 2); // rotate 45deg at edge of paddle, 0deg in middle, linear in between
+                 2); /* rotate 45deg at edge of paddle, 0deg in middle, linear in between */
       RotateBall(-rotation);
     }
-    // left wall win
+    /* left wall win */
     else if (ballLoc[X] < 0 && ballVel[X] < 0) {
       ResetGame(0, 1);
     }
-    // right wall win
+    /* right wall win */
     else if (ballLoc[X] >= BOARD_SIZE * S_M * V_M && ballVel[X] > 0) {
       ResetGame(0, 0);
     }
@@ -107,7 +107,7 @@ void Pong::ResetGame(  uint8_t isInit,
   DrawField();
 }
 
-// Rotate the ball in degrees (-360 -> 359)
+/* Rotate the ball in degrees (-360 -> 359) */
 void Pong::RotateBall(int16_t degree)
 {
   if (degree < 0) {
@@ -123,7 +123,7 @@ void Pong::RotateBall(int16_t degree)
                 (int32_t)cos32[degree]) / 32;
 }
 
-// Apply a multiplier to the velocity. make this additive instead?
+/* Apply a multiplier to the velocity. make this additive instead? */
 void Pong::IncreaseSpeed(int16_t speedM)
 {
   ballVel[X] = (ballVel[X] * speedM) / V_M;

@@ -110,26 +110,26 @@ uint32_t getRGB(uint16_t polar, uint8_t brightness)
     r = 0xFF;
   }
   else if (60 < polar && polar < 120) {
-    // down slope
+    /* down slope */
     r = ((120 - polar) * 0xFF) / 60;
   }
   else if (120 <= polar && polar <= 240) {
     r = 0;
   }
   else if (240 < polar && polar < 300) {
-    // up slope
+    /* up slope */
     r = ((polar - 240) * 0xFF) / 60;
   }
 
   if (0 < polar && polar < 60) {
-    // up slope
+    /* up slope */
     g = ((polar) * 0xFF) / 60;
   }
   else if (60 <= polar && polar <= 180) {
     g = 0xFF;
   }
   else if (180 < polar && polar < 240) {
-    // down slope
+    /* down slope */
     g = ((240 - polar) * 0xFF) / 60;
   }
   else if ((240 <= polar && polar <= 360) || polar == 0) {
@@ -140,14 +140,14 @@ uint32_t getRGB(uint16_t polar, uint8_t brightness)
     b = 0;
   }
   else if (120 < polar && polar < 180) {
-    // up slope
+    /* up slope */
     b = ((polar - 120) * 0xFF) / 60;
   }
   else if (180 <= polar && polar <= 300) {
     b = 0xFF;
   }
   else if (300 < polar && polar < 360) {
-    // down slope
+    /* down slope */
     b = ((360 - polar) * 0xFF) / 60;
   }
 

@@ -43,8 +43,8 @@ void Tetris::ResetGame(
   }
   else {
     gameOver = 0;
-    NewActiveTetromino( 1); // ignore return, it will always be placed
-    NewActiveTetromino( 0); // ignore return, it will always be placed
+    NewActiveTetromino( 1); /* ignore return, it will always be placed */
+    NewActiveTetromino( 0); /* ignore return, it will always be placed */
     DrawActiveTetromino();
     DrawNextTetromino();
   }
@@ -192,7 +192,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     }
   }
   else {
-    // reset the timer
+    /* reset the timer */
     cursorTimer = 0;
   }
 }
@@ -373,32 +373,32 @@ uint8_t Tetris::DropActiveTetromino( )
   uint8_t i, j, k, rowFull, isBlocked = 0, rc = 0;
   ClearActiveTetromino();
 
-  // Check to see if the tetromino can be moved down
+  /* Check to see if the tetromino can be moved down */
   for(i=0; i < 4; i++) {
-    if(activeTetromino[i][Y] + activeOffset[Y] + 1 == BOARD_SIZE || // floor
+    if(activeTetromino[i][Y] + activeOffset[Y] + 1 == BOARD_SIZE || /* floor */
         IsPixelLit(activeTetromino[i][X] + activeOffset[X],
                    activeTetromino[i][Y] + activeOffset[Y] +
-                   1)) { // used to be ==2, set piece TOTO PROBMEL
+                   1)) { /* used to be ==2, set piece TOTO PROBMEL */
       isBlocked = 1;
     }
   }
 
-  // If the piece is not blocked, move it downward
+  /* If the piece is not blocked, move it downward */
   if(!isBlocked) {
     activeOffset[Y]++;
     DrawActiveTetromino();
     return 1;
   }
-  // Otherwise set the piece in the  clear lines, and try to spawn a new piece
+  /* Otherwise set the piece in the  clear lines, and try to spawn a new piece */
   else {
-    leadPlayer = (leadPlayer+1)%2; // whenever a piece is set, swap the controls
-    // Set the piece
+    leadPlayer = (leadPlayer+1)%2; /* whenever a piece is set, swap the controls */
+    /* Set the piece */
     for(i=0; i < 4; i++) {
       SetPixel(activeTetromino[i][X] + activeOffset[X],
                activeTetromino[i][Y] + activeOffset[Y], activeTetrominoColor);
     }
 
-    // check for rows to clear, clear them
+    /* check for rows to clear, clear them */
     for(i=0; i < BOARD_SIZE; i++) {
       rowFull = 1;
       for(j=0; j < 10; j++) {
@@ -408,7 +408,7 @@ uint8_t Tetris::DropActiveTetromino( )
       }
       if(rowFull) {
         rc++;
-        // drop row
+        /* drop row */
         for(j = i; j > 0; j--) {
           for(k=4; k < 14; k++) {
             SetPixel(k, j, GetPixel(k, j-1));
@@ -420,7 +420,7 @@ uint8_t Tetris::DropActiveTetromino( )
       }
     }
 
-    // if a row was cleared, add to the score, draw it, and check for victory
+    /* if a row was cleared, add to the score, draw it, and check for victory */
     if(rc) {
       rowsCleared += rc;
 
@@ -438,7 +438,7 @@ uint8_t Tetris::DropActiveTetromino( )
 
     ClearNextTetromino();
     if(NewActiveTetromino( 0)) {
-      gameOver = 1; // the new tetromino spawned and intersected
+      gameOver = 1; /* the new tetromino spawned and intersected */
     }
     DrawActiveTetromino();
     DrawNextTetromino();
@@ -453,17 +453,17 @@ void Tetris::SlideActiveTetromino(
 
   ClearActiveTetromino();
 
-  // Check to see if the tetromino can be moved laterally
+  /* Check to see if the tetromino can be moved laterally */
   for(i=0; i < 4; i++) {
-    // 3 is a wall, 2 is a set piece
+    /* 3 is a wall, 2 is a set piece */
     if(IsPixelLit(activeTetromino[i][X] + activeOffset[X] + direction,
                   activeTetromino[i][Y] + activeOffset[Y]) ) { /* Used to be == 2 or 3 */
       DrawActiveTetromino();
-      return; // can't slide :(
+      return; /* can't slide :( */
     }
   }
 
-  // If the piece is not blocked, move it downward
+  /* If the piece is not blocked, move it downward */
   activeOffset[X] += direction;
   DrawActiveTetromino();
 }
@@ -479,7 +479,7 @@ void Tetris::RotateActiveTetromino(
 
   switch(activeType) {
     case O_TET:
-      // no rotation
+      /* no rotation */
       DrawActiveTetromino();
       return;
     case I_TET:
@@ -529,16 +529,16 @@ void Tetris::RotateActiveTetromino(
   for(i=0; i < 4; i++) {
     if(IsPixelLit(newRotation[i][X] + activeOffset[X],
                   newRotation[i][Y] + activeOffset[Y])
-        || // /* Used to be == 2 (piece) or 3 (wall) */
+        || /* /* Used to be == 2 (piece) or 3 (wall) */ */
         newRotation[i][Y] + activeOffset[Y] < 0  ||
         newRotation[i][Y] + activeOffset[Y] > 15) {
-      activeRotation = oldRotation; // undo
+      activeRotation = oldRotation; /* undo */
       DrawActiveTetromino();
-      return; // can't rotate :(
+      return; /* can't rotate :( */
     }
   }
 
-  // rotate the tetromino
+  /* rotate the tetromino */
   for(i=0; i < 4; i++) {
     activeTetromino[i][X] = newRotation[i][X];
     activeTetromino[i][Y] = newRotation[i][Y];

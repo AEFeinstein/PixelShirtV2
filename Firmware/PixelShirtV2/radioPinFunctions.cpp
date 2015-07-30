@@ -18,11 +18,11 @@
 /* ------------------------------------------------------------------------- */
 void nrf24_setupPins()
 {
-  set_bit(DDRC,6); // CE output, digital pin 5
-  set_bit(DDRD,7); // CSN output, digital pin 6
-  set_bit(DDRB,1); // SCK output
-  set_bit(DDRB,2); // MOSI output
-  clr_bit(DDRB,3); // MISO input
+  set_bit(DDRC,6); /* CE output, digital pin 5 */
+  set_bit(DDRD,7); /* CSN output, digital pin 6 */
+  set_bit(DDRB,1); /* SCK output */
+  set_bit(DDRB,2); /* MOSI output */
+  clr_bit(DDRB,3); /* MISO input */
 }
 /* ------------------------------------------------------------------------- */
 void nrf24_ce_digitalWrite(uint8_t state)
