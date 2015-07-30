@@ -121,20 +121,7 @@ void SuperSquare::ResetGame(
   }
 }
 
-void SuperSquare::ProcessInput(
-  __attribute__((unused))
-  int32_t p1ax,
-  __attribute__((unused)) int32_t p1ay,
-  __attribute__((unused)) int8_t p1bl,
-  __attribute__((unused)) int8_t p1br,
-  __attribute__((unused)) int8_t p1bu,
-  __attribute__((unused)) int8_t p1bd,
-  __attribute__((unused)) int32_t p2ax,
-  __attribute__((unused)) int32_t p2ay,
-  __attribute__((unused)) int8_t p2bl,
-  __attribute__((unused)) int8_t p2br,
-  __attribute__((unused)) int8_t p2bu,
-  __attribute__((unused)) int8_t p2bd)
+void SuperSquare::ProcessInput(int32_t p1, __attribute__((unused)) int32_t p2)
 {
   uint8_t newPos[2];
   uint8_t i;
@@ -148,7 +135,7 @@ void SuperSquare::ProcessInput(
   SetPixel(newPos[0], newPos[1], EMPTY_COLOR);
 
   /* Update the player position */
-  playerPosition = (playerPosition + ((p1ax - 512) / 25));
+  playerPosition = (playerPosition + (((GET_X_AXIS(p1)) - 512) / 25));
   if(playerPosition < 0) {
     playerPosition += 360;
   }

@@ -12,12 +12,20 @@ uint32_t tetrominoColors[7] = {
   0x0022001D,
 };
 
+/**
+ * TODO
+ */
 Tetris::Tetris()
 {
   multiplayer = 1;
   ResetGame(1, 0);
 }
 
+/**
+ * TODO
+ * @param isInit
+ * @param whoWon
+ */
 void Tetris::ResetGame(
   uint8_t isInit,
   __attribute__((unused)) uint8_t whoWon)
@@ -55,6 +63,9 @@ void Tetris::ResetGame(
   downTimer = 0;
 }
 
+/**
+ * TODO
+ */
 void Tetris::UpdatePhysics( )
 {
   if(gameOver) {
@@ -78,25 +89,17 @@ void Tetris::UpdatePhysics( )
   }
 }
 
-void Tetris::ProcessInput(
-
-  int32_t p1ax,
-  int32_t p1ay,
-  int8_t p1bl,
-  int8_t p1br,
-  int8_t p1bu,
-  int8_t p1bd,
-  int32_t p2ax,
-  int32_t p2ay,
-  int8_t p2bl,
-  int8_t p2br,
-  int8_t p2bu,
-  int8_t p2bd)
+/**
+ * TODO
+ * @param p1
+ * @param p2
+ */
+void Tetris::ProcessInput(int32_t p1, int32_t p2)
 {
   int32_t ax, ay;
   int8_t br, bl, bu;
 
-  if(p1bl && p2bl) {
+  if((GET_BUTTONS(p1) & LEFT) && (GET_BUTTONS(p2) & LEFT)) {
     downTimer++;
   }
   else {
@@ -110,12 +113,12 @@ void Tetris::ProcessInput(
 
   if(gameOver) {
     if(multiplayer) {
-      if(p1bd && p2bd) {
+      if((GET_BUTTONS(p1) & DOWN) && (GET_BUTTONS(p2) & DOWN)) {
         ResetGame(0, 0);
       }
     }
     else {
-      if(p1bd) {
+      if((GET_BUTTONS(p1) & DOWN)) {
         ResetGame(0, 0);
       }
     }
@@ -124,26 +127,26 @@ void Tetris::ProcessInput(
 
   if(multiplayer) {
     if(leadPlayer%2) {
-      ax = p1ax;
-      ay = p1ay;
-      bu = p2bu;
-      bl = p2bl;
-      br = p2br;
+      ax = (GET_X_AXIS(p1));
+      ay = (GET_Y_AXIS(p1));
+      bu = (GET_BUTTONS(p2) & UP);
+      bl = (GET_BUTTONS(p2) & LEFT);
+      br = (GET_BUTTONS(p2) & RIGHT);
     }
     else {
-      ax = p2ax;
-      ay = p2ay;
-      bu = p1bu;
-      bl = p1bl;
-      br = p1br;
+      ax = (GET_X_AXIS(p2));
+      ay = (GET_Y_AXIS(p2));
+      bu = (GET_BUTTONS(p1) & UP);
+      bl = (GET_BUTTONS(p1) & LEFT);
+      br = (GET_BUTTONS(p1) & RIGHT);
     }
   }
   else {
-    ax = p1ax;
-    ay = p1ay;
-    bu = p1bu;
-    bl = p1bl;
-    br = p1br;
+    ax = (GET_X_AXIS(p1));
+    ay = (GET_Y_AXIS(p1));
+    bu = (GET_BUTTONS(p1) & UP);
+    bl = (GET_BUTTONS(p1) & LEFT);
+    br = (GET_BUTTONS(p1) & RIGHT);
   }
 
   if(bl && !rotatedYet) {
@@ -194,6 +197,11 @@ void Tetris::ProcessInput(
   }
 }
 
+/**
+ * TODO
+ * @param isFirst
+ * @return
+ */
 uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 {
   uint8_t i;

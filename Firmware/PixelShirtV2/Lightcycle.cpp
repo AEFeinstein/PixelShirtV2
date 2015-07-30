@@ -1,10 +1,16 @@
 #include "Lightcycle.h"
 
+/**
+ * TODO
+ */
 Lightcycle::Lightcycle()
 {
   ResetGame(1, 0);
 }
 
+/**
+ * TODO
+ */
 void Lightcycle::UpdatePhysics( )
 {
   uint8_t losers = 0;
@@ -73,6 +79,11 @@ void Lightcycle::UpdatePhysics( )
   }
 }
 
+/**
+ * TODO
+ * @param isInit
+ * @param whoWon
+ */
 void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
                             uint8_t whoWon)
 {
@@ -118,61 +129,54 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
   }
 }
 
-void Lightcycle::ProcessInput(
-  __attribute__((unused)) int32_t p1ax,
-  __attribute__((unused)) int32_t p1ay,
-  int8_t p1bl,
-  int8_t p1br,
-  int8_t p1bu,
-  int8_t p1bd,
-  __attribute__((unused)) int32_t p2ax,
-  __attribute__((unused)) int32_t p2ay,
-  int8_t p2bl,
-  int8_t p2br,
-  int8_t p2bu,
-  int8_t p2bd)
+/**
+ * TODO
+ * @param p1
+ * @param p2
+ */
+void Lightcycle::ProcessInput(int32_t p1, int32_t p2)
 {
   if(!started) {
     return;
   }
   // Switch position based on buttons
-  if(p1bu) {
+  if((GET_BUTTONS(p1) & UP)) {
     if(p1dir != DOWN) {
       p1dir = UP;
     }
   }
-  else if(p1bd) {
+  else if((GET_BUTTONS(p1) & DOWN)) {
     if(p1dir != UP) {
       p1dir = DOWN;
     }
   }
-  else if(p1bl) {
+  else if((GET_BUTTONS(p1) & LEFT)) {
     if(p1dir != RIGHT) {
       p1dir = LEFT;
     }
   }
-  else if(p1br) {
+  else if((GET_BUTTONS(p1) & RIGHT)) {
     if(p1dir != LEFT) {
       p1dir = RIGHT;
     }
   }
 
-  if(p2bu) {
+  if((GET_BUTTONS(p2) & UP)) {
     if(p2dir != DOWN) {
       p2dir = UP;
     }
   }
-  else if(p2bd) {
+  else if((GET_BUTTONS(p2) & DOWN)) {
     if(p2dir != UP) {
       p2dir = DOWN;
     }
   }
-  else if(p2bl) {
+  else if((GET_BUTTONS(p2) & LEFT)) {
     if(p2dir != RIGHT) {
       p2dir = LEFT;
     }
   }
-  else if(p2br) {
+  else if((GET_BUTTONS(p2) & RIGHT)) {
     if(p2dir != LEFT) {
       p2dir = RIGHT;
     }

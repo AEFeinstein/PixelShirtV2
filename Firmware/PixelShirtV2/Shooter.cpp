@@ -25,11 +25,11 @@ void Shooter::UpdatePhysics( )
   else {
     /* Clear bullets */
     for (i = 0; i < NUM_BULLETS; i++) {
-      if(p1.bullets[i][1] != -1 && p1.bullets[i][1] != BOARD_SIZE - 2) {
-        SetPixel(p1.bullets[i][0], p1.bullets[i][1], EMPTY_COLOR);
+      if(player1.bullets[i][1] != -1 && player1.bullets[i][1] != BOARD_SIZE - 2) {
+        SetPixel(player1.bullets[i][0], player1.bullets[i][1], EMPTY_COLOR);
       }
-      if(p2.bullets[i][1] != -1 && p2.bullets[i][1] != BOARD_SIZE - 2) {
-        SetPixel(p2.bullets[i][0], p2.bullets[i][1], EMPTY_COLOR);
+      if(player2.bullets[i][1] != -1 && player2.bullets[i][1] != BOARD_SIZE - 2) {
+        SetPixel(player2.bullets[i][0], player2.bullets[i][1], EMPTY_COLOR);
       }
     }
 
@@ -41,47 +41,47 @@ void Shooter::UpdatePhysics( )
     }
 
     /* Cooldown for shooting */
-    if(p1.shotClock > 0) {
-      p1.shotClock--;
+    if(player1.shotClock > 0) {
+      player1.shotClock--;
     }
-    if(p2.shotClock > 0) {
-      p2.shotClock--;
+    if(player2.shotClock > 0) {
+      player2.shotClock--;
     }
 
     /* Move bullets */
     for (i = 0; i < NUM_BULLETS; i++) {
-      if(p1.bullets[i][1] != -1) {
+      if(player1.bullets[i][1] != -1) {
         /* Move the bullet, if it is == -1, it will invalidate */
-        p1.bullets[i][1]--;
+        player1.bullets[i][1]--;
       }
-      if(p2.bullets[i][1] != -1) {
+      if(player2.bullets[i][1] != -1) {
         /* Move the bullet, if it is == -1, it will invalidate */
-        p2.bullets[i][1]--;
+        player2.bullets[i][1]--;
       }
     }
 
     /* Draw bullets, checking for collisions */
     for (i = 0; i < NUM_BULLETS; i++) {
-      if(p1.bullets[i][1] != -1) {
-        if(GetPixel(p1.bullets[i][0], p1.bullets[i][1]) == ENEMY_COLOR) {
+      if(player1.bullets[i][1] != -1) {
+        if(GetPixel(player1.bullets[i][0], player1.bullets[i][1]) == ENEMY_COLOR) {
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
-          SetPixel(p1.bullets[i][0], p1.bullets[i][1], EMPTY_COLOR);
+          SetPixel(player1.bullets[i][0], player1.bullets[i][1], EMPTY_COLOR);
           KillEnemy();
-          p1.bullets[i][1] = -1;
+          player1.bullets[i][1] = -1;
         }
         else {
-          SetPixel(p1.bullets[i][0], p1.bullets[i][1], BULLET_COLOR);
+          SetPixel(player1.bullets[i][0], player1.bullets[i][1], BULLET_COLOR);
         }
       }
-      if(p2.bullets[i][1] != -1) {
-        if(GetPixel(p2.bullets[i][0], p2.bullets[i][1]) == ENEMY_COLOR) {
+      if(player2.bullets[i][1] != -1) {
+        if(GetPixel(player2.bullets[i][0], player2.bullets[i][1]) == ENEMY_COLOR) {
           /* KILL SHOT, clear the pixel, invalidate the bullet, increment the score */
-          SetPixel(p2.bullets[i][0], p2.bullets[i][1], EMPTY_COLOR);
+          SetPixel(player2.bullets[i][0], player2.bullets[i][1], EMPTY_COLOR);
           KillEnemy();
-          p2.bullets[i][1] = -1;
+          player2.bullets[i][1] = -1;
         }
         else {
-          SetPixel(p2.bullets[i][0], p2.bullets[i][1], BULLET_COLOR);
+          SetPixel(player2.bullets[i][0], player2.bullets[i][1], BULLET_COLOR);
         }
       }
     }
@@ -119,15 +119,15 @@ void Shooter::ResetGame(
   moveTimer = IRQ_HZ;
   activeDirection = RIGHT;
 
-  p1.position = PLAYER_SCALAR * 3;
-  p2.position = PLAYER_SCALAR * 12;
+  player1.position = PLAYER_SCALAR * 3;
+  player2.position = PLAYER_SCALAR * 12;
 
-  p1.shotClock = 0;
-  p2.shotClock = 0;
+  player1.shotClock = 0;
+  player2.shotClock = 0;
 
   for(i=0; i < NUM_BULLETS; i++) {
-    p1.bullets[i][1] = -1;
-    p2.bullets[i][1] = -1;
+    player1.bullets[i][1] = -1;
+    player2.bullets[i][1] = -1;
   }
 
   if(FALSE == DrawPlayers()) {
@@ -154,20 +154,7 @@ void Shooter::SpawnWave()
   }
 }
 
-void Shooter::ProcessInput(
-  __attribute__((unused))
-  int32_t p1ax,
-  __attribute__((unused)) int32_t p1ay,
-  __attribute__((unused)) int8_t p1bl,
-  __attribute__((unused)) int8_t p1br,
-  __attribute__((unused)) int8_t p1bu,
-  int8_t p1bd,
-  int32_t p2ax,
-  __attribute__((unused)) int32_t p2ay,
-  __attribute__((unused)) int8_t p2bl,
-  __attribute__((unused)) int8_t p2br,
-  __attribute__((unused)) int8_t p2bu,
-  int8_t p2bd)
+void Shooter::ProcessInput(int32_t p1, int32_t p2)
 {
   uint8_t i;
 
@@ -175,23 +162,23 @@ void Shooter::ProcessInput(
     ClearPlayers();
 
     /* Handle position */
-    if(p1ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ax) {
-      p1.position += ((p1ax - 512) / 32);
-      if(p1.position < 0) {
-        p1.position = 0;
+    if((GET_X_AXIS(p1)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_X_AXIS(p1))) {
+      player1.position += (((GET_X_AXIS(p1)) - 512) / 32);
+      if(player1.position < 0) {
+        player1.position = 0;
       }
-      else if(p1.position > p2.position - PLAYER_SCALAR) {
-        p1.position = p2.position - PLAYER_SCALAR;
+      else if(player1.position > player2.position - PLAYER_SCALAR) {
+        player1.position = player2.position - PLAYER_SCALAR;
       }
     }
 
-    if(p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax) {
-      p2.position += ((p2ax - 512) / 32);
-      if(p2.position < p1.position + PLAYER_SCALAR) {
-        p2.position = p1.position + PLAYER_SCALAR;
+    if((GET_X_AXIS(p2)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_X_AXIS(p2))) {
+      player2.position += (((GET_X_AXIS(p2)) - 512) / 32);
+      if(player2.position < player1.position + PLAYER_SCALAR) {
+        player2.position = player1.position + PLAYER_SCALAR;
       }
-      else if(p2.position > PLAYER_SCALAR * (BOARD_SIZE - 1)) {
-        p2.position = PLAYER_SCALAR * (BOARD_SIZE - 1);
+      else if(player2.position > PLAYER_SCALAR * (BOARD_SIZE - 1)) {
+        player2.position = PLAYER_SCALAR * (BOARD_SIZE - 1);
       }
     }
 
@@ -201,28 +188,28 @@ void Shooter::ProcessInput(
 
     /* Handle bullets */
     /* If the player presses the button, and the timer has expired */
-    if(p1bd && p1.shotClock == 0) {
+    if((GET_BUTTONS(p1) & DOWN) && player1.shotClock == 0) {
       /* Find a place to store the bullet */
       for( i = 0; i < NUM_BULLETS; i++) {
         /* If there is space, store the bullet position and start the clock again */
-        if(p1.bullets[i][1] == -1) {
-          p1.bullets[i][0] = p1.position / PLAYER_SCALAR;
-          p1.bullets[i][1] = BOARD_SIZE - 2;
-          p1.shotClock = IRQ_HZ / 4;
+        if(player1.bullets[i][1] == -1) {
+          player1.bullets[i][0] = player1.position / PLAYER_SCALAR;
+          player1.bullets[i][1] = BOARD_SIZE - 2;
+          player1.shotClock = IRQ_HZ / 4;
           break;
         }
       }
     }
 
     /* If the player presses the button, and the timer has expired */
-    if(p2bd && p2.shotClock == 0) {
+    if((GET_BUTTONS(p2) & DOWN) && player2.shotClock == 0) {
       /* Find a place to store the bullet */
       for( i = 0; i < NUM_BULLETS; i++) {
         /* If there is space, store the bullet position and start the clock again */
-        if(p2.bullets[i][1] == -1) {
-          p2.bullets[i][0] = p2.position / PLAYER_SCALAR;
-          p2.bullets[i][1] = BOARD_SIZE - 2;
-          p2.shotClock = IRQ_HZ / 4;
+        if(player2.bullets[i][1] == -1) {
+          player2.bullets[i][0] = player2.position / PLAYER_SCALAR;
+          player2.bullets[i][1] = BOARD_SIZE - 2;
+          player2.shotClock = IRQ_HZ / 4;
           break;
         }
       }
@@ -339,18 +326,18 @@ void Shooter::ClearPlayers()
   /* For each pixel in the ship */
   for(i = 0; i < 4; i++) {
     /* If the pixel is in bounds */
-    if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
-        && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
+    if(0 <= (player1.position / PLAYER_SCALAR) + shipShape[i][0]
+        && (player1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+      SetPixel((player1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
                EMPTY_COLOR);
     }
 
-    /* And then again, for P2. If the pixel is in bounds */
-    if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
-        && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
+    /* And then again, for player2. If the pixel is in bounds */
+    if(0 <= (player2.position / PLAYER_SCALAR) + shipShape[i][0]
+        && (player2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
-      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+      SetPixel((player2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
                EMPTY_COLOR);
     }
   }
@@ -363,31 +350,31 @@ uint8_t Shooter::DrawPlayers()
   /* For each pixel in the ship */
   for(i = 0; i < 4; i++) {
     /* If the pixel is in bounds */
-    if(0 <= (p1.position / PLAYER_SCALAR) + shipShape[i][0]
-        && (p1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
+    if(0 <= (player1.position / PLAYER_SCALAR) + shipShape[i][0]
+        && (player1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit red, i.e. touched by an enemy */
-      if(GetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0],
+      if(GetPixel((player1.position / PLAYER_SCALAR) + shipShape[i][0],
                   shipShape[i][1]) == ENEMY_COLOR) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+      SetPixel((player1.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
                P1_COLOR);
     }
   }
 
-  /* And then again, for P2. If the pixel is in bounds */
+  /* And then again, for player2. If the pixel is in bounds */
   for(i = 0; i < 4; i++) {
     /* If the pixel is in bounds */
-    if(0 <= (p2.position / PLAYER_SCALAR) + shipShape[i][0]
-        && (p2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
+    if(0 <= (player2.position / PLAYER_SCALAR) + shipShape[i][0]
+        && (player2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* If the pixel is already lit red, i.e. touched by an enemy */
-      if(GetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0],
+      if(GetPixel((player2.position / PLAYER_SCALAR) + shipShape[i][0],
                   shipShape[i][1]) == ENEMY_COLOR) {
         return FALSE;
       }
       /* Otherwise, draw that part of the ship */
-      SetPixel((p2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
+      SetPixel((player2.position / PLAYER_SCALAR) + shipShape[i][0], shipShape[i][1],
                P2_COLOR);
     }
   }

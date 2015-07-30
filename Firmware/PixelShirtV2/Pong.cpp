@@ -166,23 +166,10 @@ void Pong::DrawField( )
   }
 }
 
-void Pong::ProcessInput(
-  __attribute__((unused))
-  __attribute__((unused)) int32_t p1ax,
-  int32_t p1ay,
-  __attribute__((unused)) int8_t p1bl,
-  __attribute__((unused)) int8_t p1br,
-  __attribute__((unused)) int8_t p1bu,
-  __attribute__((unused)) int8_t p1bd,
-  __attribute__((unused)) int32_t p2ax,
-  int32_t p2ay,
-  __attribute__((unused)) int8_t p2bl,
-  __attribute__((unused)) int8_t p2br,
-  __attribute__((unused)) int8_t p2bu,
-  __attribute__((unused)) int8_t p2bd)
+void Pong::ProcessInput(int32_t p1, int32_t p2)
 {
-  if(p1ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ay) {
-    paddleLocL -= ((512 - p1ay) * 3);
+  if((GET_Y_AXIS(p1)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p1))) {
+    paddleLocL -= ((512 - (GET_Y_AXIS(p1))) * 3);
     if(paddleLocL < 0) {
       paddleLocL = 0;
     }
@@ -191,8 +178,8 @@ void Pong::ProcessInput(
     }
   }
 
-  if(p2ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ay) {
-    paddleLocR -= ((512 - p2ay) * 3);
+  if((GET_Y_AXIS(p2)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p2))) {
+    paddleLocR -= ((512 - (GET_Y_AXIS(p2))) * 3);
     if(paddleLocR < 0) {
       paddleLocR = 0;
     }

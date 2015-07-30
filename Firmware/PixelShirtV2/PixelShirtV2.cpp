@@ -148,22 +148,22 @@ void loop()
 
 void doEverything()
 {
-  uint8_t p1buVal = GET_BUTTONS(p1controller) & UP;
-  uint8_t p1bdVal = GET_BUTTONS(p1controller) & DOWN;
-  uint8_t p1brVal = GET_BUTTONS(p1controller) & RIGHT;
-  uint8_t p1blVal = GET_BUTTONS(p1controller) & LEFT;
-  int16_t p1ax = GET_X_AXIS(p1controller);
-  int16_t p1ay = GET_Y_AXIS(p1controller);
-
-  uint8_t p2buVal = GET_BUTTONS(p2controller) & UP;
-  uint8_t p2bdVal = GET_BUTTONS(p2controller) & DOWN;
-  uint8_t p2brVal = GET_BUTTONS(p2controller) & RIGHT;
-  uint8_t p2blVal = GET_BUTTONS(p2controller) & LEFT;
-  int16_t p2ax = GET_X_AXIS(p2controller);
-  int16_t p2ay = GET_Y_AXIS(p2controller);
+  //  uint8_t (GET_BUTTONS(p1) & UP) = GET_BUTTONS(p1controller) & UP;
+  //  uint8_t (GET_BUTTONS(p1) & DOWN) = GET_BUTTONS(p1controller) & DOWN;
+  //  uint8_t (GET_BUTTONS(p1) & RIGHT) = GET_BUTTONS(p1controller) & RIGHT;
+  //  uint8_t (GET_BUTTONS(p1) & LEFT) = GET_BUTTONS(p1controller) & LEFT;
+  //  int16_t (GET_X_AXIS(p1)) = GET_X_AXIS(p1controller);
+  //  int16_t (GET_Y_AXIS(p1)) = GET_Y_AXIS(p1controller);
+  //
+  //  uint8_t (GET_BUTTONS(p2) & UP) = GET_BUTTONS(p2controller) & UP;
+  //  uint8_t (GET_BUTTONS(p2) & DOWN) = GET_BUTTONS(p2controller) & DOWN;
+  //  uint8_t (GET_BUTTONS(p2) & RIGHT) = GET_BUTTONS(p2controller) & RIGHT;
+  //  uint8_t (GET_BUTTONS(p2) & LEFT) = GET_BUTTONS(p2controller) & LEFT;
+  //  int16_t (GET_X_AXIS(p2)) = GET_X_AXIS(p2controller);
+  //  int16_t (GET_Y_AXIS(p2)) = GET_Y_AXIS(p2controller);
 
   /* If both up buttons are held, maybe the game mode is being changed */
-  if(p1buVal && p2buVal) {
+  if((GET_BUTTONS(p1controller) & UP) && (GET_BUTTONS(p2controller) & UP)) {
     downTimer++;
   }
   else {
@@ -171,12 +171,18 @@ void doEverything()
   }
 
   /* If there is any input, exit the screensaver */
-  if(p1buVal || p1bdVal || p1blVal || p1brVal ||
-      p2buVal || p2bdVal || p2blVal || p2brVal ||
-      (p1ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ax) ||
-      (p2ax < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ax) ||
-      (p1ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p1ay) ||
-      (p2ay < 512 - DEAD_ZONE || 512 + DEAD_ZONE < p2ay)) {
+  if((GET_BUTTONS(p1controller) & UP) || (GET_BUTTONS(p1controller) & DOWN)
+      || (GET_BUTTONS(p1controller) & LEFT) || (GET_BUTTONS(p1controller) & RIGHT) ||
+      (GET_BUTTONS(p2controller) & UP) || (GET_BUTTONS(p2controller) & DOWN)
+      || (GET_BUTTONS(p2controller) & LEFT) || (GET_BUTTONS(p2controller) & RIGHT) ||
+      ((GET_X_AXIS(p1controller)) < 512 - DEAD_ZONE
+       || 512 + DEAD_ZONE < (GET_X_AXIS(p1controller))) ||
+      ((GET_X_AXIS(p2controller)) < 512 - DEAD_ZONE
+       || 512 + DEAD_ZONE < (GET_X_AXIS(p2controller))) ||
+      ((GET_Y_AXIS(p1controller)) < 512 - DEAD_ZONE
+       || 512 + DEAD_ZONE < (GET_Y_AXIS(p1controller))) ||
+      ((GET_Y_AXIS(p2controller)) < 512 - DEAD_ZONE
+       || 512 + DEAD_ZONE < (GET_Y_AXIS(p2controller)))) {
     ExitScreensaver(currentGame);
   }
 
@@ -217,8 +223,7 @@ void doEverything()
     }
     else {
       /* Process new controller input */
-      currentGame->ProcessInput(p1ax, p1ay, p1blVal, p1brVal, p1buVal, p1bdVal,
-                                p2ax, p2ay, p2blVal, p2brVal, p2buVal, p2bdVal);
+      currentGame->ProcessInput(p1controller, p2controller);
 
       /* Update the game state */
       currentGame->UpdatePhysics();
