@@ -6,11 +6,17 @@ int8_t shipShape[4][2] = {{-1,BOARD_SIZE-1},{0,BOARD_SIZE-1},{1,BOARD_SIZE-1},{0
 #define BULLET_COLOR 0x151515
 #define ENEMY_COLOR  0x004000
 
+/**
+ * TODO
+ */
 Shooter::Shooter()
 {
   ResetGame(1, 0);
 }
 
+/**
+ * TODO
+ */
 void Shooter::UpdatePhysics( )
 {
   uint8_t i;
@@ -88,6 +94,9 @@ void Shooter::UpdatePhysics( )
   }
 }
 
+/**
+ * TODO
+ */
 void Shooter::KillEnemy()
 {
   score++;
@@ -105,6 +114,11 @@ void Shooter::KillEnemy()
   }
 }
 
+/**
+ * TODO
+ * @param isInit
+ * @param whoWon
+ */
 void Shooter::ResetGame(
 
   __attribute__((unused)) uint8_t isInit,
@@ -137,6 +151,9 @@ void Shooter::ResetGame(
   resetTimer = 0;
 }
 
+/**
+ * TODO
+ */
 void Shooter::SpawnWave()
 {
   uint8_t x, y;
@@ -154,6 +171,11 @@ void Shooter::SpawnWave()
   }
 }
 
+/**
+ * TODO
+ * @param p1
+ * @param p2
+ */
 void Shooter::ProcessInput(int32_t p1, int32_t p2)
 {
   uint8_t i;
@@ -217,6 +239,9 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
   }
 }
 
+/**
+ * TODO
+ */
 void Shooter::ShiftBoard()
 {
   uint8_t canMove = TRUE;
@@ -306,6 +331,9 @@ void Shooter::ShiftBoard()
   }
 }
 
+/**
+ * TODO
+ */
 void Shooter::DropBoard()
 {
   uint8_t x, y;
@@ -319,6 +347,9 @@ void Shooter::DropBoard()
   }
 }
 
+/**
+ * TODO
+ */
 void Shooter::ClearPlayers()
 {
   uint8_t i;
@@ -343,6 +374,10 @@ void Shooter::ClearPlayers()
   }
 }
 
+/**
+ * TODO
+ * @return
+ */
 uint8_t Shooter::DrawPlayers()
 {
   uint8_t i;
@@ -382,11 +417,18 @@ uint8_t Shooter::DrawPlayers()
   return TRUE;
 }
 
+/**
+ * TODO
+ */
 void Shooter::GameOver()
 {
   resetTimer = IRQ_HZ * 5;
 }
 
+/**
+ * TODO
+ * @return
+ */
 uint8_t Shooter::NumEnemies()
 {
   uint8_t x, y, enemies = 0;

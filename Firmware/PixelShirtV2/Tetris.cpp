@@ -323,6 +323,9 @@ uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
   return 0;
 }
 
+/**
+ * TODO
+ */
 void Tetris::ClearActiveTetromino( )
 {
   uint8_t i;
@@ -336,6 +339,9 @@ void Tetris::ClearActiveTetromino( )
   }
 }
 
+/**
+ * TODO
+ */
 void Tetris::DrawActiveTetromino( )
 {
   uint8_t i;
@@ -349,6 +355,9 @@ void Tetris::DrawActiveTetromino( )
   }
 }
 
+/**
+ * TODO
+ */
 void Tetris::ClearNextTetromino( )
 {
   uint8_t i;
@@ -357,6 +366,9 @@ void Tetris::ClearNextTetromino( )
   }
 }
 
+/**
+ * TODO
+ */
 void Tetris::DrawNextTetromino( )
 {
   uint8_t i;
@@ -366,7 +378,8 @@ void Tetris::DrawNextTetromino( )
 }
 
 /**
- * Returns 1 if the piece dropped or 0 if the piece was blocked
+ * TODO
+ * @return 1 if the piece dropped or 0 if the piece was blocked
  */
 uint8_t Tetris::DropActiveTetromino( )
 {
@@ -446,6 +459,10 @@ uint8_t Tetris::DropActiveTetromino( )
   }
 }
 
+/**
+ *
+ * @param direction
+ */
 void Tetris::SlideActiveTetromino(
   int8_t direction)
 {
@@ -468,6 +485,10 @@ void Tetris::SlideActiveTetromino(
   DrawActiveTetromino();
 }
 
+/**
+ * TODO
+ * @param direction
+ */
 void Tetris::RotateActiveTetromino(
   int8_t direction)
 {
@@ -529,7 +550,7 @@ void Tetris::RotateActiveTetromino(
   for(i=0; i < 4; i++) {
     if(IsPixelLit(newRotation[i][X] + activeOffset[X],
                   newRotation[i][Y] + activeOffset[Y])
-        || /* /* Used to be == 2 (piece) or 3 (wall) */ */
+        || /* Used to be == 2 (piece) or 3 (wall) */
         newRotation[i][Y] + activeOffset[Y] < 0  ||
         newRotation[i][Y] + activeOffset[Y] > 15) {
       activeRotation = oldRotation; /* undo */

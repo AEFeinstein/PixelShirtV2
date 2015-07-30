@@ -3,11 +3,17 @@
 #define CENTER_COLOR 0x004000
 #define LINE_COLOR   0x400000
 
+/**
+ * TODO
+ */
 SuperSquare::SuperSquare()
 {
   ResetGame(1, 0);
 }
 
+/**
+ * TODO
+ */
 void SuperSquare::UpdatePhysics( )
 {
   int16_t i;
@@ -89,6 +95,11 @@ void SuperSquare::UpdatePhysics( )
   score++;
 }
 
+/**
+ * TODO
+ * @param isInit
+ * @param whoWon
+ */
 void SuperSquare::ResetGame(
 
   __attribute__((unused)) uint8_t isInit,
@@ -121,6 +132,11 @@ void SuperSquare::ResetGame(
   }
 }
 
+/**
+ * TODO
+ * @param p1
+ * @param p2
+ */
 void SuperSquare::ProcessInput(int32_t p1, __attribute__((unused)) int32_t p2)
 {
   uint8_t newPos[2];
@@ -160,6 +176,10 @@ void SuperSquare::ProcessInput(int32_t p1, __attribute__((unused)) int32_t p2)
   }
 }
 
+/**
+ * TODO
+ * @param position
+ */
 void SuperSquare::PlacePlayerPixel(uint8_t position[])
 {
   switch(playerPosition / 30) {
@@ -214,6 +234,12 @@ void SuperSquare::PlacePlayerPixel(uint8_t position[])
   }
 }
 
+/**
+ * TODO
+ * @param line
+ * @param rgb
+ * @return
+ */
 uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
 {
   int16_t i;
@@ -268,6 +294,11 @@ uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
   return TRUE;
 }
 
+/**
+ * TODO
+ * @param direction
+ * @param velocity
+ */
 void SuperSquare::AddLine(uint8_t direction, uint16_t velocity)
 {
   int16_t i;

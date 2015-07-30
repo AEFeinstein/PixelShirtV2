@@ -8,11 +8,17 @@
 
 #define BALL_COLOR 0x004000
 
+/**
+ * TODO
+ */
 Pong::Pong()
 {
   ResetGame(1, 0);
 }
 
+/**
+ * TODO
+ */
 void Pong::UpdatePhysics( )
 {
   int16_t diff, rotation;
@@ -83,6 +89,11 @@ void Pong::UpdatePhysics( )
   DrawField();
 }
 
+/**
+ * TODO
+ * @param isInit
+ * @param whoWon
+ */
 void Pong::ResetGame(  uint8_t isInit,
                        uint8_t whoWon)
 {
@@ -107,7 +118,10 @@ void Pong::ResetGame(  uint8_t isInit,
   DrawField();
 }
 
-/* Rotate the ball in degrees (-360 -> 359) */
+/**
+ * TODO Rotate the ball in degrees (-360 -> 359)
+ * @param degree
+ */
 void Pong::RotateBall(int16_t degree)
 {
   if (degree < 0) {
@@ -123,7 +137,10 @@ void Pong::RotateBall(int16_t degree)
                 (int32_t)cos32[degree]) / 32;
 }
 
-/* Apply a multiplier to the velocity. make this additive instead? */
+/**
+ * TODO Apply a multiplier to the velocity. make this additive instead?
+ * @param speedM
+ */
 void Pong::IncreaseSpeed(int16_t speedM)
 {
   ballVel[X] = (ballVel[X] * speedM) / V_M;
@@ -143,6 +160,9 @@ void Pong::IncreaseSpeed(int16_t speedM)
   }
 }
 
+/**
+ * TODO
+ */
 void Pong::DrawField( )
 {
   int16_t i, j;
@@ -166,6 +186,11 @@ void Pong::DrawField( )
   }
 }
 
+/**
+ * TODO
+ * @param p1
+ * @param p2
+ */
 void Pong::ProcessInput(int32_t p1, int32_t p2)
 {
   if((GET_Y_AXIS(p1)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p1))) {
@@ -188,7 +213,3 @@ void Pong::ProcessInput(int32_t p1, int32_t p2)
     }
   }
 }
-
-
-
-

@@ -60,6 +60,9 @@ uint32_t p2controller;
 
 void doEverything();
 
+/**
+ * TODO
+ */
 void setup()
 {
   /* Set up hearbeat */
@@ -107,6 +110,9 @@ void setup()
   SET_Y_AXIS(p2controller, 512);
 }
 
+/**
+ * TODO
+ */
 void loop()
 {
   uint32_t jsTmp;
@@ -146,21 +152,11 @@ void loop()
   }
 }
 
+/**
+ * TODO
+ */
 void doEverything()
 {
-  /* uint8_t (GET_BUTTONS(p1) & UP) = GET_BUTTONS(p1controller) & UP; */
-  /* uint8_t (GET_BUTTONS(p1) & DOWN) = GET_BUTTONS(p1controller) & DOWN; */
-  /* uint8_t (GET_BUTTONS(p1) & RIGHT) = GET_BUTTONS(p1controller) & RIGHT; */
-  /* uint8_t (GET_BUTTONS(p1) & LEFT) = GET_BUTTONS(p1controller) & LEFT; */
-  /* int16_t (GET_X_AXIS(p1)) = GET_X_AXIS(p1controller); */
-  /* int16_t (GET_Y_AXIS(p1)) = GET_Y_AXIS(p1controller); */
-  /* //  uint8_t (GET_BUTTONS(p2) & UP) = GET_BUTTONS(p2controller) & UP; */
-  /* uint8_t (GET_BUTTONS(p2) & DOWN) = GET_BUTTONS(p2controller) & DOWN; */
-  /* uint8_t (GET_BUTTONS(p2) & RIGHT) = GET_BUTTONS(p2controller) & RIGHT; */
-  /* uint8_t (GET_BUTTONS(p2) & LEFT) = GET_BUTTONS(p2controller) & LEFT; */
-  /* int16_t (GET_X_AXIS(p2)) = GET_X_AXIS(p2controller); */
-  /* int16_t (GET_Y_AXIS(p2)) = GET_Y_AXIS(p2controller); */
-
   /* If both up buttons are held, maybe the game mode is being changed */
   if((GET_BUTTONS(p1controller) & UP) && (GET_BUTTONS(p2controller) & UP)) {
     downTimer++;
@@ -236,6 +232,11 @@ void doEverything()
   pixels3.show();
 }
 
+/**
+ * TODO
+ * @param score
+ * @param rgb
+ */
 void DisplayScore(  uint16_t score, uint32_t rgb)
 {
   uint8_t i, j;
@@ -258,6 +259,13 @@ void DisplayScore(  uint16_t score, uint32_t rgb)
   DrawNumber((score / 1   ) % 10, 12, 5, rgb);
 }
 
+/**
+ * TODO
+ * @param number
+ * @param offsetX
+ * @param offsetY
+ * @param rgb
+ */
 void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
 {
   switch(number) {
@@ -394,7 +402,12 @@ void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
   }
 }
 
-/* Sets a pixel in the matrix */
+/**
+ * TODO Sets a pixel in the matrix
+ * @param x
+ * @param y
+ * @param val
+ */
 void SetPixel(int8_t x, int8_t y, uint32_t val)
 {
   uint8_t index = (-16 * (x%4)) + 63 - y;
@@ -415,6 +428,12 @@ void SetPixel(int8_t x, int8_t y, uint32_t val)
   }
 }
 
+/**
+ * TODO
+ * @param x
+ * @param y
+ * @return
+ */
 uint32_t GetPixel(int8_t x, int8_t y)
 {
   uint8_t index = (-16 * (x%4)) + 63 - y;

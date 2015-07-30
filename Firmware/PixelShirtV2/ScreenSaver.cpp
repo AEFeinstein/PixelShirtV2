@@ -11,6 +11,10 @@ uint16_t colorStep = 0;
 uint32_t getRGB(uint16_t polar, uint8_t brightness);
 uint8_t screensaverShiftTimer = IRQ_HZ / 4;
 
+/**
+ * TODO
+ * @param currentGame
+ */
 void ExitScreensaver(ArduinoGame* currentGame)
 {
   if (screensaverTimer == 0) {
@@ -26,6 +30,9 @@ void ExitScreensaver(ArduinoGame* currentGame)
   screensaverTimer = (IRQ_HZ * 30);
 }
 
+/**
+ * TODO
+ */
 void HandleScreensaverTimer()
 {
   if (screensaverTimer > 0) {
@@ -42,11 +49,18 @@ void HandleScreensaverTimer()
   }
 }
 
+/**
+ * TODO
+ * @return
+ */
 uint16_t GetScreensaverTimer()
 {
   return screensaverTimer;
 }
 
+/**
+ * TODO
+ */
 void DisplayScreensaver()
 {
   /* display screensaver */
@@ -100,6 +114,12 @@ void DisplayScreensaver()
   }
 }
 
+/**
+ * TODO
+ * @param polar
+ * @param brightness
+ * @return
+ */
 uint32_t getRGB(uint16_t polar, uint8_t brightness)
 {
   uint32_t r = 0, g = 0, b = 0;
