@@ -50,7 +50,7 @@ class Adafruit_NeoPixel
 
   /* Constructor: number of LEDs, pin number, LED type */
   Adafruit_NeoPixel(uint16_t n, uint8_t p=6, uint8_t t=NEO_GRB + NEO_KHZ800);
-  ~Adafruit_NeoPixel();
+  ~Adafruit_NeoPixel(void);
 
   void
   begin(void),
@@ -59,7 +59,7 @@ class Adafruit_NeoPixel
         setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b),
         setPixelColor(uint16_t n, uint32_t c),
         setBrightness(uint8_t),
-        clear();
+        clear(void);
   uint8_t
   * getPixels(void) const,
   getBrightness(void) const;

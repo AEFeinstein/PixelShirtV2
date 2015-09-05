@@ -14,21 +14,21 @@ typedef struct {
 class Shooter : public ArduinoGame
 {
  public:
-  Shooter();
-  ~Shooter() {};
-  void UpdatePhysics( );
+  Shooter(void);
+  ~Shooter(void) {};
+  void UpdatePhysics(void);
   void ResetGame(  uint8_t isInit,
                    uint8_t whoWon);
   void ProcessInput( int32_t p1, int32_t p2);
  private:
-  void ShiftBoard();
-  void DropBoard();
-  void ClearPlayers();
-  uint8_t DrawPlayers();
-  void GameOver();
-  void SpawnWave();
-  void KillEnemy();
-  uint8_t NumEnemies();
+  void ShiftBoard(void);
+  void DropBoard(void);
+  void ClearPlayers(void);
+  uint8_t DrawPlayers(void);
+  void GameOver(void);
+  void SpawnWave(void);
+  void KillEnemy(void);
+  uint8_t NumEnemies(void);
   uint8_t activeDirection;
   uint8_t moveTimer;
   Player player1;

@@ -70,7 +70,7 @@ Adafruit_NeoPixel::Adafruit_NeoPixel(
 
 }
 
-Adafruit_NeoPixel::~Adafruit_NeoPixel()
+Adafruit_NeoPixel::~Adafruit_NeoPixel(void)
 {
   if(pixels) { free(pixels); }
   pinMode(pin, INPUT);
@@ -845,7 +845,7 @@ void Adafruit_NeoPixel::setPixelColor(
   uint16_t n, uint8_t r, uint8_t g, uint8_t b)
 {
   if(n < numLEDs) {
-    if(brightness) { /* See notes in setBrightness() */
+    if(brightness) { /* See notes in setBrightness(void) */
       r = (r * brightness) >> 8;
       g = (g * brightness) >> 8;
       b = (b * brightness) >> 8;
@@ -865,7 +865,7 @@ void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c)
     r = (uint8_t)(c >> 16),
     g = (uint8_t)(c >>  8),
     b = (uint8_t)c;
-    if(brightness) { /* See notes in setBrightness() */
+    if(brightness) { /* See notes in setBrightness(void) */
       r = (r * brightness) >> 8;
       g = (g * brightness) >> 8;
       b = (b * brightness) >> 8;
@@ -897,7 +897,7 @@ uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const
                (uint32_t)p[bOffset];
   /* Adjust this back up to the true color, as setting a pixel color will */
   /* scale it back down again. */
-  if(brightness) { /* See notes in setBrightness() */
+  if(brightness) { /* See notes in setBrightness(void) */
     //Cast the color to a byte array
     uint8_t* c_ptr =reinterpret_cast<uint8_t*>(&c);
     c_ptr[0] = (c_ptr[0] << 8)/brightness;
@@ -922,7 +922,7 @@ uint16_t Adafruit_NeoPixel::numPixels(void) const
 
 /* Adjust output brightness; 0=darkest (off), 255=brightest.  This does */
 /* NOT immediately affect what's currently displayed on the LEDs.  The */
-/* next call to show() will refresh the LEDs at this level.  However, */
+/* next call to show(void) will refresh the LEDs at this level.  However, */
 /* this process is potentially "lossy," especially when increasing */
 /* brightness.  The tight timing in the WS2811/WS2812 code means there */
 /* aren't enough free cycles to perform this scaling on the fly as data */
@@ -964,7 +964,7 @@ uint8_t Adafruit_NeoPixel::getBrightness(void) const
   return brightness - 1;
 }
 
-void Adafruit_NeoPixel::clear()
+void Adafruit_NeoPixel::clear(void)
 {
   memset(pixels, 0, numBytes);
 }

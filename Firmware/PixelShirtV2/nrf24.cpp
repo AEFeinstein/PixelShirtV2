@@ -17,7 +17,7 @@
 uint8_t payload_len;
 
 /* init the hardware pins */
-void nrf24_init()
+void nrf24_init(void)
 {
   nrf24_setupPins();
   nrf24_ce_digitalWrite(LOW);
@@ -75,7 +75,7 @@ void nrf24_rx_address(uint8_t* adr)
 }
 
 /* Returns the payload length */
-uint8_t nrf24_payload_length()
+uint8_t nrf24_payload_length(void)
 {
   return payload_len;
 }
@@ -90,9 +90,9 @@ void nrf24_tx_address(uint8_t* adr)
 
 /* Checks if data is available for reading */
 /* Returns 1 if data is ready ... */
-uint8_t nrf24_dataReady()
+uint8_t nrf24_dataReady(void)
 {
-  /* See note in getData() function - just checking RX_DR isn't good enough */
+  /* See note in getData(void) function - just checking RX_DR isn't good enough */
   uint8_t status = nrf24_getStatus();
 
   /* We can short circuit on RX_DR, but if it's not set, we still need */
@@ -101,11 +101,11 @@ uint8_t nrf24_dataReady()
     return 1;
   }
 
-  return !nrf24_rxFifoEmpty();;
+  return !nrf24_rxFifoEmpty();
 }
 
 /* Checks if receive FIFO is empty or not */
-uint8_t nrf24_rxFifoEmpty()
+uint8_t nrf24_rxFifoEmpty(void)
 {
   uint8_t fifoStatus;
 
@@ -115,7 +115,7 @@ uint8_t nrf24_rxFifoEmpty()
 }
 
 /* Returns the length of data waiting in the RX fifo */
-uint8_t nrf24_payloadLength()
+uint8_t nrf24_payloadLength(void)
 {
   uint8_t status;
   nrf24_csn_digitalWrite(LOW);
@@ -145,7 +145,7 @@ void nrf24_getData(uint8_t* data)
 }
 
 /* Returns the number of retransmissions occured for the last message */
-uint8_t nrf24_retransmissionCount()
+uint8_t nrf24_retransmissionCount(void)
 {
   uint8_t rv;
   nrf24_readRegister(OBSERVE_TX,&rv,1);
@@ -191,7 +191,7 @@ void nrf24_send(uint8_t* value)
   nrf24_ce_digitalWrite(HIGH);
 }
 
-uint8_t nrf24_isSending()
+uint8_t nrf24_isSending(void)
 {
   uint8_t status;
 
@@ -207,7 +207,7 @@ uint8_t nrf24_isSending()
 
 }
 
-uint8_t nrf24_getStatus()
+uint8_t nrf24_getStatus(void)
 {
   uint8_t rv;
   nrf24_csn_digitalWrite(LOW);
@@ -216,7 +216,7 @@ uint8_t nrf24_getStatus()
   return rv;
 }
 
-uint8_t nrf24_lastMessageStatus()
+uint8_t nrf24_lastMessageStatus(void)
 {
   uint8_t rv;
 
@@ -237,7 +237,7 @@ uint8_t nrf24_lastMessageStatus()
   }
 }
 
-void nrf24_powerUpRx()
+void nrf24_powerUpRx(void)
 {
   nrf24_csn_digitalWrite(LOW);
   spi_transfer(FLUSH_RX);
@@ -250,14 +250,14 @@ void nrf24_powerUpRx()
   nrf24_ce_digitalWrite(HIGH);
 }
 
-void nrf24_powerUpTx()
+void nrf24_powerUpTx(void)
 {
   nrf24_configRegister(STATUS,(1<<RX_DR)|(1<<TX_DS)|(1<<MAX_RT));
 
   nrf24_configRegister(CONFIG,nrf24_CONFIG|((1<<PWR_UP)|(0<<PRIM_RX)));
 }
 
-void nrf24_powerDown()
+void nrf24_powerDown(void)
 {
   nrf24_ce_digitalWrite(LOW);
   nrf24_configRegister(CONFIG,nrf24_CONFIG);

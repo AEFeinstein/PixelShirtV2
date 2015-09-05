@@ -48,22 +48,22 @@ const uint8_t t_tet[4][4][2] = {
 class Tetris : public ArduinoGame
 {
  public:
-  Tetris();
-  ~Tetris() {};
-  void UpdatePhysics( );
+  Tetris(void);
+  ~Tetris(void) {};
+  void UpdatePhysics(void);
   void ResetGame(  uint8_t isInit,
                    uint8_t whoWon);
   void ProcessInput( int32_t p1, int32_t p2);
  private:
   /* Drawing */
-  void ClearActiveTetromino( );
-  void DrawActiveTetromino( );
-  void ClearNextTetromino( );
-  void DrawNextTetromino( );
+  void ClearActiveTetromino(void);
+  void DrawActiveTetromino(void);
+  void ClearNextTetromino(void);
+  void DrawNextTetromino(void);
   /* Moving */
   uint8_t NewActiveTetromino(uint8_t isFirst);
   void RotateActiveTetromino(int8_t direction);
-  uint8_t DropActiveTetromino( );
+  uint8_t DropActiveTetromino(void);
   void SlideActiveTetromino(int8_t direction);
   /* Timers */
   uint8_t dropTimer;

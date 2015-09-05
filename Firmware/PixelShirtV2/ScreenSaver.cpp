@@ -33,7 +33,7 @@ void ExitScreensaver(ArduinoGame* currentGame)
 /**
  * TODO
  */
-void HandleScreensaverTimer()
+void HandleScreensaverTimer(void)
 {
   if (screensaverTimer > 0) {
     screensaverTimer--;
@@ -53,7 +53,7 @@ void HandleScreensaverTimer()
  * TODO
  * @return
  */
-uint16_t GetScreensaverTimer()
+uint16_t GetScreensaverTimer(void)
 {
   return screensaverTimer;
 }
@@ -61,7 +61,7 @@ uint16_t GetScreensaverTimer()
 /**
  * TODO
  */
-void DisplayScreensaver()
+void DisplayScreensaver(void)
 {
   /* display screensaver */
 

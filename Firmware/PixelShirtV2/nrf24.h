@@ -24,35 +24,35 @@
 #define NRF24_MESSAGE_LOST   1
 
 /* adjustment functions */
-void    nrf24_init();
+void    nrf24_init(void);
 void    nrf24_rx_address(uint8_t* adr);
 void    nrf24_tx_address(uint8_t* adr);
 void    nrf24_config(uint8_t channel, uint8_t pay_length);
 
 /* state check functions */
-uint8_t nrf24_dataReady();
-uint8_t nrf24_isSending();
-uint8_t nrf24_getStatus();
-uint8_t nrf24_rxFifoEmpty();
+uint8_t nrf24_dataReady(void);
+uint8_t nrf24_isSending(void);
+uint8_t nrf24_getStatus(void);
+uint8_t nrf24_rxFifoEmpty(void);
 
 /* core TX / RX functions */
 void    nrf24_send(uint8_t* value);
 void    nrf24_getData(uint8_t* data);
 
 /* use in dynamic length mode */
-uint8_t nrf24_payloadLength();
+uint8_t nrf24_payloadLength(void);
 
 /* post transmission analysis */
-uint8_t nrf24_lastMessageStatus();
-uint8_t nrf24_retransmissionCount();
+uint8_t nrf24_lastMessageStatus(void);
+uint8_t nrf24_retransmissionCount(void);
 
 /* Returns the payload length */
-uint8_t nrf24_payload_length();
+uint8_t nrf24_payload_length(void);
 
 /* power management */
-void    nrf24_powerUpRx();
-void    nrf24_powerUpTx();
-void    nrf24_powerDown();
+void    nrf24_powerUpRx(void);
+void    nrf24_powerUpTx(void);
+void    nrf24_powerDown(void);
 
 /* low level interface ... */
 uint8_t spi_transfer(uint8_t tx);
@@ -74,7 +74,7 @@ void    nrf24_writeRegister(uint8_t reg, uint8_t* value, uint8_t len);
  *    - Set CSN pin output
  *    - Set CE pin output     */
 /* -------------------------------------------------------------------------- */
-extern void nrf24_setupPins();
+extern void nrf24_setupPins(void);
 
 /* -------------------------------------------------------------------------- */
 /* nrf24 CE pin control function
@@ -108,6 +108,6 @@ extern void nrf24_mosi_digitalWrite(uint8_t state);
 /* nrf24 MISO pin read function
  * - returns: Non-zero if the pin is high */
 /* -------------------------------------------------------------------------- */
-extern uint8_t nrf24_miso_digitalRead();
+extern uint8_t nrf24_miso_digitalRead(void);
 
 #endif

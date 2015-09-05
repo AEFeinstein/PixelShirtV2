@@ -11,7 +11,7 @@
 /**
  * TODO
  */
-Pong::Pong()
+Pong::Pong(void)
 {
   ResetGame(1, 0);
 }
@@ -19,7 +19,7 @@ Pong::Pong()
 /**
  * TODO
  */
-void Pong::UpdatePhysics( )
+void Pong::UpdatePhysics(void)
 {
   int16_t diff, rotation;
   if(restartTimer > 0) {
@@ -163,7 +163,7 @@ void Pong::IncreaseSpeed(int16_t speedM)
 /**
  * TODO
  */
-void Pong::DrawField( )
+void Pong::DrawField(void)
 {
   int16_t i, j;
   for (i = 0; i < BOARD_SIZE; i++) {

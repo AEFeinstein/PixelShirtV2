@@ -6,9 +6,9 @@
 class Lightcycle : public ArduinoGame
 {
  public:
-  Lightcycle();
-  ~Lightcycle() {};
-  void UpdatePhysics( );
+  Lightcycle(void);
+  ~Lightcycle(void) {};
+  void UpdatePhysics(void);
   void ResetGame( uint8_t isInit,
                   uint8_t whoWon);
   void ProcessInput( int32_t p1, int32_t p2);

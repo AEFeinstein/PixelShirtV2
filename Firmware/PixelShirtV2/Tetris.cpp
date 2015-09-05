@@ -15,7 +15,7 @@ uint32_t tetrominoColors[7] = {
 /**
  * TODO
  */
-Tetris::Tetris()
+Tetris::Tetris(void)
 {
   multiplayer = 1;
   ResetGame(1, 0);
@@ -66,7 +66,7 @@ void Tetris::ResetGame(
 /**
  * TODO
  */
-void Tetris::UpdatePhysics( )
+void Tetris::UpdatePhysics(void)
 {
   if(gameOver) {
     return;
@@ -326,7 +326,7 @@ uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 /**
  * TODO
  */
-void Tetris::ClearActiveTetromino( )
+void Tetris::ClearActiveTetromino(void)
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -342,7 +342,7 @@ void Tetris::ClearActiveTetromino( )
 /**
  * TODO
  */
-void Tetris::DrawActiveTetromino( )
+void Tetris::DrawActiveTetromino(void)
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -358,7 +358,7 @@ void Tetris::DrawActiveTetromino( )
 /**
  * TODO
  */
-void Tetris::ClearNextTetromino( )
+void Tetris::ClearNextTetromino(void)
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -369,7 +369,7 @@ void Tetris::ClearNextTetromino( )
 /**
  * TODO
  */
-void Tetris::DrawNextTetromino( )
+void Tetris::DrawNextTetromino(void)
 {
   uint8_t i;
   for(i=0; i < 4; i++) {
@@ -381,7 +381,7 @@ void Tetris::DrawNextTetromino( )
  * TODO
  * @return 1 if the piece dropped or 0 if the piece was blocked
  */
-uint8_t Tetris::DropActiveTetromino( )
+uint8_t Tetris::DropActiveTetromino(void)
 {
   uint8_t i, j, k, rowFull, isBlocked = 0, rc = 0;
   ClearActiveTetromino();

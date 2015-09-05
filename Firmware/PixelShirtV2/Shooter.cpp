@@ -9,7 +9,7 @@ int8_t shipShape[4][2] = {{-1,BOARD_SIZE-1},{0,BOARD_SIZE-1},{1,BOARD_SIZE-1},{0
 /**
  * TODO
  */
-Shooter::Shooter()
+Shooter::Shooter(void)
 {
   ResetGame(1, 0);
 }
@@ -17,7 +17,7 @@ Shooter::Shooter()
 /**
  * TODO
  */
-void Shooter::UpdatePhysics( )
+void Shooter::UpdatePhysics(void)
 {
   uint8_t i;
 
@@ -97,7 +97,7 @@ void Shooter::UpdatePhysics( )
 /**
  * TODO
  */
-void Shooter::KillEnemy()
+void Shooter::KillEnemy(void)
 {
   score++;
   if(score == 250) {
@@ -154,7 +154,7 @@ void Shooter::ResetGame(
 /**
  * TODO
  */
-void Shooter::SpawnWave()
+void Shooter::SpawnWave(void)
 {
   uint8_t x, y;
 
@@ -242,7 +242,7 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
 /**
  * TODO
  */
-void Shooter::ShiftBoard()
+void Shooter::ShiftBoard(void)
 {
   uint8_t canMove = TRUE;
   uint8_t x, y;
@@ -334,7 +334,7 @@ void Shooter::ShiftBoard()
 /**
  * TODO
  */
-void Shooter::DropBoard()
+void Shooter::DropBoard(void)
 {
   uint8_t x, y;
   for(y = BOARD_SIZE - 1; y > 0; y--) {
@@ -350,7 +350,7 @@ void Shooter::DropBoard()
 /**
  * TODO
  */
-void Shooter::ClearPlayers()
+void Shooter::ClearPlayers(void)
 {
   uint8_t i;
 
@@ -378,7 +378,7 @@ void Shooter::ClearPlayers()
  * TODO
  * @return
  */
-uint8_t Shooter::DrawPlayers()
+uint8_t Shooter::DrawPlayers(void)
 {
   uint8_t i;
 
@@ -420,7 +420,7 @@ uint8_t Shooter::DrawPlayers()
 /**
  * TODO
  */
-void Shooter::GameOver()
+void Shooter::GameOver(void)
 {
   resetTimer = IRQ_HZ * 5;
 }
@@ -429,7 +429,7 @@ void Shooter::GameOver()
  * TODO
  * @return
  */
-uint8_t Shooter::NumEnemies()
+uint8_t Shooter::NumEnemies(void)
 {
   uint8_t x, y, enemies = 0;
   for(x = 0; x < BOARD_SIZE; x++) {

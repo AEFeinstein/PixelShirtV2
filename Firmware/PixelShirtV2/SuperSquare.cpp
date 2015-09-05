@@ -6,7 +6,7 @@
 /**
  * TODO
  */
-SuperSquare::SuperSquare()
+SuperSquare::SuperSquare(void)
 {
   ResetGame(1, 0);
 }
@@ -14,7 +14,7 @@ SuperSquare::SuperSquare()
 /**
  * TODO
  */
-void SuperSquare::UpdatePhysics( )
+void SuperSquare::UpdatePhysics(void)
 {
   int16_t i;
 

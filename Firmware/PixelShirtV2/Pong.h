@@ -26,14 +26,14 @@
 class Pong : public ArduinoGame
 {
  public:
-  Pong();
-  ~Pong() {};
-  void UpdatePhysics( );
+  Pong(void);
+  ~Pong(void) {};
+  void UpdatePhysics(void);
   void ResetGame(  uint8_t isInit,
                    uint8_t whoWon);
   void ProcessInput( int32_t p1, int32_t p2);
  private:
-  void DrawField( );
+  void DrawField(void);
   void IncreaseSpeed(int16_t speedM);
   void RotateBall(int16_t degree);
   int16_t binPaddleLocation(int32_t loc);

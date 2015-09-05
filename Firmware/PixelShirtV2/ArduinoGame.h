@@ -58,9 +58,9 @@ static const int8_t sin32[360] = {
 class ArduinoGame
 {
  public:
-  ArduinoGame() {};
-  virtual ~ArduinoGame() {};
-  virtual void UpdatePhysics( ) = 0;
+  ArduinoGame(void) {};
+  virtual ~ArduinoGame(void) {};
+  virtual void UpdatePhysics(void) = 0;
   virtual void ResetGame(
     uint8_t isInit, uint8_t whoWon) = 0;
   virtual void ProcessInput(int32_t p1, int32_t p2) = 0;

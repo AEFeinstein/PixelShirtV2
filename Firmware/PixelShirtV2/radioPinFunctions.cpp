@@ -16,7 +16,7 @@
 #define check_bit(reg,bit) (reg&(1<<bit))
 
 /* ------------------------------------------------------------------------- */
-void nrf24_setupPins()
+void nrf24_setupPins(void)
 {
   set_bit(DDRC,6); /* CE output, digital pin 5 */
   set_bit(DDRD,7); /* CSN output, digital pin 6 */
@@ -65,7 +65,7 @@ void nrf24_mosi_digitalWrite(uint8_t state)
   }
 }
 /* ------------------------------------------------------------------------- */
-uint8_t nrf24_miso_digitalRead()
+uint8_t nrf24_miso_digitalRead(void)
 {
   return check_bit(PINB,PINB3);
 }

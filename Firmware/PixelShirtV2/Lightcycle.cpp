@@ -3,7 +3,7 @@
 /**
  * TODO
  */
-Lightcycle::Lightcycle()
+Lightcycle::Lightcycle(void)
 {
   ResetGame(1, 0);
 }
@@ -11,7 +11,7 @@ Lightcycle::Lightcycle()
 /**
  * TODO
  */
-void Lightcycle::UpdatePhysics( )
+void Lightcycle::UpdatePhysics(void)
 {
   uint8_t losers = 0;
   uint8_t i;

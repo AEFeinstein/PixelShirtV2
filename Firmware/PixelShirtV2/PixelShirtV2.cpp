@@ -58,12 +58,12 @@ uint8_t rx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
 uint32_t p1controller;
 uint32_t p2controller;
 
-void doEverything();
+void doEverything(void);
 
 /**
  * TODO
  */
-void setup()
+void setup(void)
 {
   /* Set up hearbeat */
   pinMode(HEARTBEAT_PIN, OUTPUT);
@@ -113,7 +113,7 @@ void setup()
 /**
  * TODO
  */
-void loop()
+void loop(void)
 {
   uint32_t jsTmp;
   uint32_t currentTime = micros();
@@ -155,7 +155,7 @@ void loop()
 /**
  * TODO
  */
-void doEverything()
+void doEverything(void)
 {
   /* If both up buttons are held, maybe the game mode is being changed */
   if((GET_BUTTONS(p1controller) & UP) && (GET_BUTTONS(p2controller) & UP)) {
