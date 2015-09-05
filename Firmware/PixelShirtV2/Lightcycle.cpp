@@ -1,7 +1,8 @@
 #include "Lightcycle.h"
 
 /**
- * TODO
+ * Default constructor. Resets the game with the
+ * initialization flag and no winner
  */
 Lightcycle::Lightcycle(void)
 {
@@ -9,7 +10,8 @@ Lightcycle::Lightcycle(void)
 }
 
 /**
- * TODO
+ * Updates the lightcycle positions twice a second.
+ * Checks for collisions.
  */
 void Lightcycle::UpdatePhysics(void)
 {
@@ -80,12 +82,15 @@ void Lightcycle::UpdatePhysics(void)
 }
 
 /**
- * TODO
- * @param isInit
- * @param whoWon
+ * Clears the screen, resets timers, and places cycles at their initial
+ * positions. If there was a winner, light some LEDs on their side.
+ *
+ * @param isInit	1 if this is the initial reset, 0 otherwise
+ * @param losers	A bitmask of losers. 0x01 indicates P1 lost,
+ * 					0x02 indicates P2 lost
  */
 void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
-                            uint8_t whoWon)
+                            uint8_t losers)
 {
   uint8_t i;
   movementTimer = IRQ_HZ*3;
@@ -112,16 +117,16 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
   SetPixel(p2pos[X], p2pos[Y], P2_COLOR);
 
   /* If there was a winner, draw some lights */
-  if((whoWon & 0x01) && (whoWon & 0x02)) {
+  if((losers & 0x01) && (losers & 0x02)) {
     ;/* everyone loses! */
   }
-  else if(whoWon & 0x01) {
+  else if(losers & 0x01) {
     for(i=0; i < BOARD_SIZE; i++) {
       SetPixel(BOARD_SIZE-1, i, P2_COLOR);
       showingWinningLEDs = 1;
     }
   }
-  else if(whoWon & 0x02) {
+  else if(losers & 0x02) {
     for(i=0; i < BOARD_SIZE; i++) {
       SetPixel(0, i, P1_COLOR);
       showingWinningLEDs = 1;
@@ -130,9 +135,10 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
 }
 
 /**
- * TODO
- * @param p1
- * @param p2
+ * Process input from the controllers. Only the D-Pad can drive cycles
+ *
+ * @param p1	The 32 bits of player 1 input, to be masked into buttons
+ * @param p2	The 32 bits of player 2 input, to be masked into buttons
  */
 void Lightcycle::ProcessInput(int32_t p1, int32_t p2)
 {
