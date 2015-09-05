@@ -898,7 +898,7 @@ uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const
   /* Adjust this back up to the true color, as setting a pixel color will */
   /* scale it back down again. */
   if(brightness) { /* See notes in setBrightness(void) */
-    //Cast the color to a byte array
+    /* Cast the color to a byte array */
     uint8_t* c_ptr =reinterpret_cast<uint8_t*>(&c);
     c_ptr[0] = (c_ptr[0] << 8)/brightness;
     c_ptr[1] = (c_ptr[1] << 8)/brightness;
@@ -958,7 +958,7 @@ void Adafruit_NeoPixel::setBrightness(uint8_t b)
   }
 }
 
-//Return the brightness value
+/* Return the brightness value */
 uint8_t Adafruit_NeoPixel::getBrightness(void) const
 {
   return brightness - 1;
