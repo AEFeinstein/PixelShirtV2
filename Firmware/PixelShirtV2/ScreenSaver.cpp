@@ -12,8 +12,11 @@ uint32_t getRGB(uint16_t polar, uint8_t brightness);
 uint8_t screensaverShiftTimer = IRQ_HZ / 4;
 
 /**
- * TODO
- * @param currentGame
+ * If the screensaver is active, it clears the screen, leaves the screensaver,
+ * and resets the current game. Otherwise it extends the time until the
+ * screensaver activates.
+ *
+ * @param currentGame	The game to restart
  */
 void ExitScreensaver(ArduinoGame* currentGame)
 {
@@ -31,7 +34,7 @@ void ExitScreensaver(ArduinoGame* currentGame)
 }
 
 /**
- * TODO
+ * Decrements the screensaver timer, and enters the screensaver if it hits zero
  */
 void HandleScreensaverTimer(void)
 {
@@ -50,8 +53,7 @@ void HandleScreensaverTimer(void)
 }
 
 /**
- * TODO
- * @return
+ * @return	The time until the screensaver activates, without controller input
  */
 uint16_t GetScreensaverTimer(void)
 {
@@ -59,7 +61,7 @@ uint16_t GetScreensaverTimer(void)
 }
 
 /**
- * TODO
+ * Draws the screensaver, a scrolling square wave which smoothly changes color
  */
 void DisplayScreensaver(void)
 {
@@ -115,10 +117,12 @@ void DisplayScreensaver(void)
 }
 
 /**
- * TODO
- * @param polar
- * @param brightness
- * @return
+ * Given a position on the color wheel, and a brightness, return the color
+ * at that position
+ *
+ * @param polar			The position on the color wheel, in degrees
+ * @param brightness	The brightness of the color to return
+ * @return				A color on the color wheel
  */
 uint32_t getRGB(uint16_t polar, uint8_t brightness)
 {
