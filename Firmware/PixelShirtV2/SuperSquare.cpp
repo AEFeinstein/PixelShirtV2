@@ -4,7 +4,7 @@
 #define LINE_COLOR   0x400000
 
 /**
- * TODO
+ * Default constructor. Resets the game with the init flag & no winner
  */
 SuperSquare::SuperSquare(void)
 {
@@ -12,12 +12,15 @@ SuperSquare::SuperSquare(void)
 }
 
 /**
- * TODO
+ * This clears the screen, updates the positions of the lines, generate
+ * new lines if it's time, and checks for collisions between lines and
+ * the player.
  */
 void SuperSquare::UpdatePhysics(void)
 {
   int16_t i;
 
+  /* This timer is for in between games. Decrement it if it's active */
   if(resetTimer > 0) {
     resetTimer--;
     if(resetTimer == 0) {
@@ -96,12 +99,13 @@ void SuperSquare::UpdatePhysics(void)
 }
 
 /**
- * TODO
- * @param isInit
- * @param whoWon
+ * Clear the display, clear all lines, and draw the center square the
+ * player rotates around
+ *
+ * @param isInit Unused, nothing special happens on initialization
+ * @param whoWon Unused, it's a one player game
  */
 void SuperSquare::ResetGame(
-
   __attribute__((unused)) uint8_t isInit,
   __attribute__((unused)) uint8_t whoWon)
 {
@@ -133,9 +137,11 @@ void SuperSquare::ResetGame(
 }
 
 /**
- * TODO
- * @param p1
- * @param p2
+ * Moves the player pixel around the center square according to the p1 joystick.
+ * Checks for collisions with lines when the player moves
+ *
+ * @param p1 The 32 bits of player 1 input, to be masked into the joystick
+ * @param p2 Unused, it's a one player game
  */
 void SuperSquare::ProcessInput(int32_t p1, __attribute__((unused)) int32_t p2)
 {
@@ -177,8 +183,10 @@ void SuperSquare::ProcessInput(int32_t p1, __attribute__((unused)) int32_t p2)
 }
 
 /**
- * TODO
- * @param position
+ * Given the player's angle around the center square, return the closest pixel.
+ * Lookups are faster than math
+ *
+ * @param position The angle of the player, in degrees, around the center square
  */
 void SuperSquare::PlacePlayerPixel(uint8_t position[])
 {
@@ -235,10 +243,12 @@ void SuperSquare::PlacePlayerPixel(uint8_t position[])
 }
 
 /**
- * TODO
- * @param line
- * @param rgb
- * @return
+ * Given a line struct and color, draw it on the display, and check for
+ * collisions
+ *
+ * @param line	The line to draw (position)
+ * @param rgb	The color of the line to draw
+ * @return		FALSE if there was a collision, TRUE if there wasn't
  */
 uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
 {
@@ -295,9 +305,11 @@ uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
 }
 
 /**
- * TODO
- * @param direction
- * @param velocity
+ * Given a direction and initial velocity, add a line. This doesn't draw
+ * anything, but stores the line in memory
+ *
+ * @param direction	The initial direction of the line
+ * @param velocity	The initial velocity of the line
  */
 void SuperSquare::AddLine(uint8_t direction, uint16_t velocity)
 {
