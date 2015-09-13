@@ -33,7 +33,7 @@
 #define DEAD_ZONE 15
 
 #define WRAP(x,y) \
-	( ((x) < 0) ? ((x) + (y)) : ( ((x) >= (y)) ? ((x) - (y)) : (x) ) )
+  ( ((x) < 0) ? ((x) + (y)) : ( ((x) >= (y)) ? ((x) - (y)) : (x) ) )
 #define CLAMP(x,y) ((x) > (y) ? (y) : ((x) < 0 ? 0 : (x)))
 
 #define RANDOM_PIN   4  /* Analog, not connected */
