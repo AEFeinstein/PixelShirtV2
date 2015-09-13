@@ -33,7 +33,7 @@ uint8_t screensaverShiftTimer = IRQ_HZ / 4;
  * and resets the current game. Otherwise it extends the time until the
  * screensaver activates.
  *
- * @param currentGame	The game to restart
+ * @param currentGame The game to restart
  */
 void ExitScreensaver(ArduinoGame* currentGame)
 {
@@ -70,7 +70,7 @@ void HandleScreensaverTimer(void)
 }
 
 /**
- * @return	The time until the screensaver activates, without controller input
+ * @return  The time until the screensaver activates, without controller input
  */
 uint16_t GetScreensaverTimer(void)
 {
@@ -137,9 +137,9 @@ void DisplayScreensaver(void)
  * Given a position on the color wheel, and a brightness, return the color
  * at that position
  *
- * @param polar			The position on the color wheel, in degrees
- * @param brightness	The brightness of the color to return
- * @return				A color on the color wheel
+ * @param polar     The position on the color wheel, in degrees
+ * @param brightness  The brightness of the color to return
+ * @return        A color on the color wheel
  */
 uint32_t getRGB(uint16_t polar, uint8_t brightness)
 {

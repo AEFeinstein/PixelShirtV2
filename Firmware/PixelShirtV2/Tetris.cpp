@@ -43,8 +43,8 @@ Tetris::Tetris(void)
  * Clear the display and reset all state & timers. If this is the initial reset,
  * don't start the game yet. Otherwise start the game
  *
- * @param isInit	Whether or not this is the initial reset
- * @param whoWon	Unused, this is a team effort (or single player)
+ * @param isInit  Whether or not this is the initial reset
+ * @param whoWon  Unused, this is a team effort (or single player)
  */
 void Tetris::ResetGame(
   uint8_t isInit,
@@ -117,8 +117,8 @@ void Tetris::UpdatePhysics(void)
  * down drops it faster.
  * The left and right buttons rotate the tetromino, and the up button drops it.
  *
- * @param p1	Player 1's input, to be masked
- * @param p2	Player 1's input, to be masked
+ * @param p1  Player 1's input, to be masked
+ * @param p2  Player 1's input, to be masked
  */
 void Tetris::ProcessInput(int32_t p1, int32_t p2)
 {
@@ -236,8 +236,8 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
  * move the next piece on to the field, since there is no next yet.
  * When the tetromino is placed on the field, collisions are checked.
  *
- * @param isFirst	If this is the first tetromino generated in the game
- * @return			1 if the tetromino collided (game over), 0 otherwise
+ * @param isFirst If this is the first tetromino generated in the game
+ * @return      1 if the tetromino collided (game over), 0 otherwise
  */
 uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 {
@@ -446,8 +446,8 @@ uint8_t Tetris::DropActiveTetromino(void)
   }
   /* Otherwise set the piece in the clear lines, and try to spawn a new piece */
   else {
-	/* whenever a piece is set, swap the controls */
-	leadPlayer = (leadPlayer+1)%2;
+    /* whenever a piece is set, swap the controls */
+    leadPlayer = (leadPlayer+1)%2;
     /* Set the piece */
     for(i=0; i < 4; i++) {
       SetPixel(activeTetromino[i][X] + activeOffset[X],
@@ -506,7 +506,7 @@ uint8_t Tetris::DropActiveTetromino(void)
  * Moves the active tetromino one pixel left or right, as long as nothing
  * is blocking the movement
  *
- * @param direction	The direction to move. T_RIGHT == +1, T_LEFT = -1
+ * @param direction The direction to move. T_RIGHT == +1, T_LEFT = -1
  */
 void Tetris::SlideActiveTetromino(
   int8_t direction)
@@ -535,7 +535,7 @@ void Tetris::SlideActiveTetromino(
  * If the piece cannot be rotated (up against a wall, etc), the function does
  * nothing
  *
- * @param direction	The direction to rotate, CLOCKWISE == 1,
+ * @param direction The direction to rotate, CLOCKWISE == 1,
  *                  COUNTERCLOCKWISE == -1
  */
 void Tetris::RotateActiveTetromino(
@@ -599,8 +599,8 @@ void Tetris::RotateActiveTetromino(
   for(i=0; i < 4; i++) {
     if(IsPixelLit(newRotation[i][X] + activeOffset[X],
                   newRotation[i][Y] + activeOffset[Y]) ||
-                newRotation[i][Y] + activeOffset[Y] < 0  ||
-                newRotation[i][Y] + activeOffset[Y] > 15) {
+        newRotation[i][Y] + activeOffset[Y] < 0  ||
+        newRotation[i][Y] + activeOffset[Y] > 15) {
       activeRotation = oldRotation; /* undo */
       DrawActiveTetromino();
       return; /* can't rotate :( */

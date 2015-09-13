@@ -263,9 +263,9 @@ void SuperSquare::PlacePlayerPixel(uint8_t position[])
  * Given a line struct and color, draw it on the display, and check for
  * collisions
  *
- * @param line	The line to draw (position)
- * @param rgb	The color of the line to draw
- * @return		FALSE if there was a collision, TRUE if there wasn't
+ * @param line  The line to draw (position)
+ * @param rgb The color of the line to draw
+ * @return    FALSE if there was a collision, TRUE if there wasn't
  */
 uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
 {
@@ -325,8 +325,8 @@ uint8_t SuperSquare::DrawLine( Line line, uint32_t rgb)
  * Given a direction and initial velocity, add a line. This doesn't draw
  * anything, but stores the line in memory
  *
- * @param direction	The initial direction of the line
- * @param velocity	The initial velocity of the line
+ * @param direction The initial direction of the line
+ * @param velocity  The initial velocity of the line
  */
 void SuperSquare::AddLine(uint8_t direction, uint16_t velocity)
 {

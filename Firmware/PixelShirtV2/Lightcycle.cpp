@@ -102,9 +102,9 @@ void Lightcycle::UpdatePhysics(void)
  * Clears the screen, resets timers, and places cycles at their initial
  * positions. If there was a winner, light some LEDs on their side.
  *
- * @param isInit	1 if this is the initial reset, 0 otherwise
- * @param losers	A bitmask of losers. 0x01 indicates P1 lost,
- * 					0x02 indicates P2 lost
+ * @param isInit  1 if this is the initial reset, 0 otherwise
+ * @param losers  A bitmask of losers. 0x01 indicates P1 lost,
+ *          0x02 indicates P2 lost
  */
 void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
                             uint8_t losers)
@@ -154,8 +154,8 @@ void Lightcycle::ResetGame( __attribute__((unused)) uint8_t isInit,
 /**
  * Process input from the controllers. Only the D-Pad can drive cycles
  *
- * @param p1	The 32 bits of player 1 input, to be masked into buttons
- * @param p2	The 32 bits of player 2 input, to be masked into buttons
+ * @param p1  The 32 bits of player 1 input, to be masked into buttons
+ * @param p2  The 32 bits of player 2 input, to be masked into buttons
  */
 void Lightcycle::ProcessInput(int32_t p1, int32_t p2)
 {

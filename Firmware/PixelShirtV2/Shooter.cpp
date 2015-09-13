@@ -18,10 +18,11 @@
 #include "Shooter.h"
 
 int8_t shipShape[4][2] = {
-		{-1,BOARD_SIZE-1},
-		{0,BOARD_SIZE-1},
-		{1,BOARD_SIZE-1},
-		{0,BOARD_SIZE-2}};
+  {-1,BOARD_SIZE-1},
+  {0,BOARD_SIZE-1},
+  {1,BOARD_SIZE-1},
+  {0,BOARD_SIZE-2}
+};
 #define PLAYER_SCALAR 16
 
 #define BULLET_COLOR 0x151515
@@ -55,11 +56,11 @@ void Shooter::UpdatePhysics(void)
     /* Clear bullets */
     for (i = 0; i < NUM_BULLETS; i++) {
       if(player1.bullets[i][1] != -1 &&
-    		  player1.bullets[i][1] != BOARD_SIZE - 2) {
+          player1.bullets[i][1] != BOARD_SIZE - 2) {
         SetPixel(player1.bullets[i][0], player1.bullets[i][1], EMPTY_COLOR);
       }
       if(player2.bullets[i][1] != -1 &&
-    		  player2.bullets[i][1] != BOARD_SIZE - 2) {
+          player2.bullets[i][1] != BOARD_SIZE - 2) {
         SetPixel(player2.bullets[i][0], player2.bullets[i][1], EMPTY_COLOR);
       }
     }
@@ -95,7 +96,7 @@ void Shooter::UpdatePhysics(void)
     for (i = 0; i < NUM_BULLETS; i++) {
       if(player1.bullets[i][1] != -1) {
         if(GetPixel(player1.bullets[i][0], player1.bullets[i][1]) ==
-        		ENEMY_COLOR) {
+            ENEMY_COLOR) {
           /* Clear the pixel, invalidate the bullet, increment the score */
           SetPixel(player1.bullets[i][0], player1.bullets[i][1], EMPTY_COLOR);
           KillEnemy();
@@ -107,7 +108,7 @@ void Shooter::UpdatePhysics(void)
       }
       if(player2.bullets[i][1] != -1) {
         if(GetPixel(player2.bullets[i][0], player2.bullets[i][1]) ==
-        		ENEMY_COLOR) {
+            ENEMY_COLOR) {
           /* Clear the pixel, invalidate the bullet, increment the score */
           SetPixel(player2.bullets[i][0], player2.bullets[i][1], EMPTY_COLOR);
           KillEnemy();
@@ -146,8 +147,8 @@ void Shooter::KillEnemy(void)
  * Always reset the player's position and bullet state. Spawn the initial
  * wave of invaders.
  *
- * @param isInit	Ignored
- * @param whoWon	Ignored
+ * @param isInit  Ignored
+ * @param whoWon  Ignored
  */
 void Shooter::ResetGame(
 
@@ -207,8 +208,8 @@ void Shooter::SpawnWave(void)
  * The joysticks control the lateral motion of the ships, and the down buttons
  * fire bullets. The player's ships cannot pass through each other.
  *
- * @param p1	Player 1's input, to be masked into joystick and button
- * @param p2	Player 2's input, to be masked into joystick and button
+ * @param p1  Player 1's input, to be masked into joystick and button
+ * @param p2  Player 2's input, to be masked into joystick and button
  */
 void Shooter::ProcessInput(int32_t p1, int32_t p2)
 {
@@ -219,7 +220,7 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
 
     /* Handle position */
     if((GET_X_AXIS(p1)) < 512 - DEAD_ZONE ||
-    		512 + DEAD_ZONE < (GET_X_AXIS(p1))) {
+        512 + DEAD_ZONE < (GET_X_AXIS(p1))) {
       player1.position += (((GET_X_AXIS(p1)) - 512) / 32);
       if(player1.position < 0) {
         player1.position = 0;
@@ -230,7 +231,7 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
     }
 
     if((GET_X_AXIS(p2)) < 512 - DEAD_ZONE ||
-    		512 + DEAD_ZONE < (GET_X_AXIS(p2))) {
+        512 + DEAD_ZONE < (GET_X_AXIS(p2))) {
       player2.position += (((GET_X_AXIS(p2)) - 512) / 32);
       if(player2.position < player1.position + PLAYER_SCALAR) {
         player2.position = player1.position + PLAYER_SCALAR;
@@ -400,7 +401,7 @@ void Shooter::ClearPlayers(void)
         && (player1.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
       SetPixel((player1.position / PLAYER_SCALAR) + shipShape[i][0],
-    		  shipShape[i][1], EMPTY_COLOR);
+               shipShape[i][1], EMPTY_COLOR);
     }
 
     /* And then again, for player2. If the pixel is in bounds */
@@ -408,7 +409,7 @@ void Shooter::ClearPlayers(void)
         && (player2.position / PLAYER_SCALAR) + shipShape[i][0] < BOARD_SIZE) {
       /* Clear it */
       SetPixel((player2.position / PLAYER_SCALAR) + shipShape[i][0],
-    		  shipShape[i][1], EMPTY_COLOR);
+               shipShape[i][1], EMPTY_COLOR);
     }
   }
 }
@@ -434,7 +435,7 @@ uint8_t Shooter::DrawPlayers(void)
       }
       /* Otherwise, draw that part of the ship */
       SetPixel((player1.position / PLAYER_SCALAR) + shipShape[i][0],
-    		  shipShape[i][1], P1_COLOR);
+               shipShape[i][1], P1_COLOR);
     }
   }
 
@@ -450,7 +451,7 @@ uint8_t Shooter::DrawPlayers(void)
       }
       /* Otherwise, draw that part of the ship */
       SetPixel((player2.position / PLAYER_SCALAR) + shipShape[i][0],
-    		  shipShape[i][1], P2_COLOR);
+               shipShape[i][1], P2_COLOR);
     }
   }
 
@@ -469,7 +470,7 @@ void Shooter::GameOver(void)
 /**
  * Counts the number invaders, and returns it
  *
- * @return	The current number of invaders on the display
+ * @return  The current number of invaders on the display
  */
 uint8_t Shooter::NumEnemies(void)
 {

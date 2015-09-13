@@ -108,8 +108,8 @@ void Pong::UpdatePhysics(void)
  * Always resets the timers, ball position, and ball velocity, Resets the
  * paddles if this isn't the initial reset. Serves to the winner.
  *
- * @param isInit	1 if this the initial reset, 0 otherwise
- * @param whoWon	The winner of last round, used to determine serve direction
+ * @param isInit  1 if this the initial reset, 0 otherwise
+ * @param whoWon  The winner of last round, used to determine serve direction
  */
 void Pong::ResetGame(  uint8_t isInit,
                        uint8_t whoWon)
@@ -139,7 +139,7 @@ void Pong::ResetGame(  uint8_t isInit,
  * Rotate the ball's velocity vector using a rotation matrix.
  * Trigonometry uses a lookup table rather than a function.
  *
- * @param degree	The number of degrees to rotate the vector
+ * @param degree  The number of degrees to rotate the vector
  */
 void Pong::RotateBall(int16_t degree)
 {
@@ -191,15 +191,15 @@ void Pong::DrawField(void)
   for (i = 0; i < BOARD_SIZE; i++) {
     for (j = 0; j < BOARD_SIZE; j++) {
       if ((j == 0) && ((paddleLocL / (S_M * V_M)) <= i &&
-    		  i < (paddleLocL / (S_M * V_M)) + PADDLE_SIZE / (V_M * S_M))) {
+                       i < (paddleLocL / (S_M * V_M)) + PADDLE_SIZE / (V_M * S_M))) {
         SetPixel(j, i, P1_COLOR);
       }
       else if ((j == (BOARD_SIZE - 1)) && ((paddleLocR / (S_M * V_M)) <= i &&
-    		  i < (paddleLocR / (S_M * V_M)) + PADDLE_SIZE / (V_M * S_M))) {
+                                           i < (paddleLocR / (S_M * V_M)) + PADDLE_SIZE / (V_M * S_M))) {
         SetPixel(j, i, P2_COLOR);
       }
       else if (j == (ballLoc[X] / (S_M * V_M)) &&
-    		   i == (ballLoc[Y] / (S_M * V_M))) {
+               i == (ballLoc[Y] / (S_M * V_M))) {
         SetPixel(j, i, BALL_COLOR);
       }
       else {
@@ -214,8 +214,8 @@ void Pong::DrawField(void)
  * count if the joystick is outside of the DEAD_ZONE, so there isn't any drift
  * with no input.
  *
- * @param p1	The 32 bits of player 1 input, to be masked into the joystick
- * @param p2	The 32 bits of player 2 input, to be masked into the joystick
+ * @param p1  The 32 bits of player 1 input, to be masked into the joystick
+ * @param p2  The 32 bits of player 2 input, to be masked into the joystick
  */
 void Pong::ProcessInput(int32_t p1, int32_t p2)
 {

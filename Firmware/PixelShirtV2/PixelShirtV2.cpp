@@ -209,20 +209,20 @@ void doEverything(void)
 
   /* If there is any input, exit the screen saver */
   if((GET_BUTTONS(p1controller) & UP) ||
-     (GET_BUTTONS(p1controller) & DOWN) ||
-     (GET_BUTTONS(p1controller) & LEFT) ||
-     (GET_BUTTONS(p1controller) & RIGHT) ||
-     ((GET_X_AXIS(p1controller)) < 512 - DEAD_ZONE ||
+      (GET_BUTTONS(p1controller) & DOWN) ||
+      (GET_BUTTONS(p1controller) & LEFT) ||
+      (GET_BUTTONS(p1controller) & RIGHT) ||
+      ((GET_X_AXIS(p1controller)) < 512 - DEAD_ZONE ||
        512 + DEAD_ZONE < (GET_X_AXIS(p1controller))) ||
-     ((GET_Y_AXIS(p1controller)) < 512 - DEAD_ZONE ||
+      ((GET_Y_AXIS(p1controller)) < 512 - DEAD_ZONE ||
        512 + DEAD_ZONE < (GET_Y_AXIS(p1controller))) ||
-     (GET_BUTTONS(p2controller) & UP) ||
-     (GET_BUTTONS(p2controller) & DOWN) ||
-     (GET_BUTTONS(p2controller) & LEFT) ||
-     (GET_BUTTONS(p2controller) & RIGHT) ||
-     ((GET_X_AXIS(p2controller)) < 512 - DEAD_ZONE ||
+      (GET_BUTTONS(p2controller) & UP) ||
+      (GET_BUTTONS(p2controller) & DOWN) ||
+      (GET_BUTTONS(p2controller) & LEFT) ||
+      (GET_BUTTONS(p2controller) & RIGHT) ||
+      ((GET_X_AXIS(p2controller)) < 512 - DEAD_ZONE ||
        512 + DEAD_ZONE < (GET_X_AXIS(p2controller))) ||
-     ((GET_Y_AXIS(p2controller)) < 512 - DEAD_ZONE ||
+      ((GET_Y_AXIS(p2controller)) < 512 - DEAD_ZONE ||
        512 + DEAD_ZONE < (GET_Y_AXIS(p2controller)))) {
     ExitScreensaver(currentGame);
   }
@@ -282,8 +282,8 @@ void doEverything(void)
  * Draws an up to four digit number in the center of the display
  * with the given color
  *
- * @param score	The score to draw, 0 to 9999
- * @param rgb	The color to draw the score with
+ * @param score The score to draw, 0 to 9999
+ * @param rgb The color to draw the score with
  */
 void DisplayScore(uint16_t score, uint32_t rgb)
 {
@@ -310,10 +310,10 @@ void DisplayScore(uint16_t score, uint32_t rgb)
 /**
  * Draws a single digit on the display in the given color at the given offset
  *
- * @param number	The number to draw, 0-9
- * @param offsetX	The X offset where to draw the number
- * @param offsetY	The Y offset where to draw the number
- * @param rgb		The color to draw the number with
+ * @param number  The number to draw, 0-9
+ * @param offsetX The X offset where to draw the number
+ * @param offsetY The Y offset where to draw the number
+ * @param rgb   The color to draw the number with
  */
 void DrawNumber(uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
 {
@@ -454,9 +454,9 @@ void DrawNumber(uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
 /**
  * Sets a pixel in the display at the given position to the given color
  *
- * @param x		The X coordinate of the pixel to set
- * @param y		The Y coordinate of the pixel to set
- * @param rgb	The color to set the pixel to
+ * @param x   The X coordinate of the pixel to set
+ * @param y   The Y coordinate of the pixel to set
+ * @param rgb The color to set the pixel to
  */
 void SetPixel(int8_t x, int8_t y, uint32_t rgb)
 {
@@ -464,30 +464,30 @@ void SetPixel(int8_t x, int8_t y, uint32_t rgb)
 
   switch(x / 4) {
     case 0: {
-      pixels0.setPixelColor(index, rgb);
-      break;
-    }
+        pixels0.setPixelColor(index, rgb);
+        break;
+      }
     case 1: {
-      pixels1.setPixelColor(index, rgb);
-      break;
-    }
+        pixels1.setPixelColor(index, rgb);
+        break;
+      }
     case 2: {
-      pixels2.setPixelColor(index, rgb);
-      break;
-    }
+        pixels2.setPixelColor(index, rgb);
+        break;
+      }
     case 3: {
-      pixels3.setPixelColor(index, rgb);
-      break;
-    }
+        pixels3.setPixelColor(index, rgb);
+        break;
+      }
   }
 }
 
 /**
  * Gets a pixel in the display at the given position and returns the color
  *
- * @param x		The X coordinate of the pixel to get
- * @param y		The Y coordinate of the pixel to get
- * @return		The color of the given pixel
+ * @param x   The X coordinate of the pixel to get
+ * @param y   The Y coordinate of the pixel to get
+ * @return    The color of the given pixel
  */
 uint32_t GetPixel(int8_t x, int8_t y)
 {
@@ -495,19 +495,19 @@ uint32_t GetPixel(int8_t x, int8_t y)
 
   switch(x / 4) {
     case 0: {
-      return pixels0.getPixelColor(index);
-    }
+        return pixels0.getPixelColor(index);
+      }
     case 1: {
-      return pixels1.getPixelColor(index);
-    }
+        return pixels1.getPixelColor(index);
+      }
     case 2: {
-      return pixels2.getPixelColor(index);
-    }
+        return pixels2.getPixelColor(index);
+      }
     case 3: {
-      return pixels3.getPixelColor(index);
-    }
+        return pixels3.getPixelColor(index);
+      }
     default: {
-      return 0;
-    }
+        return 0;
+      }
   }
 }
