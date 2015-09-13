@@ -13,7 +13,8 @@ uint32_t tetrominoColors[7] = {
 };
 
 /**
- * TODO
+ * Default constructor. Reset the game with the init flag, and put it in
+ * multiplayer mode
  */
 Tetris::Tetris(void)
 {
@@ -22,9 +23,11 @@ Tetris::Tetris(void)
 }
 
 /**
- * TODO
- * @param isInit
- * @param whoWon
+ * Clear the display and reset all state & timers. If this is the initial reset,
+ * don't start the game yet. Otherwise start the game
+ *
+ * @param isInit	Whether or not this is the initial reset
+ * @param whoWon	Unused, this is a team effort (or single player)
  */
 void Tetris::ResetGame(
   uint8_t isInit,
@@ -64,7 +67,7 @@ void Tetris::ResetGame(
 }
 
 /**
- * TODO
+ * Debounces input with cursorTimer and drops tetrominos with dropTimer
  */
 void Tetris::UpdatePhysics(void)
 {
@@ -90,15 +93,22 @@ void Tetris::UpdatePhysics(void)
 }
 
 /**
- * TODO
- * @param p1
- * @param p2
+ * If both players hold left for two seconds, the game switches modes between
+ * single & multiplayer.
+ * Both players tapping the down button starts the game.
+ * Left and right on the analog stick moves the tetromino laterally. Tilting
+ * down drops it faster.
+ * The left and right buttons rotate the tetromino, and the up button drops it.
+ *
+ * @param p1	Player 1's input, to be masked
+ * @param p2	Player 1's input, to be masked
  */
 void Tetris::ProcessInput(int32_t p1, int32_t p2)
 {
   int32_t ax, ay;
   int8_t br, bl, bu;
 
+  /* If both controllers hold left for two seconds, switch game mode */
   if((GET_BUTTONS(p1) & LEFT) && (GET_BUTTONS(p2) & LEFT)) {
     downTimer++;
   }
@@ -111,6 +121,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     return;
   }
 
+  /* If the game is over, and active players tap down, the game starts */
   if(gameOver) {
     if(multiplayer) {
       if((GET_BUTTONS(p1) & DOWN) && (GET_BUTTONS(p2) & DOWN)) {
@@ -125,6 +136,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     return;
   }
 
+  /* Get the input, depending on game mode */
   if(multiplayer) {
     if(leadPlayer%2) {
       ax = (GET_X_AXIS(p1));
@@ -149,6 +161,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     br = (GET_BUTTONS(p1) & RIGHT);
   }
 
+  /* Rotations */
   if(bl && !rotatedYet) {
     RotateActiveTetromino( CLOCKWISE);
     rotatedYet = 1;
@@ -161,6 +174,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     rotatedYet = 0;
   }
 
+  /* Auto-drop */
   if(bu && !hardDroppedYet) {
     while(DropActiveTetromino()) {
       ;
@@ -171,6 +185,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     hardDroppedYet = 0;
   }
 
+  /* Fast-drop */
   if(ay > 768 && !turboMode) {
     turboMode = 1;
     dropTimer = 0;
@@ -179,6 +194,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     turboMode = 0;
   }
 
+  /* Lateral movement, with debounce */
   if(ax > 768) {
     if(cursorTimer == 0) {
       SlideActiveTetromino( T_RIGHT);
@@ -198,9 +214,13 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
 }
 
 /**
- * TODO
- * @param isFirst
- * @return
+ * Moves the next tetromino onto the playing field and generates a new random
+ * tetromino to be dropped next. If this is the first piece, it doesn't
+ * move the next piece on to the field, since there is no next yet.
+ * When the tetromino is placed on the field, collisions are checked.
+ *
+ * @param isFirst	If this is the first tetromino generated in the game
+ * @return			1 if the tetromino collided (game over), 0 otherwise
  */
 uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 {
@@ -324,7 +344,8 @@ uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
 }
 
 /**
- * TODO
+ * Removes the active tetromino piece from the playing field.
+ * This is called before dropping, rotating, or sliding a piece.
  */
 void Tetris::ClearActiveTetromino(void)
 {
@@ -340,7 +361,8 @@ void Tetris::ClearActiveTetromino(void)
 }
 
 /**
- * TODO
+ * Draws the active tetromino on the playing field.
+ * This is called after dropping, rotating, or sliding a piece.
  */
 void Tetris::DrawActiveTetromino(void)
 {
@@ -356,7 +378,7 @@ void Tetris::DrawActiveTetromino(void)
 }
 
 /**
- * TODO
+ * Clears the next tetromino, to the left of the playing field.
  */
 void Tetris::ClearNextTetromino(void)
 {
@@ -367,7 +389,7 @@ void Tetris::ClearNextTetromino(void)
 }
 
 /**
- * TODO
+ * Draws the next tetromino, to the left of the playing field
  */
 void Tetris::DrawNextTetromino(void)
 {
@@ -378,7 +400,10 @@ void Tetris::DrawNextTetromino(void)
 }
 
 /**
- * TODO
+ * If the active tetromino can be dropped one row, it is. Otherwise it is
+ * locked in place, any full rows are cleared, score is incremented as
+ * appropriate, and a new active & next tetromino are drawn.
+ *
  * @return 1 if the piece dropped or 0 if the piece was blocked
  */
 uint8_t Tetris::DropActiveTetromino(void)
@@ -391,7 +416,7 @@ uint8_t Tetris::DropActiveTetromino(void)
     if(activeTetromino[i][Y] + activeOffset[Y] + 1 == BOARD_SIZE || /* floor */
         IsPixelLit(activeTetromino[i][X] + activeOffset[X],
                    activeTetromino[i][Y] + activeOffset[Y] +
-                   1)) { /* used to be ==2, set piece TOTO PROBMEL */
+                   1)) {
       isBlocked = 1;
     }
   }
@@ -402,9 +427,10 @@ uint8_t Tetris::DropActiveTetromino(void)
     DrawActiveTetromino();
     return 1;
   }
-  /* Otherwise set the piece in the  clear lines, and try to spawn a new piece */
+  /* Otherwise set the piece in the clear lines, and try to spawn a new piece */
   else {
-    leadPlayer = (leadPlayer+1)%2; /* whenever a piece is set, swap the controls */
+	/* whenever a piece is set, swap the controls */
+	leadPlayer = (leadPlayer+1)%2;
     /* Set the piece */
     for(i=0; i < 4; i++) {
       SetPixel(activeTetromino[i][X] + activeOffset[X],
@@ -460,8 +486,10 @@ uint8_t Tetris::DropActiveTetromino(void)
 }
 
 /**
+ * Moves the active tetromino one pixel left or right, as long as nothing
+ * is blocking the movement
  *
- * @param direction
+ * @param direction	The direction to move. T_RIGHT == +1, T_LEFT = -1
  */
 void Tetris::SlideActiveTetromino(
   int8_t direction)
@@ -474,7 +502,7 @@ void Tetris::SlideActiveTetromino(
   for(i=0; i < 4; i++) {
     /* 3 is a wall, 2 is a set piece */
     if(IsPixelLit(activeTetromino[i][X] + activeOffset[X] + direction,
-                  activeTetromino[i][Y] + activeOffset[Y]) ) { /* Used to be == 2 or 3 */
+                  activeTetromino[i][Y] + activeOffset[Y]) ) {
       DrawActiveTetromino();
       return; /* can't slide :( */
     }
@@ -486,8 +514,12 @@ void Tetris::SlideActiveTetromino(
 }
 
 /**
- * TODO
- * @param direction
+ * Rotates the active tetromino using a lookup table of tetromino orientations
+ * If the piece cannot be rotated (up against a wall, etc), the function does
+ * nothing
+ *
+ * @param direction	The direction to rotate, CLOCKWISE == 1,
+ *                  COUNTERCLOCKWISE == -1
  */
 void Tetris::RotateActiveTetromino(
   int8_t direction)
@@ -549,10 +581,9 @@ void Tetris::RotateActiveTetromino(
 
   for(i=0; i < 4; i++) {
     if(IsPixelLit(newRotation[i][X] + activeOffset[X],
-                  newRotation[i][Y] + activeOffset[Y])
-        || /* Used to be == 2 (piece) or 3 (wall) */
-        newRotation[i][Y] + activeOffset[Y] < 0  ||
-        newRotation[i][Y] + activeOffset[Y] > 15) {
+                  newRotation[i][Y] + activeOffset[Y]) ||
+                newRotation[i][Y] + activeOffset[Y] < 0  ||
+                newRotation[i][Y] + activeOffset[Y] > 15) {
       activeRotation = oldRotation; /* undo */
       DrawActiveTetromino();
       return; /* can't rotate :( */
@@ -566,5 +597,3 @@ void Tetris::RotateActiveTetromino(
   }
   DrawActiveTetromino();
 }
-
-
