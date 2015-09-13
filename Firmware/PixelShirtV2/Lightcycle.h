@@ -27,7 +27,7 @@ class Lightcycle : public ArduinoGame
   ~Lightcycle(void) {};
   void UpdatePhysics(void);
   void ResetGame( uint8_t isInit,
-                  uint8_t whoWon);
+                  uint8_t losers);
   void ProcessInput( int32_t p1, int32_t p2);
  private:
   int8_t p1pos[2], p2pos[2];
