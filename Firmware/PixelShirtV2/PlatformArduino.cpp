@@ -11,6 +11,8 @@
 #include "nRF24L01.h"
 #include "nrf24.h"
 #include "Arduino.h"
+#include "ArduinoGame.h"
+#include "PixelShirtV2.h"
 
 /* A pin to seed random with */
 #define RANDOM_PIN   4  /* Analog, not connected */

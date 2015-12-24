@@ -18,6 +18,8 @@
 
 #ifdef ARDUINO
 
+#include "Arduino.h"
+
 uint8_t payload_len;
 
 /* init the hardware pins */
