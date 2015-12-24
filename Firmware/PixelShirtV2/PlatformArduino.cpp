@@ -110,7 +110,8 @@ uint32_t GetPixel(int8_t x, int8_t y)
  * Initializes the hardware including the heartbeat LED, display,
  * joystick RF, and random number generator
  */
-void initializeHardware(void) {
+void initializeHardware(void)
+{
   /* Set up heart-beat */
   pinMode(HEARTBEAT_PIN, OUTPUT);
 
@@ -140,7 +141,8 @@ void initializeHardware(void) {
  *
  * Also handles the heartbeat LED, since this function is called often
  */
-void readJoystickData(void) {
+void readJoystickData(void)
+{
   uint32_t jsTmp;
 
   /* If there is data from the controllers, get it and store it */
@@ -170,7 +172,8 @@ void readJoystickData(void) {
 /**
  * Pushes all pixels out to the display
  */
-void displayPixels(void) {
+void displayPixels(void)
+{
   pixels0.show();
   pixels1.show();
   pixels2.show();
@@ -182,7 +185,8 @@ void displayPixels(void) {
  *
  * @return Number of microseconds since the program started (unsigned long)
  */
-uint32_t getMicroseconds(void) {
+uint32_t getMicroseconds(void)
+{
   return micros();
 }
 
@@ -192,7 +196,8 @@ uint32_t getMicroseconds(void) {
  * @param max upper bound of the random value, exclusive
  * @return a random number between 0 and max-1 (long)
  */
-uint32_t randomNumber(uint32_t max) {
+uint32_t randomNumber(uint32_t max)
+{
   return random(max);
 }
 

@@ -51,41 +51,105 @@ enum {
 #define IDLE_1      5
 
 uint8_t sprites[6][19][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
-    0x12, COLOR_BODY }, { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, { 0x31,
-    COLOR_BODY }, { 0x32, COLOR_BODY }, { 0x33, COLOR_BODY },
-    { 0x40, COLOR_BODY }, { 0x42, COLOR_BODY }, { 0x52, COLOR_BODY }, { 0x61,
-        COLOR_BODY }, { 0x63, COLOR_BODY }, { 0x71, COLOR_BODY }, { 0x73,
-        COLOR_BODY }, { 0x80, COLOR_BODY }, { 0x83, COLOR_BODY }, }, { { 0x02,
-    COLOR_HEAD }, { 0x03, COLOR_HEAD }, { 0x12, COLOR_BODY },
-    { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, { 0x31, COLOR_BODY }, { 0x32,
-        COLOR_BODY }, { 0x33, COLOR_BODY }, { 0x34, COLOR_ATTACK }, { 0x35,
-        COLOR_ATTACK }, { 0x42, COLOR_BODY }, { 0x52, COLOR_BODY }, { 0x61,
-        COLOR_BODY }, { 0x63, COLOR_BODY }, { 0x71, COLOR_BODY }, { 0x73,
-        COLOR_BODY }, { 0x80, COLOR_BODY }, { 0x83, COLOR_BODY }, }, { { 0x02,
-    COLOR_HEAD }, { 0x03, COLOR_HEAD }, { 0x12, COLOR_BODY },
-    { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, { 0x31, COLOR_BODY }, { 0x32,
-        COLOR_BODY }, { 0x33, COLOR_BODY }, { 0x40, COLOR_BODY }, { 0x42,
-        COLOR_BODY }, { 0x52, COLOR_BODY }, { 0x61, COLOR_BODY }, { 0x63,
-        COLOR_BODY }, { 0x64, COLOR_ATTACK }, { 0x65, COLOR_ATTACK }, { 0x71,
-        COLOR_BODY }, { 0x80, COLOR_BODY }, }, { { 0x01, COLOR_HEAD }, { 0x02,
-    COLOR_HEAD }, { 0x11, COLOR_BODY }, { 0x12, COLOR_BODY },
-    { 0x21, COLOR_BODY }, { 0x24, COLOR_BLOCK }, { 0x30, COLOR_BODY }, { 0x31,
-        COLOR_BODY }, { 0x32, COLOR_BODY }, { 0x33, COLOR_BODY }, { 0x34,
-        COLOR_BLOCK }, { 0x41, COLOR_BODY }, { 0x51, COLOR_BODY }, { 0x60,
-        COLOR_BODY }, { 0x62, COLOR_BODY }, { 0x70, COLOR_BODY }, { 0x72,
-        COLOR_BODY }, { 0x80, COLOR_BODY }, { 0x83, COLOR_BODY }, }, { { 0x01,
-    COLOR_HEAD }, { 0x02, COLOR_HEAD }, { 0x11, COLOR_BODY },
-    { 0x12, COLOR_BODY }, { 0x21, COLOR_BODY }, { 0x30, COLOR_BODY }, { 0x31,
-        COLOR_BODY }, { 0x32, COLOR_BODY }, { 0x41, COLOR_BODY }, { 0x51,
-        COLOR_BODY }, { 0x54, COLOR_BLOCK }, { 0x60, COLOR_BODY }, { 0x62,
-        COLOR_BODY }, { 0x63, COLOR_BODY }, { 0x64, COLOR_BLOCK }, { 0x70,
-        COLOR_BODY }, { 0x80, COLOR_BODY }, }, { { 0x01, COLOR_HEAD }, { 0x02,
-    COLOR_HEAD }, { 0x11, COLOR_BODY }, { 0x12, COLOR_BODY },
-    { 0x21, COLOR_BODY }, { 0x30, COLOR_BODY }, { 0x31, COLOR_BODY }, { 0x32,
-        COLOR_BODY }, { 0x41, COLOR_BODY }, { 0x43, COLOR_BODY }, { 0x51,
-        COLOR_BODY }, { 0x60, COLOR_BODY }, { 0x62, COLOR_BODY }, { 0x70,
-        COLOR_BODY }, { 0x72, COLOR_BODY }, { 0x80, COLOR_BODY }, { 0x83,
-        COLOR_BODY }, }, };
+      0x12, COLOR_BODY
+    }, { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, {
+      0x31,
+      COLOR_BODY
+    }, { 0x32, COLOR_BODY }, { 0x33, COLOR_BODY },
+    { 0x40, COLOR_BODY }, { 0x42, COLOR_BODY }, { 0x52, COLOR_BODY }, {
+      0x61,
+      COLOR_BODY
+    }, { 0x63, COLOR_BODY }, { 0x71, COLOR_BODY }, {
+      0x73,
+      COLOR_BODY
+    }, { 0x80, COLOR_BODY }, { 0x83, COLOR_BODY },
+  }, { {
+      0x02,
+      COLOR_HEAD
+    }, { 0x03, COLOR_HEAD }, { 0x12, COLOR_BODY },
+    { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, { 0x31, COLOR_BODY }, {
+      0x32,
+      COLOR_BODY
+    }, { 0x33, COLOR_BODY }, { 0x34, COLOR_ATTACK }, {
+      0x35,
+      COLOR_ATTACK
+    }, { 0x42, COLOR_BODY }, { 0x52, COLOR_BODY }, {
+      0x61,
+      COLOR_BODY
+    }, { 0x63, COLOR_BODY }, { 0x71, COLOR_BODY }, {
+      0x73,
+      COLOR_BODY
+    }, { 0x80, COLOR_BODY }, { 0x83, COLOR_BODY },
+  }, { {
+      0x02,
+      COLOR_HEAD
+    }, { 0x03, COLOR_HEAD }, { 0x12, COLOR_BODY },
+    { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, { 0x31, COLOR_BODY }, {
+      0x32,
+      COLOR_BODY
+    }, { 0x33, COLOR_BODY }, { 0x40, COLOR_BODY }, {
+      0x42,
+      COLOR_BODY
+    }, { 0x52, COLOR_BODY }, { 0x61, COLOR_BODY }, {
+      0x63,
+      COLOR_BODY
+    }, { 0x64, COLOR_ATTACK }, { 0x65, COLOR_ATTACK }, {
+      0x71,
+      COLOR_BODY
+    }, { 0x80, COLOR_BODY },
+  }, { { 0x01, COLOR_HEAD }, {
+      0x02,
+      COLOR_HEAD
+    }, { 0x11, COLOR_BODY }, { 0x12, COLOR_BODY },
+    { 0x21, COLOR_BODY }, { 0x24, COLOR_BLOCK }, { 0x30, COLOR_BODY }, {
+      0x31,
+      COLOR_BODY
+    }, { 0x32, COLOR_BODY }, { 0x33, COLOR_BODY }, {
+      0x34,
+      COLOR_BLOCK
+    }, { 0x41, COLOR_BODY }, { 0x51, COLOR_BODY }, {
+      0x60,
+      COLOR_BODY
+    }, { 0x62, COLOR_BODY }, { 0x70, COLOR_BODY }, {
+      0x72,
+      COLOR_BODY
+    }, { 0x80, COLOR_BODY }, { 0x83, COLOR_BODY },
+  }, { {
+      0x01,
+      COLOR_HEAD
+    }, { 0x02, COLOR_HEAD }, { 0x11, COLOR_BODY },
+    { 0x12, COLOR_BODY }, { 0x21, COLOR_BODY }, { 0x30, COLOR_BODY }, {
+      0x31,
+      COLOR_BODY
+    }, { 0x32, COLOR_BODY }, { 0x41, COLOR_BODY }, {
+      0x51,
+      COLOR_BODY
+    }, { 0x54, COLOR_BLOCK }, { 0x60, COLOR_BODY }, {
+      0x62,
+      COLOR_BODY
+    }, { 0x63, COLOR_BODY }, { 0x64, COLOR_BLOCK }, {
+      0x70,
+      COLOR_BODY
+    }, { 0x80, COLOR_BODY },
+  }, { { 0x01, COLOR_HEAD }, {
+      0x02,
+      COLOR_HEAD
+    }, { 0x11, COLOR_BODY }, { 0x12, COLOR_BODY },
+    { 0x21, COLOR_BODY }, { 0x30, COLOR_BODY }, { 0x31, COLOR_BODY }, {
+      0x32,
+      COLOR_BODY
+    }, { 0x41, COLOR_BODY }, { 0x43, COLOR_BODY }, {
+      0x51,
+      COLOR_BODY
+    }, { 0x60, COLOR_BODY }, { 0x62, COLOR_BODY }, {
+      0x70,
+      COLOR_BODY
+    }, { 0x72, COLOR_BODY }, { 0x80, COLOR_BODY }, {
+      0x83,
+      COLOR_BODY
+    },
+  },
+};
 
 /***********************************
  *                                 *
@@ -96,17 +160,19 @@ uint8_t sprites[6][19][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
 /**
  * TODO Document
  */
-PixelFighterGame::PixelFighterGame(void) {
+PixelFighterGame::PixelFighterGame(void)
+{
   ResetGame(1, 0);
 }
 
 /**
  * TODO Document
  */
-void PixelFighterGame::UpdatePhysics(void) {
+void PixelFighterGame::UpdatePhysics(void)
+{
   fighter_one.ManageTimers(0, fighter_two.getXPos() - FIGHTER_WIDTH);
   fighter_two.ManageTimers(fighter_one.getXPos() + FIGHTER_WIDTH,
-  BOARD_SIZE - FIGHTER_WIDTH);
+                           BOARD_SIZE - FIGHTER_WIDTH);
 
   /* Clear the field */
   uint8_t x, y;
@@ -127,7 +193,8 @@ void PixelFighterGame::UpdatePhysics(void) {
  * @param losers
  */
 void PixelFighterGame::ResetGame(__attribute__((unused))        uint8_t isInit,
-    __attribute__((unused))        uint8_t losers) {
+                                 __attribute__((unused))        uint8_t losers)
+{
   /* TODO do something for the winner */
   fighter_one.InitFighter(FACING_RIGHT);
   fighter_two.InitFighter(FACING_LEFT);
@@ -139,7 +206,8 @@ void PixelFighterGame::ResetGame(__attribute__((unused))        uint8_t isInit,
  * @param p1
  * @param p2
  */
-void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2) {
+void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
+{
   fighter_one.ProcessFighterInput(p1);
   fighter_two.ProcessFighterInput(p2);
 }
@@ -155,7 +223,8 @@ void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2) {
  *
  * @param facing
  */
-void PixelFighter::InitFighter(uint8_t facing) {
+void PixelFighter::InitFighter(uint8_t facing)
+{
   direction = facing;
   if (facing == FACING_LEFT) {
     fighter_two.xPos = BOARD_SIZE - FIGHTER_WIDTH - 1;
@@ -178,7 +247,8 @@ void PixelFighter::InitFighter(uint8_t facing) {
  *
  * @param input
  */
-void PixelFighter::ProcessFighterInput(uint32_t input) {
+void PixelFighter::ProcessFighterInput(uint32_t input)
+{
   /* Only move if the fighter isn't jumping */
   if (jumpTimer == 0) {
     /* Start a jump */
@@ -233,7 +303,8 @@ void PixelFighter::ProcessFighterInput(uint32_t input) {
 /**
  * TODO Document
  */
-void PixelFighter::DrawFighter() {
+void PixelFighter::DrawFighter()
+{
   int8_t index;
 
   int8_t fighterOffset;
@@ -259,25 +330,25 @@ void PixelFighter::DrawFighter() {
     if (sprites[sprite][index][1] != 0) {
       switch (sprites[sprite][index][1]) {
         case COLOR_HEAD: {
-          color = playerColor;
-          break;
-        }
+            color = playerColor;
+            break;
+          }
         case COLOR_BODY: {
-          color = BODY_COLOR;
-          break;
-        }
+            color = BODY_COLOR;
+            break;
+          }
         case COLOR_ATTACK: {
-          color = ATTACK_COLOR;
-          break;
-        }
+            color = ATTACK_COLOR;
+            break;
+          }
         case COLOR_BLOCK: {
-          color = BLOCK_COLOR;
-          break;
-        }
+            color = BLOCK_COLOR;
+            break;
+          }
       }
       SetPixel(
-          (fighterOffset + posMultiplier * (sprites[sprite][index][0] & 0x0F))
-              + xPos, ((sprites[sprite][index][0] & 0xF0) >> 4) + yPos, color);
+        (fighterOffset + posMultiplier * (sprites[sprite][index][0] & 0x0F))
+        + xPos, ((sprites[sprite][index][0] & 0xF0) >> 4) + yPos, color);
     }
   }
   for (index = 0; index < hitPoints; index++) {
@@ -291,7 +362,8 @@ void PixelFighter::DrawFighter() {
  * @param lowerBound
  * @param upperBound
  */
-void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound) {
+void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
+{
 
   /* If the fighter is moving, wait for the move to finish */
   if (moveTimer > 0) {
@@ -301,19 +373,19 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound) {
     /* Is the fighter moving? */
     switch (velocity) {
       case 1: {
-        if (xPos + 1 <= upperBound) {
-          xPos++;
-          moveTimer = MOVE_TIME;
+          if (xPos + 1 <= upperBound) {
+            xPos++;
+            moveTimer = MOVE_TIME;
+          }
+          break;
         }
-        break;
-      }
       case -1: {
-        if (xPos >= lowerBound + 1) {
-          xPos--;
-          moveTimer = MOVE_TIME;
+          if (xPos >= lowerBound + 1) {
+            xPos--;
+            moveTimer = MOVE_TIME;
+          }
+          break;
         }
-        break;
-      }
     }
   }
 
@@ -384,7 +456,8 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound) {
  *
  * @return
  */
-uint8_t PixelFighter::getXPos(void) {
+uint8_t PixelFighter::getXPos(void)
+{
   return xPos;
 }
 
@@ -393,7 +466,8 @@ uint8_t PixelFighter::getXPos(void) {
  *
  * @return
  */
-uint8_t PixelFighter::isJumping(void) {
+uint8_t PixelFighter::isJumping(void)
+{
   return jumpTimer > 0;
 }
 
@@ -402,6 +476,7 @@ uint8_t PixelFighter::isJumping(void) {
  *
  * @param facing
  */
-PixelFighter::PixelFighter(uint8_t facing) {
+PixelFighter::PixelFighter(uint8_t facing)
+{
   InitFighter(facing);
 }

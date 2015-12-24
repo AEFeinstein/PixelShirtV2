@@ -192,7 +192,8 @@ void doEverything(void)
  * Cycles through the available games.
  * Switches to the next one & resets it
  */
-void switchGame(void) {
+void switchGame(void)
+{
   gameMode = (gameMode+1)%NUM_GAMES;
   switch(gameMode) {
     case PONG: {
@@ -216,9 +217,9 @@ void switchGame(void) {
         break;
       }
     case FIGHTER: {
-      currentGame = &fighter;
-      break;
-    }
+        currentGame = &fighter;
+        break;
+      }
   }
   currentGame->ResetGame(1,0);
 }

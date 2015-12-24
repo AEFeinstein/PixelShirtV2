@@ -52,18 +52,20 @@ Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
 Adafruit_NeoPixel::Adafruit_NeoPixel() :
   pin(-1), brightness(0), pixels(NULL), endTime(0), begun(false),
   numLEDs(0), numBytes(0), rOffset(1), gOffset(0), bOffset(2), wOffset(1)
-#ifdef NEO_KHZ400
+  #ifdef NEO_KHZ400
   , is800KHz(true)
-#endif
+  #endif
 {
 }
 
-Adafruit_NeoPixel::~Adafruit_NeoPixel() {
-  if(pixels)   free(pixels);
-  if(pin >= 0) pinMode(pin, INPUT);
+Adafruit_NeoPixel::~Adafruit_NeoPixel()
+{
+  if(pixels)   { free(pixels); }
+  if(pin >= 0) { pinMode(pin, INPUT); }
 }
 
-void Adafruit_NeoPixel::begin(void) {
+void Adafruit_NeoPixel::begin(void)
+{
   if(pin >= 0) {
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW);
@@ -71,47 +73,51 @@ void Adafruit_NeoPixel::begin(void) {
   begun = true;
 }
 
-void Adafruit_NeoPixel::updateLength(uint16_t n) {
-  if(pixels) free(pixels); // Free existing data (if any)
+void Adafruit_NeoPixel::updateLength(uint16_t n)
+{
+  if(pixels) { free(pixels); } // Free existing data (if any)
 
   // Allocate new data -- note: ALL PIXELS ARE CLEARED
   numBytes = n * ((wOffset == rOffset) ? 3 : 4);
-  if((pixels = (uint8_t *)malloc(numBytes))) {
+  if((pixels = (uint8_t*)malloc(numBytes))) {
     memset(pixels, 0, numBytes);
     numLEDs = n;
-  } else {
+  }
+  else {
     numLEDs = numBytes = 0;
   }
 }
 
-void Adafruit_NeoPixel::updateType(neoPixelType t) {
+void Adafruit_NeoPixel::updateType(neoPixelType t)
+{
   boolean oldThreeBytesPerPixel = (wOffset == rOffset); // false if RGBW
 
   wOffset = (t >> 6) & 0b11; // See notes in header file
   rOffset = (t >> 4) & 0b11; // regarding R/G/B/W offsets
   gOffset = (t >> 2) & 0b11;
   bOffset =  t       & 0b11;
-#ifdef NEO_KHZ400
+  #ifdef NEO_KHZ400
   is800KHz = (t < 256);      // 400 KHz flag is 1<<8
-#endif
+  #endif
 
   // If bytes-per-pixel has changed (and pixel data was previously
   // allocated), re-allocate to new size.  Will clear any data.
   if(pixels) {
     boolean newThreeBytesPerPixel = (wOffset == rOffset);
-    if(newThreeBytesPerPixel != oldThreeBytesPerPixel) updateLength(numLEDs);
+    if(newThreeBytesPerPixel != oldThreeBytesPerPixel) { updateLength(numLEDs); }
   }
 }
 
 #ifdef ESP8266
 // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
 extern "C" void ICACHE_RAM_ATTR espShow(
-  uint8_t pin, uint8_t *pixels, uint32_t numBytes, uint8_t type);
+  uint8_t pin, uint8_t* pixels, uint32_t numBytes, uint8_t type);
 #endif // ESP8266
 
-void Adafruit_NeoPixel::show(void) {
+void Adafruit_NeoPixel::show(void)
+{
 
-  if(!pixels) return;
+  if(!pixels) { return; }
 
   // Data latch = 50+ microsecond pause in the output stream.  Rather than
   // put a delay at the end of the function, the ending time is noted and
@@ -137,16 +143,16 @@ void Adafruit_NeoPixel::show(void) {
   noInterrupts(); // Need 100% focus on instruction timing
 
 
-#ifdef __AVR__
-// AVR MCUs -- ATmega & ATtiny (no XMEGA) ---------------------------------
+  #ifdef __AVR__
+  // AVR MCUs -- ATmega & ATtiny (no XMEGA) ---------------------------------
 
   volatile uint16_t
-    i   = numBytes; // Loop counter
+  i   = numBytes; // Loop counter
   volatile uint8_t
-   *ptr = pixels,   // Pointer to next byte
-    b   = *ptr++,   // Current byte value
-    hi,             // PORT w/output bit set high
-    lo;             // PORT w/output bit set low
+  *ptr = pixels,   // Pointer to next byte
+   b   = *ptr++,   // Current byte value
+   hi,             // PORT w/output bit set high
+   lo;             // PORT w/output bit set low
 
   // Hand-tuned assembly code issues data to the LED drivers at a specific
   // rate.  There's separate code for different CPU speeds (8, 12, 16 MHz)
@@ -162,12 +168,12 @@ void Adafruit_NeoPixel::show(void) {
   // Keep in mind only one CPU speed case actually gets compiled; the
   // resulting program isn't as massive as it might look from source here.
 
-// 8 MHz(ish) AVR ---------------------------------------------------------
-#if (F_CPU >= 7400000UL) && (F_CPU <= 9500000UL)
+  // 8 MHz(ish) AVR ---------------------------------------------------------
+  #if (F_CPU >= 7400000UL) && (F_CPU <= 9500000UL)
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
 
     volatile uint8_t n1, n2 = 0;  // First, next bits out
 
@@ -185,14 +191,14 @@ void Adafruit_NeoPixel::show(void) {
     // 10 instruction clocks per bit: HHxxxxxLLL
     // OUT instructions:              ^ ^    ^   (T=0,2,7)
 
-#ifdef PORTD // PORTD isn't present on ATtiny85, etc.
+    #ifdef PORTD // PORTD isn't present on ATtiny85, etc.
 
     if(port == &PORTD) {
 
       hi = PORTD |  pinMask;
       lo = PORTD & ~pinMask;
       n1 = lo;
-      if(b & 0x80) n1 = hi;
+      if(b & 0x80) { n1 = hi; }
 
       // Dirty trick: RJMPs proceeding to the next instruction are used
       // to delay two clock cycles in one instruction word (rather than
@@ -201,14 +207,14 @@ void Adafruit_NeoPixel::show(void) {
       // relative branch.
 
       asm volatile(
-       "headD:"                   "\n\t" // Clk  Pseudocode
+        "headD:"                   "\n\t" // Clk  Pseudocode
         // Bit 7:
         "out  %[port] , %[hi]"    "\n\t" // 1    PORT = hi
         "mov  %[n2]   , %[lo]"    "\n\t" // 1    n2   = lo
         "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 6"        "\n\t" // 1-2  if(b & 0x40)
-         "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
+        "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "rjmp .+0"                "\n\t" // 2    nop nop
         // Bit 6:
@@ -217,7 +223,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 5"        "\n\t" // 1-2  if(b & 0x20)
-         "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
+        "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "rjmp .+0"                "\n\t" // 2    nop nop
         // Bit 5:
@@ -226,7 +232,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 4"        "\n\t" // 1-2  if(b & 0x10)
-         "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
+        "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "rjmp .+0"                "\n\t" // 2    nop nop
         // Bit 4:
@@ -235,7 +241,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 3"        "\n\t" // 1-2  if(b & 0x08)
-         "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
+        "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "rjmp .+0"                "\n\t" // 2    nop nop
         // Bit 3:
@@ -244,7 +250,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 2"        "\n\t" // 1-2  if(b & 0x04)
-         "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
+        "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "rjmp .+0"                "\n\t" // 2    nop nop
         // Bit 2:
@@ -253,7 +259,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 1"        "\n\t" // 1-2  if(b & 0x02)
-         "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
+        "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "rjmp .+0"                "\n\t" // 2    nop nop
         // Bit 1:
@@ -262,7 +268,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n1]"    "\n\t" // 1    PORT = n1
         "rjmp .+0"                "\n\t" // 2    nop nop
         "sbrc %[byte] , 0"        "\n\t" // 1-2  if(b & 0x01)
-         "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
+        "mov %[n2]   , %[hi]"    "\n\t" // 0-1   n2 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "sbiw %[count], 1"        "\n\t" // 2    i-- (don't act on Z flag yet)
         // Bit 0:
@@ -271,36 +277,37 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t" // 1    PORT = n2
         "ld   %[byte] , %a[ptr]+" "\n\t" // 2    b = *ptr++
         "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 0x80)
-         "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
+        "mov %[n1]   , %[hi]"    "\n\t" // 0-1   n1 = hi
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo
         "brne headD"              "\n"   // 2    while(i) (Z flag set above)
-      : [byte]  "+r" (b),
+        : [byte]  "+r" (b),
         [n1]    "+r" (n1),
         [n2]    "+r" (n2),
         [count] "+w" (i)
-      : [port]   "I" (_SFR_IO_ADDR(PORTD)),
+        : [port]   "I" (_SFR_IO_ADDR(PORTD)),
         [ptr]    "e" (ptr),
         [hi]     "r" (hi),
         [lo]     "r" (lo));
 
-    } else if(port == &PORTB) {
+    }
+    else if(port == &PORTB) {
 
-#endif // PORTD
+    #endif // PORTD
 
       // Same as above, just switched to PORTB and stripped of comments.
       hi = PORTB |  pinMask;
       lo = PORTB & ~pinMask;
       n1 = lo;
-      if(b & 0x80) n1 = hi;
+      if(b & 0x80) { n1 = hi; }
 
       asm volatile(
-       "headB:"                   "\n\t"
+        "headB:"                   "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
         "mov  %[n2]   , %[lo]"    "\n\t"
         "out  %[port] , %[n1]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 6"        "\n\t"
-         "mov %[n2]   , %[hi]"    "\n\t"
+        "mov %[n2]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -308,7 +315,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 5"        "\n\t"
-         "mov %[n1]   , %[hi]"    "\n\t"
+        "mov %[n1]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -316,7 +323,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n1]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 4"        "\n\t"
-         "mov %[n2]   , %[hi]"    "\n\t"
+        "mov %[n2]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -324,7 +331,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 3"        "\n\t"
-         "mov %[n1]   , %[hi]"    "\n\t"
+        "mov %[n1]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -332,7 +339,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n1]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 2"        "\n\t"
-         "mov %[n2]   , %[hi]"    "\n\t"
+        "mov %[n2]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -340,7 +347,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 1"        "\n\t"
-         "mov %[n1]   , %[hi]"    "\n\t"
+        "mov %[n1]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -348,7 +355,7 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n1]"    "\n\t"
         "rjmp .+0"                "\n\t"
         "sbrc %[byte] , 0"        "\n\t"
-         "mov %[n2]   , %[hi]"    "\n\t"
+        "mov %[n2]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "sbiw %[count], 1"        "\n\t"
         "out  %[port] , %[hi]"    "\n\t"
@@ -356,19 +363,20 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[n2]"    "\n\t"
         "ld   %[byte] , %a[ptr]+" "\n\t"
         "sbrc %[byte] , 7"        "\n\t"
-         "mov %[n1]   , %[hi]"    "\n\t"
+        "mov %[n1]   , %[hi]"    "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "brne headB"              "\n"
-      : [byte] "+r" (b), [n1] "+r" (n1), [n2] "+r" (n2), [count] "+w" (i)
-      : [port] "I" (_SFR_IO_ADDR(PORTB)), [ptr] "e" (ptr), [hi] "r" (hi),
+        : [byte] "+r" (b), [n1] "+r" (n1), [n2] "+r" (n2), [count] "+w" (i)
+        : [port] "I" (_SFR_IO_ADDR(PORTB)), [ptr] "e" (ptr), [hi] "r" (hi),
         [lo] "r" (lo));
 
-#ifdef PORTD
+      #ifdef PORTD
     }    // endif PORTB
-#endif
+      #endif
 
-#ifdef NEO_KHZ400
-  } else { // end 800 KHz, do 400 KHz
+    #ifdef NEO_KHZ400
+  }
+  else {   // end 800 KHz, do 400 KHz
 
     // Timing is more relaxed; unrolling the inner loop for each bit is
     // not necessary.  Still using the peculiar RJMPs as 2X NOPs, not out
@@ -388,10 +396,10 @@ void Adafruit_NeoPixel::show(void) {
     bit  = 8;
 
     asm volatile(
-     "head20:"                  "\n\t" // Clk  Pseudocode    (T =  0)
+      "head20:"                  "\n\t" // Clk  Pseudocode    (T =  0)
       "st   %a[port], %[hi]"    "\n\t" // 2    PORT = hi     (T =  2)
       "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 128)
-       "mov  %[next], %[hi]"    "\n\t" // 0-1   next = hi    (T =  4)
+      "mov  %[next], %[hi]"    "\n\t" // 0-1   next = hi    (T =  4)
       "st   %a[port], %[next]"  "\n\t" // 2    PORT = next   (T =  6)
       "mov  %[next] , %[lo]"    "\n\t" // 1    next = lo     (T =  7)
       "dec  %[bit]"             "\n\t" // 1    bit--         (T =  8)
@@ -402,7 +410,7 @@ void Adafruit_NeoPixel::show(void) {
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 16)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 18)
       "rjmp head20"             "\n\t" // 2    -> head20 (next bit out)
-     "nextbyte20:"              "\n\t" //                    (T = 10)
+      "nextbyte20:"              "\n\t" //                    (T = 10)
       "st   %a[port], %[lo]"    "\n\t" // 2    PORT = lo     (T = 12)
       "nop"                     "\n\t" // 1    nop           (T = 13)
       "ldi  %[bit]  , 8"        "\n\t" // 1    bit = 8       (T = 14)
@@ -410,22 +418,22 @@ void Adafruit_NeoPixel::show(void) {
       "sbiw %[count], 1"        "\n\t" // 2    i--           (T = 18)
       "brne head20"             "\n"   // 2    if(i != 0) -> (next byte)
       : [port]  "+e" (port),
-        [byte]  "+r" (b),
-        [bit]   "+r" (bit),
-        [next]  "+r" (next),
-        [count] "+w" (i)
+      [byte]  "+r" (b),
+      [bit]   "+r" (bit),
+      [next]  "+r" (next),
+      [count] "+w" (i)
       : [hi]    "r" (hi),
-        [lo]    "r" (lo),
-        [ptr]   "e" (ptr));
+      [lo]    "r" (lo),
+      [ptr]   "e" (ptr));
   }
-#endif // NEO_KHZ400
+    #endif // NEO_KHZ400
 
-// 12 MHz(ish) AVR --------------------------------------------------------
-#elif (F_CPU >= 11100000UL) && (F_CPU <= 14300000UL)
+  // 12 MHz(ish) AVR --------------------------------------------------------
+  #elif (F_CPU >= 11100000UL) && (F_CPU <= 14300000UL)
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
 
     // In the 12 MHz case, an optimized 800 KHz datastream (no dead time
     // between bytes) requires a PORT-specific loop similar to the 8 MHz
@@ -436,19 +444,19 @@ void Adafruit_NeoPixel::show(void) {
 
     volatile uint8_t next;
 
-#ifdef PORTD
+    #ifdef PORTD
 
     if(port == &PORTD) {
 
       hi   = PORTD |  pinMask;
       lo   = PORTD & ~pinMask;
       next = lo;
-      if(b & 0x80) next = hi;
+      if(b & 0x80) { next = hi; }
 
       // Don't "optimize" the OUT calls into the bitTime subroutine;
       // we're exploiting the RCALL and RET as 3- and 4-cycle NOPs!
       asm volatile(
-       "headD:"                   "\n\t" //        (T =  0)
+        "headD:"                   "\n\t" //        (T =  0)
         "out   %[port], %[hi]"    "\n\t" //        (T =  1)
         "rcall bitTimeD"          "\n\t" // Bit 7  (T = 15)
         "out   %[port], %[hi]"    "\n\t"
@@ -470,42 +478,43 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[next]"  "\n\t" // 1    PORT = next  (T =  6)
         "mov  %[next] , %[lo]"    "\n\t" // 1    next = lo    (T =  7)
         "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 0x80) (T =  8)
-         "mov %[next] , %[hi]"    "\n\t" // 0-1    next = hi  (T =  9)
+        "mov %[next] , %[hi]"    "\n\t" // 0-1    next = hi  (T =  9)
         "nop"                     "\n\t" // 1                 (T = 10)
         "out  %[port] , %[lo]"    "\n\t" // 1    PORT = lo    (T = 11)
         "sbiw %[count], 1"        "\n\t" // 2    i--          (T = 13)
         "brne headD"              "\n\t" // 2    if(i != 0) -> (next byte)
-         "rjmp doneD"             "\n\t"
+        "rjmp doneD"             "\n\t"
         "bitTimeD:"               "\n\t" //      nop nop nop     (T =  4)
-         "out  %[port], %[next]"  "\n\t" // 1    PORT = next     (T =  5)
-         "mov  %[next], %[lo]"    "\n\t" // 1    next = lo       (T =  6)
-         "rol  %[byte]"           "\n\t" // 1    b <<= 1         (T =  7)
-         "sbrc %[byte], 7"        "\n\t" // 1-2  if(b & 0x80)    (T =  8)
-          "mov %[next], %[hi]"    "\n\t" // 0-1   next = hi      (T =  9)
-         "nop"                    "\n\t" // 1                    (T = 10)
-         "out  %[port], %[lo]"    "\n\t" // 1    PORT = lo       (T = 11)
-         "ret"                    "\n\t" // 4    nop nop nop nop (T = 15)
-         "doneD:"                 "\n"
+        "out  %[port], %[next]"  "\n\t" // 1    PORT = next     (T =  5)
+        "mov  %[next], %[lo]"    "\n\t" // 1    next = lo       (T =  6)
+        "rol  %[byte]"           "\n\t" // 1    b <<= 1         (T =  7)
+        "sbrc %[byte], 7"        "\n\t" // 1-2  if(b & 0x80)    (T =  8)
+        "mov %[next], %[hi]"    "\n\t" // 0-1   next = hi      (T =  9)
+        "nop"                    "\n\t" // 1                    (T = 10)
+        "out  %[port], %[lo]"    "\n\t" // 1    PORT = lo       (T = 11)
+        "ret"                    "\n\t" // 4    nop nop nop nop (T = 15)
+        "doneD:"                 "\n"
         : [byte]  "+r" (b),
-          [next]  "+r" (next),
-          [count] "+w" (i)
+        [next]  "+r" (next),
+        [count] "+w" (i)
         : [port]   "I" (_SFR_IO_ADDR(PORTD)),
-          [ptr]    "e" (ptr),
-          [hi]     "r" (hi),
-          [lo]     "r" (lo));
+        [ptr]    "e" (ptr),
+        [hi]     "r" (hi),
+        [lo]     "r" (lo));
 
-    } else if(port == &PORTB) {
+    }
+    else if(port == &PORTB) {
 
-#endif // PORTD
+    #endif // PORTD
 
       hi   = PORTB |  pinMask;
       lo   = PORTB & ~pinMask;
       next = lo;
-      if(b & 0x80) next = hi;
+      if(b & 0x80) { next = hi; }
 
       // Same as above, just set for PORTB & stripped of comments
       asm volatile(
-       "headB:"                   "\n\t"
+        "headB:"                   "\n\t"
         "out   %[port], %[hi]"    "\n\t"
         "rcall bitTimeB"          "\n\t"
         "out   %[port], %[hi]"    "\n\t"
@@ -526,32 +535,33 @@ void Adafruit_NeoPixel::show(void) {
         "out  %[port] , %[next]"  "\n\t"
         "mov  %[next] , %[lo]"    "\n\t"
         "sbrc %[byte] , 7"        "\n\t"
-         "mov %[next] , %[hi]"    "\n\t"
+        "mov %[next] , %[hi]"    "\n\t"
         "nop"                     "\n\t"
         "out  %[port] , %[lo]"    "\n\t"
         "sbiw %[count], 1"        "\n\t"
         "brne headB"              "\n\t"
-         "rjmp doneB"             "\n\t"
+        "rjmp doneB"             "\n\t"
         "bitTimeB:"               "\n\t"
-         "out  %[port], %[next]"  "\n\t"
-         "mov  %[next], %[lo]"    "\n\t"
-         "rol  %[byte]"           "\n\t"
-         "sbrc %[byte], 7"        "\n\t"
-          "mov %[next], %[hi]"    "\n\t"
-         "nop"                    "\n\t"
-         "out  %[port], %[lo]"    "\n\t"
-         "ret"                    "\n\t"
-         "doneB:"                 "\n"
+        "out  %[port], %[next]"  "\n\t"
+        "mov  %[next], %[lo]"    "\n\t"
+        "rol  %[byte]"           "\n\t"
+        "sbrc %[byte], 7"        "\n\t"
+        "mov %[next], %[hi]"    "\n\t"
+        "nop"                    "\n\t"
+        "out  %[port], %[lo]"    "\n\t"
+        "ret"                    "\n\t"
+        "doneB:"                 "\n"
         : [byte] "+r" (b), [next] "+r" (next), [count] "+w" (i)
         : [port] "I" (_SFR_IO_ADDR(PORTB)), [ptr] "e" (ptr), [hi] "r" (hi),
-          [lo] "r" (lo));
+        [lo] "r" (lo));
 
-#ifdef PORTD
+      #ifdef PORTD
     }
-#endif
+      #endif
 
-#ifdef NEO_KHZ400
-  } else { // 400 KHz
+    #ifdef NEO_KHZ400
+  }
+  else {   // 400 KHz
 
     // 30 instruction clocks per bit: HHHHHHxxxxxxxxxLLLLLLLLLLLLLLL
     // ST instructions:               ^     ^        ^    (T=0,6,15)
@@ -564,10 +574,10 @@ void Adafruit_NeoPixel::show(void) {
     bit  = 8;
 
     asm volatile(
-     "head30:"                  "\n\t" // Clk  Pseudocode    (T =  0)
+      "head30:"                  "\n\t" // Clk  Pseudocode    (T =  0)
       "st   %a[port], %[hi]"    "\n\t" // 2    PORT = hi     (T =  2)
       "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 128)
-       "mov  %[next], %[hi]"    "\n\t" // 0-1   next = hi    (T =  4)
+      "mov  %[next], %[hi]"    "\n\t" // 0-1   next = hi    (T =  4)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T =  6)
       "st   %a[port], %[next]"  "\n\t" // 2    PORT = next   (T =  8)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 10)
@@ -583,29 +593,29 @@ void Adafruit_NeoPixel::show(void) {
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 26)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 28)
       "rjmp head30"             "\n\t" // 2    -> head30 (next bit out)
-     "nextbyte30:"              "\n\t" //                    (T = 22)
+      "nextbyte30:"              "\n\t" //                    (T = 22)
       "nop"                     "\n\t" // 1    nop           (T = 23)
       "ldi  %[bit]  , 8"        "\n\t" // 1    bit = 8       (T = 24)
       "ld   %[byte] , %a[ptr]+" "\n\t" // 2    b = *ptr++    (T = 26)
       "sbiw %[count], 1"        "\n\t" // 2    i--           (T = 28)
       "brne head30"             "\n"   // 1-2  if(i != 0) -> (next byte)
       : [port]  "+e" (port),
-        [byte]  "+r" (b),
-        [bit]   "+r" (bit),
-        [next]  "+r" (next),
-        [count] "+w" (i)
+      [byte]  "+r" (b),
+      [bit]   "+r" (bit),
+      [next]  "+r" (next),
+      [count] "+w" (i)
       : [hi]     "r" (hi),
-        [lo]     "r" (lo),
-        [ptr]    "e" (ptr));
+      [lo]     "r" (lo),
+      [ptr]    "e" (ptr));
   }
-#endif // NEO_KHZ400
+    #endif // NEO_KHZ400
 
-// 16 MHz(ish) AVR --------------------------------------------------------
-#elif (F_CPU >= 15400000UL) && (F_CPU <= 19000000L)
+  // 16 MHz(ish) AVR --------------------------------------------------------
+  #elif (F_CPU >= 15400000UL) && (F_CPU <= 19000000L)
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
 
     // WS2811 and WS2812 have different hi/lo duty cycles; this is
     // similar but NOT an exact copy of the prior 400-on-8 code.
@@ -621,10 +631,10 @@ void Adafruit_NeoPixel::show(void) {
     bit  = 8;
 
     asm volatile(
-     "head20:"                   "\n\t" // Clk  Pseudocode    (T =  0)
+      "head20:"                   "\n\t" // Clk  Pseudocode    (T =  0)
       "st   %a[port],  %[hi]"    "\n\t" // 2    PORT = hi     (T =  2)
       "sbrc %[byte],  7"         "\n\t" // 1-2  if(b & 128)
-       "mov  %[next], %[hi]"     "\n\t" // 0-1   next = hi    (T =  4)
+      "mov  %[next], %[hi]"     "\n\t" // 0-1   next = hi    (T =  4)
       "dec  %[bit]"              "\n\t" // 1    bit--         (T =  5)
       "st   %a[port],  %[next]"  "\n\t" // 2    PORT = next   (T =  7)
       "mov  %[next] ,  %[lo]"    "\n\t" // 1    next = lo     (T =  8)
@@ -636,24 +646,25 @@ void Adafruit_NeoPixel::show(void) {
       "nop"                      "\n\t" // 1    nop           (T = 16)
       "rjmp .+0"                 "\n\t" // 2    nop nop       (T = 18)
       "rjmp head20"              "\n\t" // 2    -> head20 (next bit out)
-     "nextbyte20:"               "\n\t" //                    (T = 10)
+      "nextbyte20:"               "\n\t" //                    (T = 10)
       "ldi  %[bit]  ,  8"        "\n\t" // 1    bit = 8       (T = 11)
       "ld   %[byte] ,  %a[ptr]+" "\n\t" // 2    b = *ptr++    (T = 13)
       "st   %a[port], %[lo]"     "\n\t" // 2    PORT = lo     (T = 15)
       "nop"                      "\n\t" // 1    nop           (T = 16)
       "sbiw %[count], 1"         "\n\t" // 2    i--           (T = 18)
-       "brne head20"             "\n"   // 2    if(i != 0) -> (next byte)
+      "brne head20"             "\n"   // 2    if(i != 0) -> (next byte)
       : [port]  "+e" (port),
-        [byte]  "+r" (b),
-        [bit]   "+r" (bit),
-        [next]  "+r" (next),
-        [count] "+w" (i)
+      [byte]  "+r" (b),
+      [bit]   "+r" (bit),
+      [next]  "+r" (next),
+      [count] "+w" (i)
       : [ptr]    "e" (ptr),
-        [hi]     "r" (hi),
-        [lo]     "r" (lo));
+      [hi]     "r" (hi),
+      [lo]     "r" (lo));
 
-#ifdef NEO_KHZ400
-  } else { // 400 KHz
+    #ifdef NEO_KHZ400
+  }
+  else {   // 400 KHz
 
     // The 400 KHz clock on 16 MHz MCU is the most 'relaxed' version.
 
@@ -668,10 +679,10 @@ void Adafruit_NeoPixel::show(void) {
     bit  = 8;
 
     asm volatile(
-     "head40:"                  "\n\t" // Clk  Pseudocode    (T =  0)
+      "head40:"                  "\n\t" // Clk  Pseudocode    (T =  0)
       "st   %a[port], %[hi]"    "\n\t" // 2    PORT = hi     (T =  2)
       "sbrc %[byte] , 7"        "\n\t" // 1-2  if(b & 128)
-       "mov  %[next] , %[hi]"   "\n\t" // 0-1   next = hi    (T =  4)
+      "mov  %[next] , %[hi]"   "\n\t" // 0-1   next = hi    (T =  4)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T =  6)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T =  8)
       "st   %a[port], %[next]"  "\n\t" // 2    PORT = next   (T = 10)
@@ -693,7 +704,7 @@ void Adafruit_NeoPixel::show(void) {
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 36)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 38)
       "rjmp head40"             "\n\t" // 2    -> head40 (next bit out)
-     "nextbyte40:"              "\n\t" //                    (T = 27)
+      "nextbyte40:"              "\n\t" //                    (T = 27)
       "ldi  %[bit]  , 8"        "\n\t" // 1    bit = 8       (T = 28)
       "ld   %[byte] , %a[ptr]+" "\n\t" // 2    b = *ptr++    (T = 30)
       "rjmp .+0"                "\n\t" // 2    nop nop       (T = 32)
@@ -702,28 +713,28 @@ void Adafruit_NeoPixel::show(void) {
       "sbiw %[count], 1"        "\n\t" // 2    i--           (T = 38)
       "brne head40"             "\n"   // 1-2  if(i != 0) -> (next byte)
       : [port]  "+e" (port),
-        [byte]  "+r" (b),
-        [bit]   "+r" (bit),
-        [next]  "+r" (next),
-        [count] "+w" (i)
+      [byte]  "+r" (b),
+      [bit]   "+r" (bit),
+      [next]  "+r" (next),
+      [count] "+w" (i)
       : [ptr]    "e" (ptr),
-        [hi]     "r" (hi),
-        [lo]     "r" (lo));
+      [hi]     "r" (hi),
+      [lo]     "r" (lo));
   }
-#endif // NEO_KHZ400
+    #endif // NEO_KHZ400
 
-#else
- #error "CPU SPEED NOT SUPPORTED"
-#endif // end F_CPU ifdefs on __AVR__
+  #else
+#error "CPU SPEED NOT SUPPORTED"
+  #endif // end F_CPU ifdefs on __AVR__
 
-// END AVR ----------------------------------------------------------------
+  // END AVR ----------------------------------------------------------------
 
 
-#elif defined(__arm__)
+  #elif defined(__arm__)
 
-// ARM MCUs -- Teensy 3.0, 3.1, LC, Arduino Due ---------------------------
+  // ARM MCUs -- Teensy 3.0, 3.1, LC, Arduino Due ---------------------------
 
-#if defined(__MK20DX128__) || defined(__MK20DX256__) // Teensy 3.0 & 3.1
+  #if defined(__MK20DX128__) || defined(__MK20DX256__) // Teensy 3.0 & 3.1
 #define CYCLES_800_T0H  (F_CPU / 4000000)
 #define CYCLES_800_T1H  (F_CPU / 1250000)
 #define CYCLES_800      (F_CPU /  800000)
@@ -731,18 +742,18 @@ void Adafruit_NeoPixel::show(void) {
 #define CYCLES_400_T1H  (F_CPU /  833333)
 #define CYCLES_400      (F_CPU /  400000)
 
-  uint8_t          *p   = pixels,
-                   *end = p + numBytes, pix, mask;
-  volatile uint8_t *set = portSetRegister(pin),
-                   *clr = portClearRegister(pin);
+  uint8_t*          p   = pixels,
+                    *end = p + numBytes, pix, mask;
+  volatile uint8_t* set = portSetRegister(pin),
+                    *clr = portClearRegister(pin);
   uint32_t          cyc;
 
   ARM_DEMCR    |= ARM_DEMCR_TRCENA;
   ARM_DWT_CTRL |= ARM_DWT_CTRL_CYCCNTENA;
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
     cyc = ARM_DWT_CYCCNT + CYCLES_800;
     while(p < end) {
       pix = *p++;
@@ -752,15 +763,17 @@ void Adafruit_NeoPixel::show(void) {
         *set = 1;
         if(pix & mask) {
           while(ARM_DWT_CYCCNT - cyc < CYCLES_800_T1H);
-        } else {
+        }
+        else {
           while(ARM_DWT_CYCCNT - cyc < CYCLES_800_T0H);
         }
         *clr = 1;
       }
     }
     while(ARM_DWT_CYCCNT - cyc < CYCLES_800);
-#ifdef NEO_KHZ400
-  } else { // 400 kHz bitstream
+    #ifdef NEO_KHZ400
+  }
+  else {   // 400 kHz bitstream
     cyc = ARM_DWT_CYCCNT + CYCLES_400;
     while(p < end) {
       pix = *p++;
@@ -770,7 +783,8 @@ void Adafruit_NeoPixel::show(void) {
         *set = 1;
         if(pix & mask) {
           while(ARM_DWT_CYCCNT - cyc < CYCLES_400_T1H);
-        } else {
+        }
+        else {
           while(ARM_DWT_CYCCNT - cyc < CYCLES_400_T0H);
         }
         *clr = 1;
@@ -778,100 +792,100 @@ void Adafruit_NeoPixel::show(void) {
     }
     while(ARM_DWT_CYCCNT - cyc < CYCLES_400);
   }
-#endif // NEO_KHZ400
+    #endif // NEO_KHZ400
 
-#elif defined(__MKL26Z64__) // Teensy-LC
+  #elif defined(__MKL26Z64__) // Teensy-LC
 
-#if F_CPU == 48000000
-  uint8_t          *p   = pixels,
-		   pix, count, dly,
-                   bitmask = digitalPinToBitMask(pin);
-  volatile uint8_t *reg = portSetRegister(pin);
+  #if F_CPU == 48000000
+  uint8_t*          p   = pixels,
+                    pix, count, dly,
+                    bitmask = digitalPinToBitMask(pin);
+  volatile uint8_t* reg = portSetRegister(pin);
   uint32_t         num = numBytes;
   asm volatile(
-	"L%=_begin:"				"\n\t"
-	"ldrb	%[pix], [%[p], #0]"		"\n\t"
-	"lsl	%[pix], #24"			"\n\t"
-	"movs	%[count], #7"			"\n\t"
-	"L%=_loop:"				"\n\t"
-	"lsl	%[pix], #1"			"\n\t"
-	"bcs	L%=_loop_one"			"\n\t"
-	"L%=_loop_zero:"
-	"strb	%[bitmask], [%[reg], #0]"	"\n\t"
-	"movs	%[dly], #4"			"\n\t"
-	"L%=_loop_delay_T0H:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_loop_delay_T0H"		"\n\t"
-	"strb	%[bitmask], [%[reg], #4]"	"\n\t"
-	"movs	%[dly], #13"			"\n\t"
-	"L%=_loop_delay_T0L:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_loop_delay_T0L"		"\n\t"
-	"b	L%=_next"			"\n\t"
-	"L%=_loop_one:"
-	"strb	%[bitmask], [%[reg], #0]"	"\n\t"
-	"movs	%[dly], #13"			"\n\t"
-	"L%=_loop_delay_T1H:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_loop_delay_T1H"		"\n\t"
-	"strb	%[bitmask], [%[reg], #4]"	"\n\t"
-	"movs	%[dly], #4"			"\n\t"
-	"L%=_loop_delay_T1L:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_loop_delay_T1L"		"\n\t"
-	"nop"					"\n\t"
-	"L%=_next:"				"\n\t"
-	"sub	%[count], #1"			"\n\t"
-	"bne	L%=_loop"			"\n\t"
-	"lsl	%[pix], #1"			"\n\t"
-	"bcs	L%=_last_one"			"\n\t"
-	"L%=_last_zero:"
-	"strb	%[bitmask], [%[reg], #0]"	"\n\t"
-	"movs	%[dly], #4"			"\n\t"
-	"L%=_last_delay_T0H:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_last_delay_T0H"		"\n\t"
-	"strb	%[bitmask], [%[reg], #4]"	"\n\t"
-	"movs	%[dly], #10"			"\n\t"
-	"L%=_last_delay_T0L:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_last_delay_T0L"		"\n\t"
-	"b	L%=_repeat"			"\n\t"
-	"L%=_last_one:"
-	"strb	%[bitmask], [%[reg], #0]"	"\n\t"
-	"movs	%[dly], #13"			"\n\t"
-	"L%=_last_delay_T1H:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_last_delay_T1H"		"\n\t"
-	"strb	%[bitmask], [%[reg], #4]"	"\n\t"
-	"movs	%[dly], #1"			"\n\t"
-	"L%=_last_delay_T1L:"			"\n\t"
-	"sub	%[dly], #1"			"\n\t"
-	"bne	L%=_last_delay_T1L"		"\n\t"
-	"nop"					"\n\t"
-	"L%=_repeat:"				"\n\t"
-	"add	%[p], #1"			"\n\t"
-	"sub	%[num], #1"			"\n\t"
-	"bne	L%=_begin"			"\n\t"
-	"L%=_done:"				"\n\t"
-	: [p] "+r" (p),
-	  [pix] "=&r" (pix),
-	  [count] "=&r" (count),
-	  [dly] "=&r" (dly),
-	  [num] "+r" (num)
-	: [bitmask] "r" (bitmask),
-	  [reg] "r" (reg)
+    "L%=_begin:"        "\n\t"
+    "ldrb	%[pix], [%[p], #0]"   "\n\t"
+    "lsl	%[pix], #24"     "\n\t"
+    "movs	%[count], #7"     "\n\t"
+    "L%=_loop:"       "\n\t"
+    "lsl	%[pix], #1"      "\n\t"
+    "bcs	L%=_loop_one"      "\n\t"
+    "L%=_loop_zero:"
+    "strb	%[bitmask], [%[reg], #0]" "\n\t"
+    "movs	%[dly], #4"     "\n\t"
+    "L%=_loop_delay_T0H:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_loop_delay_T0H"    "\n\t"
+    "strb	%[bitmask], [%[reg], #4]" "\n\t"
+    "movs	%[dly], #13"      "\n\t"
+    "L%=_loop_delay_T0L:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_loop_delay_T0L"    "\n\t"
+    "b	L%=_next"      "\n\t"
+    "L%=_loop_one:"
+    "strb	%[bitmask], [%[reg], #0]" "\n\t"
+    "movs	%[dly], #13"      "\n\t"
+    "L%=_loop_delay_T1H:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_loop_delay_T1H"    "\n\t"
+    "strb	%[bitmask], [%[reg], #4]" "\n\t"
+    "movs	%[dly], #4"     "\n\t"
+    "L%=_loop_delay_T1L:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_loop_delay_T1L"    "\n\t"
+    "nop"         "\n\t"
+    "L%=_next:"       "\n\t"
+    "sub	%[count], #1"      "\n\t"
+    "bne	L%=_loop"      "\n\t"
+    "lsl	%[pix], #1"      "\n\t"
+    "bcs	L%=_last_one"      "\n\t"
+    "L%=_last_zero:"
+    "strb	%[bitmask], [%[reg], #0]" "\n\t"
+    "movs	%[dly], #4"     "\n\t"
+    "L%=_last_delay_T0H:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_last_delay_T0H"    "\n\t"
+    "strb	%[bitmask], [%[reg], #4]" "\n\t"
+    "movs	%[dly], #10"      "\n\t"
+    "L%=_last_delay_T0L:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_last_delay_T0L"    "\n\t"
+    "b	L%=_repeat"      "\n\t"
+    "L%=_last_one:"
+    "strb	%[bitmask], [%[reg], #0]" "\n\t"
+    "movs	%[dly], #13"      "\n\t"
+    "L%=_last_delay_T1H:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_last_delay_T1H"    "\n\t"
+    "strb	%[bitmask], [%[reg], #4]" "\n\t"
+    "movs	%[dly], #1"     "\n\t"
+    "L%=_last_delay_T1L:"     "\n\t"
+    "sub	%[dly], #1"      "\n\t"
+    "bne	L%=_last_delay_T1L"    "\n\t"
+    "nop"         "\n\t"
+    "L%=_repeat:"       "\n\t"
+    "add	%[p], #1"      "\n\t"
+    "sub	%[num], #1"      "\n\t"
+    "bne	L%=_begin"     "\n\t"
+    "L%=_done:"       "\n\t"
+    : [p] "+r" (p),
+    [pix] "=&r" (pix),
+    [count] "=&r" (count),
+    [dly] "=&r" (dly),
+    [num] "+r" (num)
+    : [bitmask] "r" (bitmask),
+    [reg] "r" (reg)
   );
-#else
+  #else
 #error "Sorry, only 48 MHz is supported, please set Tools > CPU Speed to 48 MHz"
-#endif // F_CPU == 48000000
+  #endif // F_CPU == 48000000
 
-#elif defined(__SAMD21G18A__) // Arduino Zero
+  #elif defined(__SAMD21G18A__) // Arduino Zero
 
   // Tried this with a timer/counter, couldn't quite get adequate
   // resolution.  So yay, you get a load of goofball NOPs...
 
-  uint8_t  *ptr, *end, p, bitMask, portNum;
+  uint8_t*  ptr, *end, p, bitMask, portNum;
   uint32_t  pinMask;
 
   portNum =  g_APinDescription[pin].ulPort;
@@ -881,12 +895,12 @@ void Adafruit_NeoPixel::show(void) {
   p       = *ptr++;
   bitMask =  0x80;
 
-  volatile uint32_t *set = &(PORT->Group[portNum].OUTSET.reg),
-                    *clr = &(PORT->Group[portNum].OUTCLR.reg);
+  volatile uint32_t* set = &(PORT->Group[portNum].OUTSET.reg),
+                     *clr = &(PORT->Group[portNum].OUTCLR.reg);
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
     for(;;) {
       *set = pinMask;
       asm("nop; nop; nop; nop; nop; nop; nop; nop;");
@@ -895,7 +909,8 @@ void Adafruit_NeoPixel::show(void) {
             "nop; nop; nop; nop; nop; nop; nop; nop;"
             "nop; nop; nop; nop;");
         *clr = pinMask;
-      } else {
+      }
+      else {
         *clr = pinMask;
         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -903,14 +918,16 @@ void Adafruit_NeoPixel::show(void) {
       }
       if(bitMask >>= 1) {
         asm("nop; nop; nop; nop; nop; nop; nop; nop; nop;");
-      } else {
-        if(ptr >= end) break;
+      }
+      else {
+        if(ptr >= end) { break; }
         p       = *ptr++;
         bitMask = 0x80;
       }
     }
-#ifdef NEO_KHZ400
-  } else { // 400 KHz bitstream
+    #ifdef NEO_KHZ400
+  }
+  else {   // 400 KHz bitstream
     for(;;) {
       *set = pinMask;
       asm("nop; nop; nop; nop; nop; nop; nop; nop; nop; nop; nop;");
@@ -920,7 +937,8 @@ void Adafruit_NeoPixel::show(void) {
             "nop; nop; nop; nop; nop; nop; nop; nop;"
             "nop; nop; nop;");
         *clr = pinMask;
-      } else {
+      }
+      else {
         *clr = pinMask;
         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
             "nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -933,21 +951,22 @@ void Adafruit_NeoPixel::show(void) {
           "nop; nop; nop; nop; nop; nop; nop; nop;");
       if(bitMask >>= 1) {
         asm("nop; nop; nop; nop; nop; nop; nop;");
-      } else {
-        if(ptr >= end) break;
+      }
+      else {
+        if(ptr >= end) { break; }
         p       = *ptr++;
         bitMask = 0x80;
       }
     }
   }
-#endif
+    #endif
 
-#elif defined (ARDUINO_STM32F2_FEATHER) // FEATHER WICED (120MHz)
+  #elif defined (ARDUINO_STM32F2_FEATHER) // FEATHER WICED (120MHz)
 
   // Tried this with a timer/counter, couldn't quite get adequate
   // resolution.  So yay, you get a load of goofball NOPs...
 
-  uint8_t  *ptr, *end, p, bitMask;
+  uint8_t*  ptr, *end, p, bitMask;
   uint32_t  pinMask;
 
   pinMask =  BIT(PIN_MAP[pin].gpio_bit);
@@ -956,12 +975,12 @@ void Adafruit_NeoPixel::show(void) {
   p       = *ptr++;
   bitMask =  0x80;
 
-  volatile uint16_t *set = &(PIN_MAP[pin].gpio_device->regs->BSRRL);
-  volatile uint16_t *clr = &(PIN_MAP[pin].gpio_device->regs->BSRRH);
+  volatile uint16_t* set = &(PIN_MAP[pin].gpio_device->regs->BSRRL);
+  volatile uint16_t* clr = &(PIN_MAP[pin].gpio_device->regs->BSRRH);
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
     for(;;) {
       if(p & bitMask) { // ONE
         // High 800ns
@@ -985,7 +1004,8 @@ void Adafruit_NeoPixel::show(void) {
             "nop; nop; nop; nop; nop; nop; nop; nop;"
             "nop; nop; nop; nop; nop; nop; nop; nop;"
             "nop; nop; nop; nop; nop; nop;");
-      } else { // ZERO
+      }
+      else {   // ZERO
         // High 400ns
         *set = pinMask;
         asm("nop; nop; nop; nop; nop; nop; nop; nop;"
@@ -1012,38 +1032,40 @@ void Adafruit_NeoPixel::show(void) {
       if(bitMask >>= 1) {
         // Move on to the next pixel
         asm("nop;");
-      } else {
-        if(ptr >= end) break;
+      }
+      else {
+        if(ptr >= end) { break; }
         p       = *ptr++;
         bitMask = 0x80;
       }
     }
-#ifdef NEO_KHZ400
-  } else { // 400 KHz bitstream
+    #ifdef NEO_KHZ400
+  }
+  else {   // 400 KHz bitstream
     // ToDo!
   }
-#endif
+    #endif
 
-#else // Other ARM architecture -- Presumed Arduino Due
+  #else // Other ARM architecture -- Presumed Arduino Due
 
-  #define SCALE      VARIANT_MCK / 2UL / 1000000UL
-  #define INST       (2UL * F_CPU / VARIANT_MCK)
-  #define TIME_800_0 ((int)(0.40 * SCALE + 0.5) - (5 * INST))
-  #define TIME_800_1 ((int)(0.80 * SCALE + 0.5) - (5 * INST))
-  #define PERIOD_800 ((int)(1.25 * SCALE + 0.5) - (5 * INST))
-  #define TIME_400_0 ((int)(0.50 * SCALE + 0.5) - (5 * INST))
-  #define TIME_400_1 ((int)(1.20 * SCALE + 0.5) - (5 * INST))
-  #define PERIOD_400 ((int)(2.50 * SCALE + 0.5) - (5 * INST))
+#define SCALE      VARIANT_MCK / 2UL / 1000000UL
+#define INST       (2UL * F_CPU / VARIANT_MCK)
+#define TIME_800_0 ((int)(0.40 * SCALE + 0.5) - (5 * INST))
+#define TIME_800_1 ((int)(0.80 * SCALE + 0.5) - (5 * INST))
+#define PERIOD_800 ((int)(1.25 * SCALE + 0.5) - (5 * INST))
+#define TIME_400_0 ((int)(0.50 * SCALE + 0.5) - (5 * INST))
+#define TIME_400_1 ((int)(1.20 * SCALE + 0.5) - (5 * INST))
+#define PERIOD_400 ((int)(2.50 * SCALE + 0.5) - (5 * INST))
 
   int             pinMask, time0, time1, period, t;
-  Pio            *port;
-  volatile WoReg *portSet, *portClear, *timeValue, *timeReset;
-  uint8_t        *p, *end, pix, mask;
+  Pio*            port;
+  volatile WoReg* portSet, *portClear, *timeValue, *timeReset;
+  uint8_t*        p, *end, pix, mask;
 
   pmc_set_writeprotect(false);
   pmc_enable_periph_clk((uint32_t)TC3_IRQn);
   TC_Configure(TC1, 0,
-    TC_CMR_WAVE | TC_CMR_WAVSEL_UP | TC_CMR_TCCLKS_TIMER_CLOCK1);
+               TC_CMR_WAVE | TC_CMR_WAVSEL_UP | TC_CMR_TCCLKS_TIMER_CLOCK1);
   TC_Start(TC1, 0);
 
   pinMask   = g_APinDescription[pin].ulPin; // Don't 'optimize' these into
@@ -1057,29 +1079,30 @@ void Adafruit_NeoPixel::show(void) {
   pix       = *p++;
   mask      = 0x80;
 
-#ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
+  #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
-#endif
+  #endif
     time0  = TIME_800_0;
     time1  = TIME_800_1;
     period = PERIOD_800;
-#ifdef NEO_KHZ400
-  } else { // 400 KHz bitstream
+    #ifdef NEO_KHZ400
+  }
+  else {   // 400 KHz bitstream
     time0  = TIME_400_0;
     time1  = TIME_400_1;
     period = PERIOD_400;
   }
-#endif
+    #endif
 
   for(t = time0;; t = time0) {
-    if(pix & mask) t = time1;
+    if(pix & mask) { t = time1; }
     while(*timeValue < period);
     *portSet   = pinMask;
     *timeReset = TC_CCR_CLKEN | TC_CCR_SWTRG;
     while(*timeValue < t);
     *portClear = pinMask;
     if(!(mask >>= 1)) {   // This 'inside-out' loop logic utilizes
-      if(p >= end) break; // idle time to minimize inter-byte delays.
+      if(p >= end) { break; } // idle time to minimize inter-byte delays.
       pix = *p++;
       mask = 0x80;
     }
@@ -1087,22 +1110,22 @@ void Adafruit_NeoPixel::show(void) {
   while(*timeValue < period); // Wait for last bit
   TC_Stop(TC1, 0);
 
-#endif // end Due
+  #endif // end Due
 
-// END ARM ----------------------------------------------------------------
+  // END ARM ----------------------------------------------------------------
 
 
-#elif defined(ESP8266)
+  #elif defined(ESP8266)
 
-// ESP8266 ----------------------------------------------------------------
+  // ESP8266 ----------------------------------------------------------------
 
   // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
   espShow(pin, pixels, numBytes, is800KHz);
 
-#endif // ESP8266
+  #endif // ESP8266
 
 
-// END ARCHITECTURE SELECT ------------------------------------------------
+  // END ARCHITECTURE SELECT ------------------------------------------------
 
 
   interrupts();
@@ -1110,24 +1133,26 @@ void Adafruit_NeoPixel::show(void) {
 }
 
 // Set the output pin number
-void Adafruit_NeoPixel::setPin(uint8_t p) {
-  if(begun && (pin >= 0)) pinMode(pin, INPUT);
+void Adafruit_NeoPixel::setPin(uint8_t p)
+{
+  if(begun && (pin >= 0)) { pinMode(pin, INPUT); }
   if(p >= 0) {
     pin = p;
     if(begun) {
       pinMode(p, OUTPUT);
       digitalWrite(p, LOW);
     }
-#ifdef __AVR__
+    #ifdef __AVR__
     port    = portOutputRegister(digitalPinToPort(p));
     pinMask = digitalPinToBitMask(p);
-#endif
+    #endif
   }
 }
 
 // Set pixel color from separate R,G,B components:
 void Adafruit_NeoPixel::setPixelColor(
- uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
+  uint16_t n, uint8_t r, uint8_t g, uint8_t b)
+{
 
   if(n < numLEDs) {
     if(brightness) { // See notes in setBrightness()
@@ -1135,10 +1160,11 @@ void Adafruit_NeoPixel::setPixelColor(
       g = (g * brightness) >> 8;
       b = (b * brightness) >> 8;
     }
-    uint8_t *p;
+    uint8_t* p;
     if(wOffset == rOffset) { // Is an RGB-type strip
       p = &pixels[n * 3];    // 3 bytes per pixel
-    } else {                 // Is a WRGB-type strip
+    }
+    else {                   // Is a WRGB-type strip
       p = &pixels[n * 4];    // 4 bytes per pixel
       p[wOffset] = 0;        // But only R,G,B passed -- set W to 0
     }
@@ -1149,7 +1175,8 @@ void Adafruit_NeoPixel::setPixelColor(
 }
 
 void Adafruit_NeoPixel::setPixelColor(
- uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
+  uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t w)
+{
 
   if(n < numLEDs) {
     if(brightness) { // See notes in setBrightness()
@@ -1158,10 +1185,11 @@ void Adafruit_NeoPixel::setPixelColor(
       b = (b * brightness) >> 8;
       w = (w * brightness) >> 8;
     }
-    uint8_t *p;
+    uint8_t* p;
     if(wOffset == rOffset) { // Is an RGB-type strip
       p = &pixels[n * 3];    // 3 bytes per pixel (ignore W)
-    } else {                 // Is a WRGB-type strip
+    }
+    else {                   // Is a WRGB-type strip
       p = &pixels[n * 4];    // 4 bytes per pixel
       p[wOffset] = w;        // Store W
     }
@@ -1172,12 +1200,13 @@ void Adafruit_NeoPixel::setPixelColor(
 }
 
 // Set pixel color from 'packed' 32-bit RGB color:
-void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c) {
+void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c)
+{
   if(n < numLEDs) {
-    uint8_t *p,
-      r = (uint8_t)(c >> 16),
-      g = (uint8_t)(c >>  8),
-      b = (uint8_t)c;
+    uint8_t* p,
+             r = (uint8_t)(c >> 16),
+             g = (uint8_t)(c >>  8),
+             b = (uint8_t)c;
     if(brightness) { // See notes in setBrightness()
       r = (r * brightness) >> 8;
       g = (g * brightness) >> 8;
@@ -1185,7 +1214,8 @@ void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c) {
     }
     if(wOffset == rOffset) {
       p = &pixels[n * 3];
-    } else {
+    }
+    else {
       p = &pixels[n * 4];
       uint8_t w = (uint8_t)(c >> 24);
       p[wOffset] = brightness ? ((w * brightness) >> 8) : w;
@@ -1198,21 +1228,24 @@ void Adafruit_NeoPixel::setPixelColor(uint16_t n, uint32_t c) {
 
 // Convert separate R,G,B into packed 32-bit RGB color.
 // Packed format is always RGB, regardless of LED strand color order.
-uint32_t Adafruit_NeoPixel::Color(uint8_t r, uint8_t g, uint8_t b) {
+uint32_t Adafruit_NeoPixel::Color(uint8_t r, uint8_t g, uint8_t b)
+{
   return ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
 }
 
 // Convert separate R,G,B,W into packed 32-bit WRGB color.
 // Packed format is always WRGB, regardless of LED strand color order.
-uint32_t Adafruit_NeoPixel::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w) {
+uint32_t Adafruit_NeoPixel::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t w)
+{
   return ((uint32_t)w << 24) | ((uint32_t)r << 16) | ((uint32_t)g <<  8) | b;
 }
 
 // Query color from previously-set pixel (returns packed 32-bit RGB value)
-uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const {
-  if(n >= numLEDs) return 0; // Out of bounds, return no color.
+uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const
+{
+  if(n >= numLEDs) { return 0; } // Out of bounds, return no color.
 
-  uint8_t *p;
+  uint8_t* p;
 
   if(wOffset == rOffset) { // Is RGB-type device
     p = &pixels[n * 3];
@@ -1225,24 +1258,27 @@ uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const {
       return (((uint32_t)(p[rOffset] << 8) / brightness) << 16) |
              (((uint32_t)(p[gOffset] << 8) / brightness) <<  8) |
              ( (uint32_t)(p[bOffset] << 8) / brightness       );
-    } else {
+    }
+    else {
       // No brightness adjustment has been made -- return 'raw' color
       return ((uint32_t)p[rOffset] << 16) |
              ((uint32_t)p[gOffset] <<  8) |
-              (uint32_t)p[bOffset];
+             (uint32_t)p[bOffset];
     }
-  } else {                 // Is RGBW-type device
+  }
+  else {                   // Is RGBW-type device
     p = &pixels[n * 4];
     if(brightness) { // Return scaled color
       return (((uint32_t)(p[wOffset] << 8) / brightness) << 24) |
              (((uint32_t)(p[rOffset] << 8) / brightness) << 16) |
              (((uint32_t)(p[gOffset] << 8) / brightness) <<  8) |
              ( (uint32_t)(p[bOffset] << 8) / brightness       );
-    } else { // Return raw color
+    }
+    else {   // Return raw color
       return ((uint32_t)p[wOffset] << 24) |
              ((uint32_t)p[rOffset] << 16) |
              ((uint32_t)p[gOffset] <<  8) |
-              (uint32_t)p[bOffset];
+             (uint32_t)p[bOffset];
     }
   }
 }
@@ -1250,11 +1286,13 @@ uint32_t Adafruit_NeoPixel::getPixelColor(uint16_t n) const {
 // Returns pointer to pixels[] array.  Pixel data is stored in device-
 // native format and is not translated here.  Application will need to be
 // aware of specific pixel data format and handle colors appropriately.
-uint8_t *Adafruit_NeoPixel::getPixels(void) const {
+uint8_t* Adafruit_NeoPixel::getPixels(void) const
+{
   return pixels;
 }
 
-uint16_t Adafruit_NeoPixel::numPixels(void) const {
+uint16_t Adafruit_NeoPixel::numPixels(void) const
+{
   return numLEDs;
 }
 
@@ -1270,7 +1308,8 @@ uint16_t Adafruit_NeoPixel::numPixels(void) const {
 // the limited number of steps (quantization) in the old data will be
 // quite visible in the re-scaled version.  For a non-destructive
 // change, you'll need to re-render the full strip data.  C'est la vie.
-void Adafruit_NeoPixel::setBrightness(uint8_t b) {
+void Adafruit_NeoPixel::setBrightness(uint8_t b)
+{
   // Stored brightness value is different than what's passed.
   // This simplifies the actual scaling math later, allowing a fast
   // 8x8-bit multiply and taking the MSB.  'brightness' is a uint8_t,
@@ -1281,12 +1320,12 @@ void Adafruit_NeoPixel::setBrightness(uint8_t b) {
   if(newBrightness != brightness) { // Compare against prior value
     // Brightness has changed -- re-scale existing data in RAM
     uint8_t  c,
-            *ptr           = pixels,
-             oldBrightness = brightness - 1; // De-wrap old brightness value
+             *ptr           = pixels,
+              oldBrightness = brightness - 1; // De-wrap old brightness value
     uint16_t scale;
-    if(oldBrightness == 0) scale = 0; // Avoid /0
-    else if(b == 255) scale = 65535 / oldBrightness;
-    else scale = (((uint16_t)newBrightness << 8) - 1) / oldBrightness;
+    if(oldBrightness == 0) { scale = 0; } // Avoid /0
+    else if(b == 255) { scale = 65535 / oldBrightness; }
+    else { scale = (((uint16_t)newBrightness << 8) - 1) / oldBrightness; }
     for(uint16_t i=0; i<numBytes; i++) {
       c      = *ptr;
       *ptr++ = (c * scale) >> 8;
@@ -1296,11 +1335,13 @@ void Adafruit_NeoPixel::setBrightness(uint8_t b) {
 }
 
 //Return the brightness value
-uint8_t Adafruit_NeoPixel::getBrightness(void) const {
+uint8_t Adafruit_NeoPixel::getBrightness(void) const
+{
   return brightness - 1;
 }
 
-void Adafruit_NeoPixel::clear() {
+void Adafruit_NeoPixel::clear()
+{
   memset(pixels, 0, numBytes);
 }
 

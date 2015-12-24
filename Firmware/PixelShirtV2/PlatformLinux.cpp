@@ -40,8 +40,9 @@ uint8_t mHasColor = 0;
  * @return EXIT_SUCCESS
  */
 int main(
-    __attribute__((unused)) int argc,
-    __attribute__((unused)) char* argv[]) {
+  __attribute__((unused)) int argc,
+  __attribute__((unused)) char* argv[])
+{
   setup();
   while(1) {
     loop();
@@ -53,7 +54,8 @@ int main(
  * Initializes the "hardware" on linux: ncurses and the
  * random number generator
  */
-void initializeHardware(void) {
+void initializeHardware(void)
+{
   /* Initialize ncurses, with color if possible */
   initscr();
   if (has_colors()) {
@@ -85,13 +87,15 @@ void initializeHardware(void) {
  *
  * @return 1 if a keypress was detected, 0 otherwise
  */
-int kbhit(void) {
+int kbhit(void)
+{
   int ch = getch();
 
   if (ch != ERR) {
     ungetch(ch);
     return 1;
-  } else {
+  }
+  else {
     return 0;
   }
 }
@@ -114,77 +118,78 @@ int kbhit(void) {
  *
  * q quits the program
  */
-void readJoystickData(void) {
+void readJoystickData(void)
+{
 
   /* Detect Keypresses, exit if necessary */
   if (kbhit()) {
     switch (getch()) {
-    case 'w':
-      p1Analog[Y] = CLAMP(p1Analog[Y] - 64, 1023);
-      break;
-    case 's':
-      p1Analog[Y] = CLAMP(p1Analog[Y] + 64, 1023);
-      break;
-    case 'a':
-      p1Analog[X] = CLAMP(p1Analog[X] - 64, 1023);
-      break;
-    case 'd':
-      p1Analog[X] = CLAMP(p1Analog[X] + 64, 1023);
-      break;
+      case 'w':
+        p1Analog[Y] = CLAMP(p1Analog[Y] - 64, 1023);
+        break;
+      case 's':
+        p1Analog[Y] = CLAMP(p1Analog[Y] + 64, 1023);
+        break;
+      case 'a':
+        p1Analog[X] = CLAMP(p1Analog[X] - 64, 1023);
+        break;
+      case 'd':
+        p1Analog[X] = CLAMP(p1Analog[X] + 64, 1023);
+        break;
 
-    case 't':
-      SET_BUTTONS(p1controller, UP);
-      break;
-    case 'f':
-      SET_BUTTONS(p1controller, LEFT);
-      break;
-    case 'g':
-      SET_BUTTONS(p1controller, DOWN);
-      break;
-    case 'h':
-      SET_BUTTONS(p1controller, RIGHT);
-      break;
-    case 'b':
-      SET_BUTTONS(p1controller, STICK);
-      break;
+      case 't':
+        SET_BUTTONS(p1controller, UP);
+        break;
+      case 'f':
+        SET_BUTTONS(p1controller, LEFT);
+        break;
+      case 'g':
+        SET_BUTTONS(p1controller, DOWN);
+        break;
+      case 'h':
+        SET_BUTTONS(p1controller, RIGHT);
+        break;
+      case 'b':
+        SET_BUTTONS(p1controller, STICK);
+        break;
 
-    case '8':
-      p2Analog[Y] = CLAMP(p2Analog[Y] - 64, 1023);
-      break;
-    case '5':
-      p2Analog[Y] = CLAMP(p2Analog[Y] + 64, 1023);
-      break;
-    case '4':
-      p2Analog[X] = CLAMP(p2Analog[X] - 64, 1023);
-      break;
-    case '6':
-      p2Analog[X] = CLAMP(p2Analog[X] + 64, 1023);
-      break;
+      case '8':
+        p2Analog[Y] = CLAMP(p2Analog[Y] - 64, 1023);
+        break;
+      case '5':
+        p2Analog[Y] = CLAMP(p2Analog[Y] + 64, 1023);
+        break;
+      case '4':
+        p2Analog[X] = CLAMP(p2Analog[X] - 64, 1023);
+        break;
+      case '6':
+        p2Analog[X] = CLAMP(p2Analog[X] + 64, 1023);
+        break;
 
-    case 'i':
-      SET_BUTTONS(p2controller, UP);
-      break;
-    case 'j':
-      SET_BUTTONS(p2controller, LEFT);
-      break;
-    case 'k':
-      SET_BUTTONS(p2controller, DOWN);
-      break;
-    case 'l':
-      SET_BUTTONS(p2controller, RIGHT);
-      break;
-    case ',':
-      SET_BUTTONS(p2controller, STICK);
-      break;
+      case 'i':
+        SET_BUTTONS(p2controller, UP);
+        break;
+      case 'j':
+        SET_BUTTONS(p2controller, LEFT);
+        break;
+      case 'k':
+        SET_BUTTONS(p2controller, DOWN);
+        break;
+      case 'l':
+        SET_BUTTONS(p2controller, RIGHT);
+        break;
+      case ',':
+        SET_BUTTONS(p2controller, STICK);
+        break;
 
-    case 'z':
-      switchGame();
-      break;
-    case 'q':
-      /* Quit the program */
-      endwin();
-      exit(0);
-      return;
+      case 'z':
+        switchGame();
+        break;
+      case 'q':
+        /* Quit the program */
+        endwin();
+        exit(0);
+        return;
     }
   }
   SET_X_AXIS(p1controller, p1Analog[X]);
@@ -200,7 +205,8 @@ void readJoystickData(void) {
  * @param y   The Y coordinate of the pixel to set
  * @param rgb The color to set the pixel to
  */
-void SetPixel(int8_t x, int8_t y, uint32_t rgb) {
+void SetPixel(int8_t x, int8_t y, uint32_t rgb)
+{
   field[x][y] = rgb;
 }
 
@@ -211,7 +217,8 @@ void SetPixel(int8_t x, int8_t y, uint32_t rgb) {
  * @param y   The Y coordinate of the pixel to get
  * @return    The color of the given pixel
  */
-uint32_t GetPixel(int8_t x, int8_t y) {
+uint32_t GetPixel(int8_t x, int8_t y)
+{
   return field[x][y];
 }
 
@@ -221,7 +228,8 @@ uint32_t GetPixel(int8_t x, int8_t y) {
  * @param color The input color to map, in 0xRRGGBB form
  * @return The closest ncurses color
  */
-uint8_t nearestColor(uint32_t color) {
+uint8_t nearestColor(uint32_t color)
+{
   uint8_t r = (color & 0xFF0000) >> 16;
   uint8_t g = (color & 0x00FF00) >> 8;
   uint8_t b = (color & 0x0000FF) >> 0;
@@ -252,7 +260,8 @@ uint8_t nearestColor(uint32_t color) {
  * Also clear the controller input, since it was processed
  * for this frame by now
  */
-void displayPixels(void) {
+void displayPixels(void)
+{
   erase();
 
   int i, j;
@@ -284,7 +293,8 @@ void displayPixels(void) {
         if (mHasColor) {
           attroff(COLOR_PAIR(nearestColor(field[j][i])));
         }
-      } else {
+      }
+      else {
         printw(" ");
       }
     }
@@ -319,7 +329,8 @@ void displayPixels(void) {
  * @return the current time in microseconds. Since this isn't since
  *         boot, it may wrap
  */
-uint32_t getMicroseconds(void) {
+uint32_t getMicroseconds(void)
+{
   struct timeval tv;
   gettimeofday(&tv,0);
   return tv.tv_usec + (tv.tv_sec * 1000000);
@@ -331,7 +342,8 @@ uint32_t getMicroseconds(void) {
  * @param max upper bound of the random value, exclusive
  * @return a random number between 0 and max-1 (long)
  */
-uint32_t randomNumber(uint32_t max) {
+uint32_t randomNumber(uint32_t max)
+{
   return rand() % max;
 }
 
