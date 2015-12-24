@@ -23,6 +23,7 @@
 #include "Tetris.h"
 #include "SuperSquare.h"
 #include "Shooter.h"
+#include "PixelFighter.h"
 #include "ScreenSaver.h"
 #include "ScoreDisplay.h"
 
@@ -30,7 +31,7 @@
 #include "PixelShirtV2.h"
 
 /* Manage the Games */
-#define NUM_GAMES 5
+#define NUM_GAMES 6
 
 /* The different game IDs */
 #define SUPER_SQUARE 0
@@ -38,6 +39,7 @@
 #define LIGHTCYCLE 2
 #define SHOOTER 3
 #define TETRIS 4
+#define FIGHTER 5
 
 /* The current game's ID */
 uint8_t gameMode;
@@ -56,6 +58,7 @@ Pong pong;
 Lightcycle lightcycle;
 Shooter shooter;
 Tetris tetris;
+PixelFighterGame fighter;
 
 /* To periodically call the main function in the loop */
 uint32_t microsCnt = 0;
@@ -88,8 +91,8 @@ void setup(void)
   gameSwitchTimer = 0;
 
   /* Set the current game */
-  gameMode = LIGHTCYCLE;
-  currentGame = &lightcycle;
+  gameMode = FIGHTER;
+  currentGame = &fighter;
   currentGame->ResetGame(1,0);
 
   /* Initialize controller state */
@@ -212,6 +215,10 @@ void switchGame(void) {
         currentGame = &shooter;
         break;
       }
+    case FIGHTER: {
+      currentGame = &fighter;
+      break;
+    }
   }
   currentGame->ResetGame(1,0);
 }

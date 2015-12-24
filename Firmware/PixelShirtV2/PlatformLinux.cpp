@@ -126,10 +126,10 @@ void readJoystickData(void) {
       p1Analog[Y] = CLAMP(p1Analog[Y] + 64, 1023);
       break;
     case 'a':
-      p1Analog[X] = CLAMP(p1Analog[X] + 64, 1023);
+      p1Analog[X] = CLAMP(p1Analog[X] - 64, 1023);
       break;
     case 'd':
-      p1Analog[X] = CLAMP(p1Analog[X] - 64, 1023);
+      p1Analog[X] = CLAMP(p1Analog[X] + 64, 1023);
       break;
 
     case 't':
@@ -155,10 +155,10 @@ void readJoystickData(void) {
       p2Analog[Y] = CLAMP(p2Analog[Y] + 64, 1023);
       break;
     case '4':
-      p2Analog[X] = CLAMP(p2Analog[X] + 64, 1023);
+      p2Analog[X] = CLAMP(p2Analog[X] - 64, 1023);
       break;
     case '6':
-      p2Analog[X] = CLAMP(p2Analog[X] - 64, 1023);
+      p2Analog[X] = CLAMP(p2Analog[X] + 64, 1023);
       break;
 
     case 'i':
