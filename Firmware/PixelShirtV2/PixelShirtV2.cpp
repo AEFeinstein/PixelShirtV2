@@ -15,6 +15,7 @@
  * along with PixelShirtV2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
 #include "ArduinoGame.h"
 
 #include "Pong.h"
@@ -23,28 +24,10 @@
 #include "SuperSquare.h"
 #include "Shooter.h"
 #include "ScreenSaver.h"
+#include "ScoreDisplay.h"
 
-#include "Adafruit_NeoPixel.h"
-#include "nrf24.h"
-
-/* Pixel strip pin connections */
-#define NP_PIN_0            11
-#define NP_PIN_1            12
-#define NP_PIN_2            8
-#define NP_PIN_3            9
-
-/* Numbers of pixels per strip */
-#define NUMPIXELS      64
-
-/* Neopixel objects */
-Adafruit_NeoPixel pixels0 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_0,
-                            NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixels1 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_1,
-                            NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixels2 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_2,
-                            NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel pixels3 = Adafruit_NeoPixel(NUMPIXELS, NP_PIN_3,
-                            NEO_GRB + NEO_KHZ800);
+#include "PlatformSpecific.h"
+#include "PixelShirtV2.h"
 
 /* Manage the Games */
 #define NUM_GAMES 5
@@ -78,19 +61,11 @@ Tetris tetris;
 uint32_t microsCnt = 0;
 uint32_t microsLast = 0;
 
-/* The LED pin for the heart-beat blink */
-#define HEARTBEAT_PIN 13
-
-/* Addresses to talk to the wireless controllers. Hard-coded in the controller
- * firmware too
- */
-uint8_t tx_address[5] = {0xD7, 0xD7, 0xD7, 0xD7, 0xD7};
-uint8_t rx_address[5] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
-
 /* Variables to store controller state */
 uint32_t p1controller;
 uint32_t p2controller;
 
+/* Prototypes */
 void doEverything(void);
 
 /**
@@ -101,17 +76,7 @@ void doEverything(void);
  */
 void setup(void)
 {
-  /* Set up heart-beat */
-  pinMode(HEARTBEAT_PIN, OUTPUT);
-
-  /* Seed the RNG */
-  randomSeed(analogRead(RANDOM_PIN));
-
-  /* Initialize the NeoPixel library. */
-  pixels0.begin();
-  pixels1.begin();
-  pixels2.begin();
-  pixels3.begin();
+  initializeHardware();
 
   /* Clear Variables */
   uint8_t x, y;
@@ -123,19 +88,9 @@ void setup(void)
   gameSwitchTimer = 0;
 
   /* Set the current game */
-  gameMode = PONG;
-  currentGame = &pong;
+  gameMode = LIGHTCYCLE;
+  currentGame = &lightcycle;
   currentGame->ResetGame(1,0);
-
-  /* Initialize hardware pins */
-  nrf24_init();
-
-  /* Channel #2 , payload length: 5 */
-  nrf24_config(2, 4);
-
-  /* Set the device addresses */
-  nrf24_tx_address(tx_address);
-  nrf24_rx_address(rx_address);
 
   /* Initialize controller state */
   p1controller = 0;
@@ -153,8 +108,7 @@ void setup(void)
  */
 void loop(void)
 {
-  uint32_t jsTmp;
-  uint32_t currentTime = micros();
+  uint32_t currentTime = getMicroseconds();
 
   /* Run the code at 32Hz (every 31250 microseconds)
    * Only add to the counter if it doesn't roll over
@@ -168,28 +122,7 @@ void loop(void)
   }
   microsLast = currentTime;
 
-  /* If there is data from the controllers, get it and store it */
-  if (nrf24_dataReady()) {
-    nrf24_getData((uint8_t*)&jsTmp);
-    switch(GET_PLAYER(jsTmp)) {
-      case 0: {
-          p1controller = jsTmp;
-          break;
-        }
-      case 1: {
-          p2controller = jsTmp;
-          break;
-        }
-    }
-  }
-
-  /* Heart-beat */
-  if((millis() / 1000) % 2 == 0) {
-    digitalWrite(HEARTBEAT_PIN, HIGH);
-  }
-  else {
-    digitalWrite(HEARTBEAT_PIN, LOW);
-  }
+  readJoystickData();
 }
 
 /**
@@ -237,30 +170,7 @@ void doEverything(void)
     /* The game mode is being changed */
     if(gameSwitchTimer == IRQ_HZ * 2) {
       gameSwitchTimer = 0;
-      gameMode = (gameMode+1)%NUM_GAMES;
-      switch(gameMode) {
-        case PONG: {
-            currentGame = &pong;
-            break;
-          }
-        case LIGHTCYCLE: {
-            currentGame = &lightcycle;
-            break;
-          }
-        case TETRIS: {
-            currentGame = &tetris;
-            break;
-          }
-        case SUPER_SQUARE: {
-            currentGame = &superSquare;
-            break;
-          }
-        case SHOOTER: {
-            currentGame = &shooter;
-            break;
-          }
-      }
-      currentGame->ResetGame(1,0);
+      switchGame();
     }
     else {
       /* Process new controller input */
@@ -272,242 +182,36 @@ void doEverything(void)
   }
 
   /* Display the frame */
-  pixels0.show();
-  pixels1.show();
-  pixels2.show();
-  pixels3.show();
+  displayPixels();
 }
 
 /**
- * Draws an up to four digit number in the center of the display
- * with the given color
- *
- * @param score The score to draw, 0 to 9999
- * @param rgb The color to draw the score with
+ * Cycles through the available games.
+ * Switches to the next one & resets it
  */
-void DisplayScore(uint16_t score, uint32_t rgb)
-{
-  uint8_t i, j;
-  for(i = 0; i < BOARD_SIZE; i++) {
-    for(j = 0; j < BOARD_SIZE; j++) {
-      SetPixel(i, j, EMPTY_COLOR);
-    }
-  }
-
-  /* draw "score" on the field */
-  if(score > 999) {
-    DrawNumber((score / 1000) % 10, 0 , 5, rgb);
-  }
-  if(score > 99) {
-    DrawNumber((score / 100 ) % 10, 4 , 5, rgb);
-  }
-  if(score > 9) {
-    DrawNumber((score / 10  ) % 10, 8 , 5, rgb);
-  }
-  DrawNumber((score / 1   ) % 10, 12, 5, rgb);
-}
-
-/**
- * Draws a single digit on the display in the given color at the given offset
- *
- * @param number  The number to draw, 0-9
- * @param offsetX The X offset where to draw the number
- * @param offsetY The Y offset where to draw the number
- * @param rgb   The color to draw the number with
- */
-void DrawNumber(uint8_t number, uint8_t offsetX, uint8_t offsetY, uint32_t rgb)
-{
-  switch(number) {
-    case 0: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 0, offsetY + 1, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 0, offsetY + 3, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 0, offsetY + 4, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
+void switchGame(void) {
+  gameMode = (gameMode+1)%NUM_GAMES;
+  switch(gameMode) {
+    case PONG: {
+        currentGame = &pong;
         break;
       }
-    case 1: {
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
+    case LIGHTCYCLE: {
+        currentGame = &lightcycle;
         break;
       }
-    case 2: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 0, offsetY + 3, rgb);
-        SetPixel(offsetX + 0, offsetY + 4, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
+    case TETRIS: {
+        currentGame = &tetris;
         break;
       }
-    case 3: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 0, offsetY + 4, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
+    case SUPER_SQUARE: {
+        currentGame = &superSquare;
         break;
       }
-    case 4: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 0, offsetY + 1, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
-        break;
-      }
-    case 5: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 0, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 0, offsetY + 4, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
-        break;
-      }
-    case 6: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 0, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 0, offsetY + 3, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 0, offsetY + 4, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
-        break;
-      }
-    case 7: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 3, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        break;
-      }
-    case 8: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 0, offsetY + 1, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 0, offsetY + 3, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 0, offsetY + 4, rgb);
-        SetPixel(offsetX + 1, offsetY + 4, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
-        break;
-      }
-    case 9: {
-        SetPixel(offsetX + 0, offsetY + 0, rgb);
-        SetPixel(offsetX + 1, offsetY + 0, rgb);
-        SetPixel(offsetX + 2, offsetY + 0, rgb);
-        SetPixel(offsetX + 0, offsetY + 1, rgb);
-        SetPixel(offsetX + 2, offsetY + 1, rgb);
-        SetPixel(offsetX + 0, offsetY + 2, rgb);
-        SetPixel(offsetX + 1, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 2, rgb);
-        SetPixel(offsetX + 2, offsetY + 3, rgb);
-        SetPixel(offsetX + 2, offsetY + 4, rgb);
+    case SHOOTER: {
+        currentGame = &shooter;
         break;
       }
   }
-}
-
-/**
- * Sets a pixel in the display at the given position to the given color
- *
- * @param x   The X coordinate of the pixel to set
- * @param y   The Y coordinate of the pixel to set
- * @param rgb The color to set the pixel to
- */
-void SetPixel(int8_t x, int8_t y, uint32_t rgb)
-{
-  uint8_t index = (-16 * (x%4)) + 63 - y;
-
-  switch(x / 4) {
-    case 0: {
-        pixels0.setPixelColor(index, rgb);
-        break;
-      }
-    case 1: {
-        pixels1.setPixelColor(index, rgb);
-        break;
-      }
-    case 2: {
-        pixels2.setPixelColor(index, rgb);
-        break;
-      }
-    case 3: {
-        pixels3.setPixelColor(index, rgb);
-        break;
-      }
-  }
-}
-
-/**
- * Gets a pixel in the display at the given position and returns the color
- *
- * @param x   The X coordinate of the pixel to get
- * @param y   The Y coordinate of the pixel to get
- * @return    The color of the given pixel
- */
-uint32_t GetPixel(int8_t x, int8_t y)
-{
-  uint8_t index = (-16 * (x%4)) + 63 - y;
-
-  switch(x / 4) {
-    case 0: {
-        return pixels0.getPixelColor(index);
-      }
-    case 1: {
-        return pixels1.getPixelColor(index);
-      }
-    case 2: {
-        return pixels2.getPixelColor(index);
-      }
-    case 3: {
-        return pixels3.getPixelColor(index);
-      }
-    default: {
-        return 0;
-      }
-  }
+  currentGame->ResetGame(1,0);
 }

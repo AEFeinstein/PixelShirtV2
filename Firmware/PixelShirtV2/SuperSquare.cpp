@@ -15,6 +15,10 @@
  * along with PixelShirtV2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+#include "PlatformSpecific.h"
+#include "ArduinoGame.h"
+#include "ScoreDisplay.h"
 #include "SuperSquare.h"
 
 #define CENTER_COLOR 0x004000
@@ -70,18 +74,18 @@ void SuperSquare::UpdatePhysics(void)
     /* How many lines to generate? */
     switch(linesDrawn / 6) {
       case 0: {
-          AddLine(random(4), currentVelocity);
+          AddLine(randomNumber(4), currentVelocity);
           break;
         }
       case 1: {
-          uint8_t newLinePosition = random(4);
-          uint8_t otherNewLinePosition = (newLinePosition + (random(3) + 1)) % 4;
+          uint8_t newLinePosition = randomNumber(4);
+          uint8_t otherNewLinePosition = (newLinePosition + (randomNumber(3) + 1)) % 4;
           AddLine(newLinePosition, currentVelocity);
           AddLine(otherNewLinePosition, currentVelocity);
           break;
         }
       default: {
-          uint8_t newLinePosition = random(4);
+          uint8_t newLinePosition = randomNumber(4);
           for(i = 0; i < 3; i++) {
             AddLine(newLinePosition, currentVelocity);
             newLinePosition = (newLinePosition + 1) % 4;

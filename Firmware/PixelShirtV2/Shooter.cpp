@@ -15,6 +15,10 @@
  * along with PixelShirtV2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+#include "PlatformSpecific.h"
+#include "ArduinoGame.h"
+#include "ScoreDisplay.h"
 #include "Shooter.h"
 
 int8_t shipShape[4][2] = {

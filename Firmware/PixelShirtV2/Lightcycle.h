@@ -18,8 +18,6 @@
 #ifndef _LIGHTCYCLE_H_
 #define _LIGHTCYCLE_H_
 
-#include "ArduinoGame.h"
-
 class Lightcycle : public ArduinoGame
 {
  public:

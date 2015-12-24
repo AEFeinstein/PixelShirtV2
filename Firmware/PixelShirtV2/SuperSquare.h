@@ -18,8 +18,6 @@
 #ifndef _SUPER_SQUARE_H_
 #define _SUPER_SQUARE_H_
 
-#include "ArduinoGame.h"
-
 #define NUM_LINES 6
 #define LINE_SPEED_SCALER 128
 

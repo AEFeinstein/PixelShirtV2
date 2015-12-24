@@ -15,7 +15,10 @@
  * along with PixelShirtV2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+#include "ArduinoGame.h"
 #include "Pong.h"
+#include "PlatformSpecific.h"
 
 #define BALL_COLOR 0x004000
 
@@ -127,7 +130,7 @@ void Pong::ResetGame(  uint8_t isInit,
   else {
     ballVel[X] = -V_M * 5;
   }
-  uint8_t initY = random(8);
+  uint8_t initY = randomNumber(8);
   if(initY == 4) {
     initY++;
   }

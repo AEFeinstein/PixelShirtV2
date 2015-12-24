@@ -15,7 +15,10 @@
  * along with PixelShirtV2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdint.h>
+#include "ArduinoGame.h"
 #include "Tetris.h"
+#include "PlatformSpecific.h"
 
 #define WALL_COLOR  0x000040
 
@@ -244,13 +247,13 @@ uint8_t Tetris::NewActiveTetromino(uint8_t isFirst)
   uint8_t i;
 
   if(isFirst) {
-    nextType = (tetromino)random(7);
+    nextType = (tetromino)randomNumber(7);
     nextTetrominoColor = tetrominoColors[nextType];
     return 0;
   }
   else {
     activeType = nextType;
-    nextType = (tetromino)random(7);
+    nextType = (tetromino)randomNumber(7);
 
     activeTetrominoColor = nextTetrominoColor;
     nextTetrominoColor = tetrominoColors[nextType];

@@ -19,6 +19,8 @@
 #ifndef ADAFRUIT_NEOPIXEL_H
 #define ADAFRUIT_NEOPIXEL_H
 
+#ifdef ARDUINO
+
 #if (ARDUINO >= 100)
  #include <Arduino.h>
 #else
@@ -176,4 +178,5 @@ class Adafruit_NeoPixel {
 
 };
 
+#endif
 #endif // ADAFRUIT_NEOPIXEL_H

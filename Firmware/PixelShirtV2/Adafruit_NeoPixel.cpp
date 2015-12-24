@@ -31,8 +31,9 @@
   License along with NeoPixel.  If not, see
   <http://www.gnu.org/licenses/>.
   -------------------------------------------------------------------------*/
-
 #include "Adafruit_NeoPixel.h"
+
+#ifdef ARDUINO
 
 // Constructor when length, pin and type are known at compile-time:
 Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint8_t p, neoPixelType t) :
@@ -1302,3 +1303,5 @@ uint8_t Adafruit_NeoPixel::getBrightness(void) const {
 void Adafruit_NeoPixel::clear() {
   memset(pixels, 0, numBytes);
 }
+
+#endif

@@ -11,8 +11,12 @@
 *   http://www.tinkerer.eu/AVRLib/nRF24L01
 * -----------------------------------------------------------------------------
 */
+
+#include <stdint.h>
+#include "nRF24L01.h"
 #include "nrf24.h"
-#include "Arduino.h"
+
+#ifdef ARDUINO
 
 uint8_t payload_len;
 
@@ -342,3 +346,5 @@ void nrf24_writeRegister(uint8_t reg, uint8_t* value, uint8_t len)
   nrf24_transmitSync(value,len);
   nrf24_csn_digitalWrite(HIGH);
 }
+
+#endif

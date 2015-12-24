@@ -18,8 +18,6 @@
 #ifndef _SHOOTER_H_
 #define _SHOOTER_H_
 
-#include "ArduinoGame.h"
-
 #define NUM_BULLETS 2
 
 typedef struct {

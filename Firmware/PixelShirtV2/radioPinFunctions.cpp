@@ -9,6 +9,8 @@
 * -----------------------------------------------------------------------------
 */
 
+#ifdef ARDUINO
+
 #include <avr/io.h>
 
 #define set_bit(reg,bit) reg |= (1<<bit)
@@ -70,3 +72,4 @@ uint8_t nrf24_miso_digitalRead(void)
   return check_bit(PINB,PINB3);
 }
 /* ------------------------------------------------------------------------- */
+#endif

@@ -18,8 +18,6 @@
 #ifndef _TETRIS_H_
 #define _TETRIS_H_
 
-#include "ArduinoGame.h"
-
 #define CLOCKWISE 1
 #define COUNTERCLOCKWISE -1
 

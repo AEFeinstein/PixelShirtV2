@@ -18,9 +18,6 @@
 #ifndef _ARDUINO_GAME_H_
 #define _ARDUINO_GAME_H_
 
-#include <stdint.h>
-#include "Arduino.h"
-
 #define BOARD_SIZE  16 /* In pixels */
 #define IRQ_HZ      32
 
@@ -36,16 +33,13 @@
   ( ((x) < 0) ? ((x) + (y)) : ( ((x) >= (y)) ? ((x) - (y)) : (x) ) )
 #define CLAMP(x,y) ((x) > (y) ? (y) : ((x) < 0 ? 0 : (x)))
 
-#define RANDOM_PIN   4  /* Analog, not connected */
-
+/* Color definitions */
 #define EMPTY_COLOR 0x000000
 #define SCORE_COLOR 0x004000
 #define P1_COLOR    0x000040
 #define P2_COLOR    0x400000
 
-/*
- * Lookup tables!
- */
+/* Lookup tables! */
 static const int8_t cos32[360] = {
   32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 31, 31, 31, 31, 31, 31, 31, 30,
   30, 30, 30, 30, 29, 29, 29, 29, 29, 28, 28, 28, 27, 27, 27, 27, 26, 26, 26,
@@ -104,16 +98,6 @@ class ArduinoGame
   virtual void ProcessInput(int32_t p1, int32_t p2) = 0;
 };
 
-
-/* Function prototype */
-void SetPixel(int8_t y, int8_t x, uint32_t val);
-uint32_t GetPixel(int8_t x, int8_t y);
-void DisplayScore( uint16_t score, uint32_t rgb);
-void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY,
-                 uint32_t rgb);
-
-#define IsPixelLit(x,y) GetPixel(x, y)
-
 /* NRF controller reading */
 #define UP    0x01
 #define DOWN  0x02
@@ -121,7 +105,7 @@ void DrawNumber( uint8_t number, uint8_t offsetX, uint8_t offsetY,
 #define RIGHT 0x08
 #define STICK 0x10
 
-/* Bitfield definitions for a uint32_t which olds all input state */
+/* Bitfield definitions for a uint32_t which holds all input state */
 #define BUTTON_MASK  0x0000001F
 #define X_AXIS_MASK  0x00007FE0
 #define X_AXIS_SHIFT 5

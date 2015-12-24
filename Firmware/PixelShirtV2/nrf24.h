@@ -14,8 +14,7 @@
 #ifndef NRF24
 #define NRF24
 
-#include "nRF24L01.h"
-#include <stdint.h>
+#ifdef ARDUINO
 
 #define nrf24_ADDR_LEN 5
 #define nrf24_CONFIG ((1<<EN_CRC)|(0<<CRCO))
@@ -109,5 +108,7 @@ extern void nrf24_mosi_digitalWrite(uint8_t state);
  * - returns: Non-zero if the pin is high */
 /* -------------------------------------------------------------------------- */
 extern uint8_t nrf24_miso_digitalRead(void);
+
+#endif
 
 #endif

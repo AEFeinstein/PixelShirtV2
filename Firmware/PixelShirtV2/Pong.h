@@ -18,8 +18,6 @@
 #ifndef PONG_H_
 #define PONG_H_
 
-#include "ArduinoGame.h"
-
 /*
  * Defines
  */
