@@ -1,26 +1,31 @@
-appname := PixelSim
+# Makefile for Linux terminal application
 
-CXX := g++
-CXXFLAGS := -Wall -Wextra -pedantic -g
-LDLIBS   := -lncurses
-srcfiles := $(shell find . -maxdepth 2 -name "*.cpp")
-objects  := $(patsubst %.cpp, %.o, $(srcfiles))
+CXX          := g++
+CXXFLAGS     := -Wall -Wextra -pedantic -g -c -x c++ -std=c++14
+INC          :=
+LDLIBS       := -lncurses
+LDFLAGS      :=
+SRCFILES_CPP := $(shell find . -maxdepth 2 -name "*.cpp")
+SRCFILES_INO := $(shell find . -maxdepth 2 -name "*.ino")
+SRCFILES     := $(SRCFILES_CPP) $(SRCFILES_INO)
+OBJECTS      := $(OBJECTS) $(patsubst %.cpp, %.o, $(SRCFILES_CPP))
+OBJECTS      := $(OBJECTS) $(patsubst %.ino, %.o, $(SRCFILES_INO))
+EXECUTABLE   := PixelShirtV2
 
-all: $(appname)
-
-$(appname): $(objects)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(appname) $(objects) $(LDLIBS)
-
-depend: .depend
-
-.depend: $(srcfiles)
-	rm -f ./.depend
-	$(CXX) $(CXXFLAGS) -MM $^>>./.depend;
+all: $(SRCFILES) $(EXECUTABLE)
 
 clean:
-	rm -f $(objects)
+	-rm -f $(OBJECTS) $(EXECUTABLE)
 
-dist-clean: clean
-	rm -f *~ .depend
+$(EXECUTABLE): $(OBJECTS) 
+	$(CXX) -o $@ $(OBJECTS) $(LDLIBS) $(LDFLAGS)
 
-include .depend
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INC) $< -o $@
+	
+%.o: %.ino
+	$(CXX) $(CXXFLAGS) $(INC) $< -o $@
+
+# To print a variable to the terminal:
+# make print-VARIABLE
+print-%  : ; @echo $* = $($*)
