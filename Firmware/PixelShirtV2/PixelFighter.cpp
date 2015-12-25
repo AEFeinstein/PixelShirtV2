@@ -20,12 +20,6 @@
 #include "PixelFighter.h"
 #include "PlatformSpecific.h"
 
-#define FACING_RIGHT 0
-#define FACING_LEFT 1
-
-PixelFighter fighter_one(FACING_RIGHT);
-PixelFighter fighter_two(FACING_LEFT);
-
 #define FIGHTER_WIDTH  4
 #define FIGHTER_HEIGHT 9
 #define STARTING_HP    5
@@ -39,18 +33,32 @@ PixelFighter fighter_two(FACING_LEFT);
 #define BLOCK_COLOR   0x002020
 #define BODY_COLOR    0x151515
 
-enum {
-  COLOR_HEAD = 1, COLOR_BODY = 2, COLOR_ATTACK = 3, COLOR_BLOCK = 4
-};
+typedef enum {
+  IDLE_2,
+  ATTACK_HIGH,
+  ATTACK_LOW,
+  BLOCK_HIGH,
+  BLOCK_LOW,
+  IDLE_1
+} sprite_t;
 
-#define IDLE_2      0
-#define ATTACK_HIGH 1
-#define ATTACK_LOW  2
-#define BLOCK_HIGH  3
-#define BLOCK_LOW   4
-#define IDLE_1      5
+typedef enum {
+  COLOR_NONE,
+  COLOR_HEAD,
+  COLOR_BODY,
+  COLOR_ATTACK,
+  COLOR_BLOCK
+} fighterColor_t;
 
-uint8_t sprites[6][19][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
+typedef enum {
+  FACING_RIGHT,
+  FACING_LEFT
+} direction_t;
+
+PixelFighter fighter_one(FACING_RIGHT);
+PixelFighter fighter_two(FACING_LEFT);
+
+const uint8_t sprites[6][19][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
       0x12, COLOR_BODY
     }, { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, {
       0x31,
@@ -158,7 +166,7 @@ uint8_t sprites[6][19][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
  ***********************************/
 
 /**
- * TODO Document
+ * Constructor. This resets the game with no winner
  */
 PixelFighterGame::PixelFighterGame(void)
 {
@@ -166,10 +174,13 @@ PixelFighterGame::PixelFighterGame(void)
 }
 
 /**
- * TODO Document
+ * Called IRQ_HZ times per second. This handles timers
+ * for each fighter, manages game state, and redraws
+ * the fighters on the display
  */
 void PixelFighterGame::UpdatePhysics(void)
 {
+  /* Handle timers for each fighter */
   fighter_one.ManageTimers(0, fighter_two.getXPos() - FIGHTER_WIDTH);
   fighter_two.ManageTimers(fighter_one.getXPos() + FIGHTER_WIDTH,
                            BOARD_SIZE - FIGHTER_WIDTH);
@@ -181,6 +192,8 @@ void PixelFighterGame::UpdatePhysics(void)
       SetPixel(x, y, EMPTY_COLOR);
     }
   }
+
+  /* Draw the fighters */
   fighter_one.DrawFighter();
   fighter_two.DrawFighter();
   /* TODO collisions & score */
@@ -189,11 +202,11 @@ void PixelFighterGame::UpdatePhysics(void)
 /**
  * TODO Document
  *
- * @param isInit
- * @param losers
+ * @param isInit Whether or not this is the initial reset
+ * @param losers Which fighter lost the match
  */
-void PixelFighterGame::ResetGame(__attribute__((unused))        uint8_t isInit,
-                                 __attribute__((unused))        uint8_t losers)
+void PixelFighterGame::ResetGame(__attribute__((unused)) uint8_t isInit,
+                                 __attribute__((unused)) uint8_t losers)
 {
   /* TODO do something for the winner */
   fighter_one.InitFighter(FACING_RIGHT);
@@ -201,10 +214,10 @@ void PixelFighterGame::ResetGame(__attribute__((unused))        uint8_t isInit,
 }
 
 /**
- * TODO Document
+ * Processes input for each fighter
  *
- * @param p1
- * @param p2
+ * @param p1 The joystick input for player 1
+ * @param p2 The joystick input for player 2
  */
 void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
 {
@@ -219,9 +232,11 @@ void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
  ***********************************/
 
 /**
- * TODO Document
+ * Constructor for a PixelFighter. Resets position, timers,
+ * and hitpoints
  *
- * @param facing
+ * @param facing The direction this fighter is facing,
+ *               either FACING_RIGHT or FACING_LEFT
  */
 void PixelFighter::InitFighter(uint8_t facing)
 {
@@ -243,9 +258,13 @@ void PixelFighter::InitFighter(uint8_t facing)
 }
 
 /**
- * TODO Document
+ * Process joystick input for a figher. Button actions
+ * may only be performed if their respective timers have
+ * timed out. The joystick doesn't actually move the fighter,
+ * but rather sets a velocity for it. The movement happens in
+ * PixelFighter::ManageTimers()
  *
- * @param input
+ * @param input The controller input to process
  */
 void PixelFighter::ProcessFighterInput(uint32_t input)
 {

@@ -50,6 +50,7 @@ class Pong : public ArduinoGame
   uint16_t restartTimer;
   int16_t ballLoc[2];
   int32_t ballVel[2];
+  int8_t movementTimer[2];
 };
 
 #endif /* PONG_H_ */

@@ -118,10 +118,14 @@ int kbhit(void)
  * z cycles the current game
  *
  * q quits the program
+ * 
+ * @param (*p1controller) A pointer to the current controller data,
+ *                     where new data should be stored
+ * @param (*p2controller) A pointer to the current controller data,
+ *                     where new data should be stored
  */
-void readJoystickData(void)
+uint8_t readJoystickData(uint32_t * p1controller, uint32_t * p2controller)
 {
-
   /* Detect Keypresses, exit if necessary */
   if (kbhit()) {
     switch (getch()) {
@@ -139,19 +143,19 @@ void readJoystickData(void)
         break;
 
       case 't':
-        SET_BUTTONS(p1controller, UP);
+        SET_BUTTONS((*p1controller), UP);
         break;
       case 'f':
-        SET_BUTTONS(p1controller, LEFT);
+        SET_BUTTONS((*p1controller), LEFT);
         break;
       case 'g':
-        SET_BUTTONS(p1controller, DOWN);
+        SET_BUTTONS((*p1controller), DOWN);
         break;
       case 'h':
-        SET_BUTTONS(p1controller, RIGHT);
+        SET_BUTTONS((*p1controller), RIGHT);
         break;
       case 'b':
-        SET_BUTTONS(p1controller, STICK);
+        SET_BUTTONS((*p1controller), STICK);
         break;
 
       case '8':
@@ -168,19 +172,19 @@ void readJoystickData(void)
         break;
 
       case 'i':
-        SET_BUTTONS(p2controller, UP);
+        SET_BUTTONS((*p2controller), UP);
         break;
       case 'j':
-        SET_BUTTONS(p2controller, LEFT);
+        SET_BUTTONS((*p2controller), LEFT);
         break;
       case 'k':
-        SET_BUTTONS(p2controller, DOWN);
+        SET_BUTTONS((*p2controller), DOWN);
         break;
       case 'l':
-        SET_BUTTONS(p2controller, RIGHT);
+        SET_BUTTONS((*p2controller), RIGHT);
         break;
       case ',':
-        SET_BUTTONS(p2controller, STICK);
+        SET_BUTTONS((*p2controller), STICK);
         break;
 
       case 'z':
@@ -190,13 +194,14 @@ void readJoystickData(void)
         /* Quit the program */
         endwin();
         exit(0);
-        return;
+        return FALSE;
     }
   }
-  SET_X_AXIS(p1controller, p1Analog[X]);
-  SET_Y_AXIS(p1controller, p1Analog[Y]);
-  SET_X_AXIS(p2controller, p2Analog[X]);
-  SET_Y_AXIS(p2controller, p2Analog[Y]);
+  SET_X_AXIS((*p1controller), p1Analog[X]);
+  SET_Y_AXIS((*p1controller), p1Analog[Y]);
+  SET_X_AXIS((*p2controller), p2Analog[X]);
+  SET_Y_AXIS((*p2controller), p2Analog[Y]);
+  return TRUE;
 }
 
 /**
@@ -320,8 +325,8 @@ void displayPixels(void)
   refresh();
 
   /* Clear the controller for next time around */
-  p1controller = 0;
-  p2controller = 0;
+  //(*p1controller) = 0;
+  //(*p2controller) = 0;
 }
 
 /**

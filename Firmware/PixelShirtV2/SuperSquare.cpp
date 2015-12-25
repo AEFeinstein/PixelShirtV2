@@ -24,6 +24,8 @@
 #define CENTER_COLOR 0x004000
 #define LINE_COLOR   0x400000
 
+#define MOVEMENT_TIMEOUT 1
+
 /**
  * Default constructor. Resets the game with the init flag & no winner
  */
@@ -48,6 +50,11 @@ void SuperSquare::UpdatePhysics(void)
       ResetGame(0, 0);
     }
     return;
+  }
+
+  /* This is the timer to limit player movement speed */
+  if(movementTimer > 0) {
+    movementTimer--;
   }
 
   /* Clear all line drawings */
@@ -137,7 +144,8 @@ void SuperSquare::ResetGame(
   resetTimer = 0;
   score = 0;
   linesDrawn = 0;
-
+  movementTimer = 0;
+  
   /* Clear the board */
   for(i = 0; i < BOARD_SIZE; i++) {
     for(j = 0; j < BOARD_SIZE; j++) {
@@ -173,33 +181,39 @@ void SuperSquare::ProcessInput(int32_t p1, __attribute__((unused)) int32_t p2)
     return;
   }
 
-  /* Clear the old player pixel */
-  PlacePlayerPixel(newPos);
-  SetPixel(newPos[0], newPos[1], EMPTY_COLOR);
+  if(movementTimer == 0 && (((GET_X_AXIS(p1)) - 512) / 25) != 0) {
+    /* Clear the old player pixel */
+    PlacePlayerPixel(newPos);
+    SetPixel(newPos[0], newPos[1], EMPTY_COLOR);
 
-  /* Update the player position */
-  playerPosition = (playerPosition + (((GET_X_AXIS(p1)) - 512) / 25));
-  if(playerPosition < 0) {
-    playerPosition += 360;
-  }
-  else if(playerPosition > 359) {
-    playerPosition -= 360;
-  }
-
-  /* Draw the new player pixel */
-  PlacePlayerPixel(newPos);
-
-  if(IsPixelLit(newPos[0], newPos[1])) {
-    /* Clear all lines */
-    for(i = 0; i < NUM_LINES; i++) {
-      INVALIDATE_LINE(lines[i]);
+    /* Update the player position */
+    playerPosition = (playerPosition + (((GET_X_AXIS(p1)) - 512) / 25));
+    if(playerPosition < 0) {
+      playerPosition += 360;
+    }
+    else if(playerPosition > 359) {
+      playerPosition -= 360;
     }
 
-    DisplayScore(score, SCORE_COLOR);
-    resetTimer = IRQ_HZ * 5;
-  }
-  else {
-    SetPixel(newPos[0], newPos[1], P1_COLOR);
+    /* Draw the new player pixel */
+    PlacePlayerPixel(newPos);
+
+    /* If the new position is already lit, that's a collision. Game over */
+    if(IsPixelLit(newPos[0], newPos[1])) {
+      /* Clear all lines */
+      for(i = 0; i < NUM_LINES; i++) {
+        INVALIDATE_LINE(lines[i]);
+      }
+
+      DisplayScore(score, SCORE_COLOR);
+      resetTimer = IRQ_HZ * 5;
+    }
+    else {
+      /* Otherwise just draw the new pixel */
+      SetPixel(newPos[0], newPos[1], P1_COLOR);
+    }
+
+    movementTimer = MOVEMENT_TIMEOUT;
   }
 }
 

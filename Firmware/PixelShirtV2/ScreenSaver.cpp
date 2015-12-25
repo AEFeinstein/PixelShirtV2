@@ -21,7 +21,7 @@
 #include "ScreenSaver.h"
 
 #define SQUARE_WAVE_SIZE  6
-uint16_t screensaverTimer = 1;
+uint16_t screensaverTimer = (IRQ_HZ * 30);
 uint8_t squareWavePoint = 0;
 uint16_t colorStep = 0;
 #define RED   0

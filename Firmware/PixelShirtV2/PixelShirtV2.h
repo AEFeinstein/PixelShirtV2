@@ -8,12 +8,11 @@
 #ifndef PIXELSHIRTV2_H_
 #define PIXELSHIRTV2_H_
 
-
+#ifndef ARDUINO
 void setup(void);
 void loop(void);
-void switchGame(void);
+#endif
 
-extern uint32_t p1controller;
-extern uint32_t p2controller;
+void switchGame(void);
 
 #endif /* PIXELSHIRTV2_H_ */

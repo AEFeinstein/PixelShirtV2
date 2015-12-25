@@ -9,7 +9,7 @@
 #define PLATFORMSPECIFIC_H_
 
 void initializeHardware(void);
-void readJoystickData(void);
+uint8_t readJoystickData(uint32_t *, uint32_t *);
 
 void SetPixel(int8_t y, int8_t x, uint32_t val);
 uint32_t GetPixel(int8_t x, int8_t y);

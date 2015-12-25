@@ -21,6 +21,7 @@
 #include "PlatformSpecific.h"
 
 #define BALL_COLOR 0x004000
+#define MOVEMENT_TIMEOUT 1
 
 /**
  * Default constructor. Reset the game with the initialization flag
@@ -104,6 +105,14 @@ void Pong::UpdatePhysics(void)
       ResetGame(0, 0);
     }
   }
+
+  /* Decrement the movement timers, if necessary */
+  if(movementTimer[0] > 0) {
+    movementTimer[0]--;
+  }
+  if(movementTimer[1] > 0) {
+    movementTimer[1]--;
+  }
   DrawField();
 }
 
@@ -135,6 +144,11 @@ void Pong::ResetGame(  uint8_t isInit,
     initY++;
   }
   ballVel[Y] = (initY - 4) * V_M;
+
+  /* Clear movement timers */
+  movementTimer[0] = 0;
+  movementTimer[1] = 0;
+
   DrawField();
 }
 
@@ -222,23 +236,29 @@ void Pong::DrawField(void)
  */
 void Pong::ProcessInput(int32_t p1, int32_t p2)
 {
-  if((GET_Y_AXIS(p1)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p1))) {
-    paddleLocL -= ((512 - (GET_Y_AXIS(p1))) * 3);
-    if(paddleLocL < 0) {
-      paddleLocL = 0;
-    }
-    else if(paddleLocL > 12288) {
-      paddleLocL = 12288;
+  if(movementTimer[0] == 0) {
+    if((GET_Y_AXIS(p1)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p1))) {
+      paddleLocL -= ((512 - (GET_Y_AXIS(p1))) * 3);
+      if(paddleLocL < 0) {
+        paddleLocL = 0;
+      }
+      else if(paddleLocL > 12288) {
+        paddleLocL = 12288;
+      }
+      movementTimer[0] = MOVEMENT_TIMEOUT;
     }
   }
 
-  if((GET_Y_AXIS(p2)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p2))) {
-    paddleLocR -= ((512 - (GET_Y_AXIS(p2))) * 3);
-    if(paddleLocR < 0) {
-      paddleLocR = 0;
+  if(movementTimer[1] == 0) {
+    if((GET_Y_AXIS(p2)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p2))) {
+      paddleLocR -= ((512 - (GET_Y_AXIS(p2))) * 3);
+      if(paddleLocR < 0) {
+        paddleLocR = 0;
+      }
+      else if(paddleLocR > 12288) {
+        paddleLocR = 12288;
+      }
     }
-    else if(paddleLocR > 12288) {
-      paddleLocR = 12288;
-    }
+    movementTimer[1] = MOVEMENT_TIMEOUT;
   }
 }

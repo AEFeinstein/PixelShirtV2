@@ -51,6 +51,7 @@ class Shooter : public ArduinoGame
   uint16_t score;
   uint8_t currentMovementSpeed;
   uint8_t resetTimer;
+  uint8_t playerMovementTimer[2];
 };
 
 #endif

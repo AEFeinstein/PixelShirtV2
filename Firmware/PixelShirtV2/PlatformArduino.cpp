@@ -13,7 +13,7 @@
 #include "Arduino.h"
 #include "ArduinoGame.h"
 #include "PixelShirtV2.h"
-
+#include "PlatformSpecific.h"
 /* A pin to seed random with */
 #define RANDOM_PIN   4  /* Analog, not connected */
 
@@ -140,25 +140,15 @@ void initializeHardware(void)
  * stores it locally for processing later
  *
  * Also handles the heartbeat LED, since this function is called often
+ * 
+ * @param p1controller A pointer to the current controller data,
+ *                     where new data should be stored
+ * @param p2controller A pointer to the current controller data,
+ *                     where new data should be stored
  */
-void readJoystickData(void)
+uint8_t readJoystickData(uint32_t * p1controller, uint32_t * p2controller)
 {
   uint32_t jsTmp;
-
-  /* If there is data from the controllers, get it and store it */
-  if (nrf24_dataReady()) {
-    nrf24_getData((uint8_t*)&jsTmp);
-    switch(GET_PLAYER(jsTmp)) {
-      case 0: {
-          p1controller = jsTmp;
-          break;
-        }
-      case 1: {
-          p2controller = jsTmp;
-          break;
-        }
-    }
-  }
 
   /* Heart-beat */
   if((millis() / 1000) % 2 == 0) {
@@ -167,6 +157,23 @@ void readJoystickData(void)
   else {
     digitalWrite(HEARTBEAT_PIN, LOW);
   }
+
+  /* If there is data from the controllers, get it and store it */
+  if (nrf24_dataReady()) {
+    nrf24_getData((uint8_t*)&jsTmp);
+    switch(GET_PLAYER(jsTmp)) {
+      case 0: {
+          *p1controller = jsTmp;
+          break;
+        }
+      case 1: {
+          *p2controller = jsTmp;
+          break;
+        }
+    }
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**

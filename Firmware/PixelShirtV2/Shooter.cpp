@@ -32,6 +32,8 @@ int8_t shipShape[4][2] = {
 #define BULLET_COLOR 0x151515
 #define ENEMY_COLOR  0x004000
 
+#define MOVEMENT_TIMEOUT 1
+
 /**
  * Default constructor, resets the game with the initialization flag
  */
@@ -124,6 +126,14 @@ void Shooter::UpdatePhysics(void)
       }
     }
   }
+
+  /* Decrement movement timers */
+  if(playerMovementTimer[0] > 0) {
+    playerMovementTimer[0]--;
+  }
+  if(playerMovementTimer[1] > 0) {
+    playerMovementTimer[1]--;
+  }
 }
 
 /**
@@ -184,6 +194,8 @@ void Shooter::ResetGame(
   }
 
   resetTimer = 0;
+  playerMovementTimer[0] = 0;
+  playerMovementTimer[1] = 0;
 }
 
 /**
@@ -223,8 +235,9 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
     ClearPlayers();
 
     /* Handle position */
-    if((GET_X_AXIS(p1)) < 512 - DEAD_ZONE ||
-        512 + DEAD_ZONE < (GET_X_AXIS(p1))) {
+    if(((GET_X_AXIS(p1)) < 512 - DEAD_ZONE ||
+        512 + DEAD_ZONE < (GET_X_AXIS(p1))) &&
+        playerMovementTimer[0] == 0) {
       player1.position += (((GET_X_AXIS(p1)) - 512) / 32);
       if(player1.position < 0) {
         player1.position = 0;
@@ -232,10 +245,12 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
       else if(player1.position > player2.position - PLAYER_SCALAR) {
         player1.position = player2.position - PLAYER_SCALAR;
       }
+      playerMovementTimer[0] = MOVEMENT_TIMEOUT;
     }
 
-    if((GET_X_AXIS(p2)) < 512 - DEAD_ZONE ||
-        512 + DEAD_ZONE < (GET_X_AXIS(p2))) {
+    if(((GET_X_AXIS(p2)) < 512 - DEAD_ZONE ||
+        512 + DEAD_ZONE < (GET_X_AXIS(p2))) &&
+        playerMovementTimer[1] == 0) {
       player2.position += (((GET_X_AXIS(p2)) - 512) / 32);
       if(player2.position < player1.position + PLAYER_SCALAR) {
         player2.position = player1.position + PLAYER_SCALAR;
@@ -243,6 +258,7 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
       else if(player2.position > PLAYER_SCALAR * (BOARD_SIZE - 1)) {
         player2.position = PLAYER_SCALAR * (BOARD_SIZE - 1);
       }
+      playerMovementTimer[1] = MOVEMENT_TIMEOUT;
     }
 
     if(FALSE == DrawPlayers()) {

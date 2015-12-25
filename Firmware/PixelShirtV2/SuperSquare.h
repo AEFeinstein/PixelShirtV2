@@ -51,6 +51,7 @@ class SuperSquare : public ArduinoGame
   uint8_t resetTimer;
   Line lines[NUM_LINES];
   uint8_t linesDrawn;
+  uint8_t movementTimer;
 };
 
 #endif

@@ -119,13 +119,22 @@ void loop(void)
   if(currentTime > microsLast) {
     microsCnt += (currentTime - microsLast);
   }
-  if(microsCnt >= 31250) {
+  if(microsCnt >= (1000000 / IRQ_HZ)) {
     microsCnt = 0;
     doEverything();
   }
   microsLast = currentTime;
 
-  readJoystickData();
+  /* If there was new joystick data read, process it */
+  if(readJoystickData(&p1controller, &p2controller)) {
+    currentGame->ProcessInput(p1controller, p2controller);
+    /* Controller input was processed, so clear it
+     * This is a little platform-wacky, since Arduino
+     * will report button releases, while Linux does not
+     */
+    p1controller = 0;
+    p2controller = 0;
+  }
 }
 
 /**
@@ -176,9 +185,6 @@ void doEverything(void)
       switchGame();
     }
     else {
-      /* Process new controller input */
-      currentGame->ProcessInput(p1controller, p2controller);
-
       /* Update the game state */
       currentGame->UpdatePhysics();
     }
