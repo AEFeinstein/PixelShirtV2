@@ -24,7 +24,7 @@
 #define FIGHTER_HEIGHT 9
 #define STARTING_HP    5
 
-#define JUMP_TIME   15 /* Should be a multiple of 5 */
+#define JUMP_TIME   18 /* Should be a multiple of 6 */
 #define MOVE_TIME   (IRQ_HZ/4)
 #define ACTION_TIME (IRQ_HZ/4)
 #define DANCE_TIME  (IRQ_HZ/2)
@@ -50,15 +50,12 @@ typedef enum {
   COLOR_BLOCK
 } fighterColor_t;
 
-typedef enum {
-  FACING_RIGHT,
-  FACING_LEFT
-} direction_t;
-
 PixelFighter fighter_one(FACING_RIGHT);
 PixelFighter fighter_two(FACING_LEFT);
 
-const uint8_t sprites[6][19][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
+#define PIXELS_PER_SPRITE 19
+
+const uint8_t sprites[6][PIXELS_PER_SPRITE][2] = { { { 0x02, COLOR_HEAD }, { 0x03, COLOR_HEAD }, {
       0x12, COLOR_BODY
     }, { 0x13, COLOR_BODY }, { 0x22, COLOR_BODY }, {
       0x31,
@@ -232,13 +229,25 @@ void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
  ***********************************/
 
 /**
- * Constructor for a PixelFighter. Resets position, timers,
+ * Constructor, calls InitFighter with the given
+ * direction
+ *
+ * @param facing The direction this fighter is facing,
+ *               either FACING_RIGHT or FACING_LEFT
+ */
+PixelFighter::PixelFighter(direction_t facing)
+{
+  InitFighter(facing);
+}
+
+/**
+ * Initializer for a PixelFighter. Resets position, timers,
  * and hitpoints
  *
  * @param facing The direction this fighter is facing,
  *               either FACING_RIGHT or FACING_LEFT
  */
-void PixelFighter::InitFighter(uint8_t facing)
+void PixelFighter::InitFighter(direction_t facing)
 {
   direction = facing;
   if (facing == FACING_LEFT) {
@@ -320,7 +329,8 @@ void PixelFighter::ProcessFighterInput(uint32_t input)
 }
 
 /**
- * TODO Document
+ * Draws both the PixelFigher and it's HP bar
+ * on the display
  */
 void PixelFighter::DrawFighter()
 {
@@ -345,8 +355,8 @@ void PixelFighter::DrawFighter()
     playerColor = P1_COLOR;
   }
 
-  for (index = 0; index < 19; index++) {
-    if (sprites[sprite][index][1] != 0) {
+  for (index = 0; index < PIXELS_PER_SPRITE; index++) {
+    if (sprites[sprite][index][1] != COLOR_NONE) {
       switch (sprites[sprite][index][1]) {
         case COLOR_HEAD: {
             color = playerColor;
@@ -376,10 +386,11 @@ void PixelFighter::DrawFighter()
 }
 
 /**
- * TODO Document
+ * Manage timers for lateral movement, jumping, and actions
+ * Move the fighter if necessary
  *
- * @param lowerBound
- * @param upperBound
+ * @param lowerBound As far left as the figher can move
+ * @param upperBound As far rigth as the fighter can move
  */
 void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
 {
@@ -392,6 +403,7 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
     /* Is the fighter moving? */
     switch (velocity) {
       case 1: {
+          /* Moving rightward */
           if (xPos + 1 <= upperBound) {
             xPos++;
             moveTimer = MOVE_TIME;
@@ -399,6 +411,7 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
           break;
         }
       case -1: {
+          /* Moving leftward */
           if (xPos >= lowerBound + 1) {
             xPos--;
             moveTimer = MOVE_TIME;
@@ -411,32 +424,32 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
   /* Is the fighter jumping? */
   if (jumpTimer > 0) {
     /* Adjust the height based on the time in the jump */
-    if (jumpTimer > (JUMP_TIME / 5) * 4) {
+    if (jumpTimer > (JUMP_TIME / 6) * 5) {
       /* Rising */
       yPos = BOARD_SIZE - FIGHTER_HEIGHT - 1;
     }
-    else if (jumpTimer > (JUMP_TIME / 5) * 3) {
+    else if (jumpTimer > (JUMP_TIME / 6) * 4) {
       /* Rising */
       yPos = BOARD_SIZE - FIGHTER_HEIGHT - 2;
     }
-    else if (jumpTimer > (JUMP_TIME / 5) * 2) {
+    else if (jumpTimer > (JUMP_TIME / 6) * 3) {
       /* Apex */
       yPos = BOARD_SIZE - FIGHTER_HEIGHT - 3;
     }
-    else if (jumpTimer > (JUMP_TIME / 5) * 1) {
+    else if (jumpTimer > (JUMP_TIME / 6) * 2) {
       /* Falling */
       yPos = BOARD_SIZE - FIGHTER_HEIGHT - 2;
     }
-    else if (jumpTimer > (JUMP_TIME / 5) * 0) {
+    else if (jumpTimer > (JUMP_TIME / 6) * 1) {
       /* Falling */
       yPos = BOARD_SIZE - FIGHTER_HEIGHT - 1;
     }
+    else if (jumpTimer > (JUMP_TIME / 6) * 0) {
+      /* On the ground, resting */
+      yPos = BOARD_SIZE - FIGHTER_HEIGHT;
+    }
 
     jumpTimer--;
-  }
-  else {
-    /* On the ground */
-    yPos = BOARD_SIZE - FIGHTER_HEIGHT;
   }
 
   /* Is an action being performed? */
@@ -471,9 +484,7 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
 }
 
 /**
- * TODO Document
- *
- * @return
+ * @return The current X coordinate of this fighter
  */
 uint8_t PixelFighter::getXPos(void)
 {
@@ -481,21 +492,9 @@ uint8_t PixelFighter::getXPos(void)
 }
 
 /**
- * TODO Document
- *
- * @return
+ * @return TRUE if the fighter is jumping, FALSE otherwise
  */
 uint8_t PixelFighter::isJumping(void)
 {
-  return jumpTimer > 0;
-}
-
-/**
- * TODO Document
- *
- * @param facing
- */
-PixelFighter::PixelFighter(uint8_t facing)
-{
-  InitFighter(facing);
+  return yPos != BOARD_SIZE - FIGHTER_HEIGHT;
 }

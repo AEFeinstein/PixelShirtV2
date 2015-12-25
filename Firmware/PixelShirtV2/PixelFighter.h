@@ -18,26 +18,20 @@
 #ifndef _FIGHTER_H_
 #define _FIGHTER_H_
 
-class PixelFighterGame : public ArduinoGame
-{
- public:
-  PixelFighterGame(void);
-  ~PixelFighterGame(void) {};
-  void UpdatePhysics(void);
-  void ResetGame( uint8_t isInit,
-                  uint8_t losers);
-  void ProcessInput( int32_t p1, int32_t p2);
-};
+typedef enum {
+  FACING_RIGHT,
+  FACING_LEFT
+} direction_t;
 
 class PixelFighter
 {
  public:
-  PixelFighter(uint8_t facing);
+  PixelFighter(direction_t facing);
   ~PixelFighter(void) {};
   void DrawFighter(void);
   void ManageTimers(uint8_t xBound, uint8_t yBound);
   void ProcessFighterInput(uint32_t input);
-  void InitFighter(uint8_t facing);
+  void InitFighter(direction_t facing);
   uint8_t getXPos(void);
   uint8_t isJumping(void);
  private:
@@ -53,6 +47,17 @@ class PixelFighter
   uint8_t jumpTimer;
   uint8_t actionTimer;
   uint8_t moveTimer;
+};
+
+class PixelFighterGame : public ArduinoGame
+{
+ public:
+  PixelFighterGame(void);
+  ~PixelFighterGame(void) {};
+  void UpdatePhysics(void);
+  void ResetGame( uint8_t isInit,
+                  uint8_t losers);
+  void ProcessInput( int32_t p1, int32_t p2);
 };
 
 #endif
