@@ -1,7 +1,7 @@
 # Makefile for Linux terminal application
 
 CXX          := g++
-CXXFLAGS     := -Wall -Wextra -pedantic -g -c -x c++ -std=c++14
+CXXFLAGS     := -Wall -Wextra -pedantic -g -c -x c++ -std=c++11
 INC          :=
 LDLIBS       := -lncurses
 LDFLAGS      :=

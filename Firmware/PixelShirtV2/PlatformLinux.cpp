@@ -13,6 +13,7 @@
 #include <ncurses.h>
 #include <time.h>
 #include <sys/time.h>
+#include <stdint.h>
 #include "ArduinoGame.h"
 #include "PixelShirtV2.h"
 
