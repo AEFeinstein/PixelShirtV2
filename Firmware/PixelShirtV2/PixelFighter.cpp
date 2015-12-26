@@ -184,10 +184,6 @@ const uint8_t sprites[6][PIXELS_PER_SPRITE][2]= {
   },
 };
 
-/* The fighters */
-PixelFighter fighterOne(FACING_RIGHT);
-PixelFighter fighterTwo(FACING_LEFT);
-
 /***********************************
  *                                 *
  *         PixelFighterGame        *
@@ -261,18 +257,6 @@ void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
  ***********************************/
 
 /**
- * Constructor, calls InitFighter with the given
- * direction
- *
- * @param facing The direction this fighter is facing,
- *               either FACING_RIGHT or FACING_LEFT
- */
-PixelFighter::PixelFighter(direction_t facing)
-{
-  InitFighter(facing);
-}
-
-/**
  * Initializer for a PixelFighter. Resets position, timers,
  * and hitpoints
  *
@@ -283,7 +267,7 @@ void PixelFighter::InitFighter(direction_t facing)
 {
   direction = facing;
   if (facing == FACING_LEFT) {
-    fighterTwo.xPos = BOARD_SIZE - FIGHTER_WIDTH - 1;
+    xPos = BOARD_SIZE - FIGHTER_WIDTH - 1;
   }
   else if (facing == FACING_RIGHT) {
     xPos = 1;

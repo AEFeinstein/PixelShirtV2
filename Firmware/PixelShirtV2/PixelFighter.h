@@ -26,12 +26,12 @@ typedef enum {
 class PixelFighter
 {
  public:
-  PixelFighter(direction_t facing);
+  PixelFighter() {;}
   ~PixelFighter(void) {};
-  void DrawFighter(void);
-  void ManageTimers(uint8_t xBound, uint8_t yBound);
-  void ProcessFighterInput(uint32_t input);
   void InitFighter(direction_t facing);
+  void ProcessFighterInput(uint32_t input);
+  void ManageTimers(uint8_t xBound, uint8_t yBound);
+  void DrawFighter(void);
   uint8_t getXPos(void);
   uint8_t isJumping(void);
  private:
@@ -58,6 +58,9 @@ class PixelFighterGame : public ArduinoGame
   void ResetGame( uint8_t isInit,
                   uint8_t losers);
   void ProcessInput( int32_t p1, int32_t p2);
+ private:
+  PixelFighter fighterOne;
+  PixelFighter fighterTwo;
 };
 
 #endif
