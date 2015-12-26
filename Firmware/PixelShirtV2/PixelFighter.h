@@ -25,7 +25,7 @@ typedef enum {
 
 class PixelFighter
 {
-public:
+ public:
   PixelFighter(direction_t facing);
   ~PixelFighter(void) {};
   void DrawFighter(void);
@@ -34,7 +34,7 @@ public:
   void InitFighter(direction_t facing);
   uint8_t getXPos(void);
   uint8_t isJumping(void);
-private:
+ private:
   uint8_t xPos;
   int8_t velocity;
   uint8_t yPos;
@@ -51,7 +51,7 @@ private:
 
 class PixelFighterGame : public ArduinoGame
 {
-public:
+ public:
   PixelFighterGame(void);
   ~PixelFighterGame(void) {};
   void UpdatePhysics(void);

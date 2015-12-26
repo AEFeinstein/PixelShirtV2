@@ -212,7 +212,7 @@ void PixelFighterGame::UpdatePhysics(void)
   /* Handle timers for each fighter */
   fighterOne.ManageTimers(0, fighterTwo.getXPos() - FIGHTER_WIDTH);
   fighterTwo.ManageTimers(fighterOne.getXPos() + FIGHTER_WIDTH,
-                           BOARD_SIZE - FIGHTER_WIDTH);
+                          BOARD_SIZE - FIGHTER_WIDTH);
 
   /* Clear the field */
   uint8_t x, y;

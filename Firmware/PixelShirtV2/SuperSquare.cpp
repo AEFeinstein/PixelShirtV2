@@ -145,7 +145,7 @@ void SuperSquare::ResetGame(
   score = 0;
   linesDrawn = 0;
   movementTimer = 0;
-  
+
   /* Clear the board */
   for(i = 0; i < BOARD_SIZE; i++) {
     for(j = 0; j < BOARD_SIZE; j++) {

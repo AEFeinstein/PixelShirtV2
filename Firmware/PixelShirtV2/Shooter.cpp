@@ -374,7 +374,7 @@ void Shooter::ShiftBoard(void)
           /* Shift the columns rightward */
           for(x = BOARD_SIZE - 1; x > 0; x--) {
             for(y = 0; y < BOARD_SIZE; y++) {
-              SetPixel(x, y , GetPixel(x-1, y));
+              SetPixel(x, y, GetPixel(x-1, y));
             }
           }
           /* Clear the last column */

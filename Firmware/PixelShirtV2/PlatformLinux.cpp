@@ -118,13 +118,13 @@ int kbhit(void)
  * z cycles the current game
  *
  * q quits the program
- * 
+ *
  * @param (*p1controller) A pointer to the current controller data,
  *                     where new data should be stored
  * @param (*p2controller) A pointer to the current controller data,
  *                     where new data should be stored
  */
-uint8_t readJoystickData(uint32_t * p1controller, uint32_t * p2controller)
+uint8_t readJoystickData(uint32_t* p1controller, uint32_t* p2controller)
 {
   /* Detect Keypresses, exit if necessary */
   if (kbhit()) {

@@ -140,13 +140,13 @@ void initializeHardware(void)
  * stores it locally for processing later
  *
  * Also handles the heartbeat LED, since this function is called often
- * 
+ *
  * @param p1controller A pointer to the current controller data,
  *                     where new data should be stored
  * @param p2controller A pointer to the current controller data,
  *                     where new data should be stored
  */
-uint8_t readJoystickData(uint32_t * p1controller, uint32_t * p2controller)
+uint8_t readJoystickData(uint32_t* p1controller, uint32_t* p2controller)
 {
   uint32_t jsTmp;
 

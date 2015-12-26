@@ -28,13 +28,13 @@ void DisplayScore(uint16_t score, uint32_t rgb)
 
   /* draw "score" on the field */
   if(score > 999) {
-    DrawNumber((score / 1000) % 10, 0 , 5, rgb);
+    DrawNumber((score / 1000) % 10, 0, 5, rgb);
   }
   if(score > 99) {
-    DrawNumber((score / 100 ) % 10, 4 , 5, rgb);
+    DrawNumber((score / 100 ) % 10, 4, 5, rgb);
   }
   if(score > 9) {
-    DrawNumber((score / 10  ) % 10, 8 , 5, rgb);
+    DrawNumber((score / 10  ) % 10, 8, 5, rgb);
   }
   DrawNumber((score / 1   ) % 10, 12, 5, rgb);
 }
