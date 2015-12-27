@@ -28,12 +28,19 @@ class PixelFighter
  public:
   PixelFighter() {;}
   ~PixelFighter(void) {};
-  void InitFighter(direction_t facing);
+  void InitFighter(direction_t facing, uint8_t resetHP);
   void ProcessFighterInput(uint32_t input);
   void ManageTimers(uint8_t xBound, uint8_t yBound);
   void DrawFighter(void);
+
   uint8_t getXPos(void);
+  uint8_t getActionHeight(void);
+
   uint8_t isJumping(void);
+  uint8_t isAttacking(void);
+  uint8_t isBlocking(void);
+
+  void decrementHP(void);
  private:
   uint8_t xPos;
   int8_t velocity;

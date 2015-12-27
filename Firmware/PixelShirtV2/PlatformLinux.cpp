@@ -323,10 +323,6 @@ void displayPixels(void)
   }
 
   refresh();
-
-  /* Clear the controller for next time around */
-  //(*p1controller) = 0;
-  //(*p2controller) = 0;
 }
 
 /**

@@ -19,6 +19,7 @@
 #include "ArduinoGame.h"
 #include "PixelFighter.h"
 #include "PlatformSpecific.h"
+#include <ncurses.h>
 
 /* How many hits does it take to lose?
  * No more than 8
@@ -28,7 +29,7 @@
 /* Timeouts to limit the speed of the game */
 #define JUMP_TIME   (6 * 3) /* Should be a multiple of 6 */
 #define MOVE_TIME   (IRQ_HZ/4)
-#define ACTION_TIME (IRQ_HZ/4)
+#define ACTION_TIME (IRQ_HZ/4) /* TODO split attack & block time */
 #define DANCE_TIME  (IRQ_HZ/2)
 
 /* RGB color defines */
@@ -218,10 +219,41 @@ void PixelFighterGame::UpdatePhysics(void)
     }
   }
 
+  /* Check for fighter interaction */
+  if(fighterTwo.getXPos() - fighterOne.getXPos() < FIGHTER_WIDTH + 3) {
+    /* fighters are within striking range */
+    if(fighterOne.isAttacking()) {
+      if(fighterTwo.isBlocking() &&
+          fighterOne.getActionHeight() == fighterTwo.getActionHeight()) {
+        /* Successful parry */
+      }
+      else {
+        /* Successful hit */
+        fighterTwo.decrementHP();
+        /* Reset positions & timers TODO introduce pause? */
+        fighterOne.InitFighter(FACING_RIGHT, 0);
+        fighterTwo.InitFighter(FACING_LEFT, 0);
+      }
+    }
+
+    if(fighterTwo.isAttacking()) {
+      if(fighterOne.isBlocking() &&
+          fighterOne.getActionHeight() == fighterTwo.getActionHeight()) {
+        /* Successful parry */
+      }
+      else {
+        /* Successful hit */
+        fighterOne.decrementHP();
+        /* Reset positions & timers TODO introduce pause? */
+        fighterOne.InitFighter(FACING_RIGHT, 0);
+        fighterTwo.InitFighter(FACING_LEFT, 0);
+      }
+    }
+  }
+
   /* Draw the fighters */
   fighterOne.DrawFighter();
   fighterTwo.DrawFighter();
-  /* TODO collisions & score */
 }
 
 /**
@@ -234,8 +266,8 @@ void PixelFighterGame::ResetGame(__attribute__((unused)) uint8_t isInit,
                                  __attribute__((unused)) uint8_t losers)
 {
   /* TODO do something for the winner */
-  fighterOne.InitFighter(FACING_RIGHT);
-  fighterTwo.InitFighter(FACING_LEFT);
+  fighterOne.InitFighter(FACING_RIGHT, 1);
+  fighterTwo.InitFighter(FACING_LEFT, 1);
 }
 
 /**
@@ -263,7 +295,7 @@ void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
  * @param facing The direction this fighter is facing,
  *               either FACING_RIGHT or FACING_LEFT
  */
-void PixelFighter::InitFighter(direction_t facing)
+void PixelFighter::InitFighter(direction_t facing, uint8_t resetHP)
 {
   direction = facing;
   if (facing == FACING_LEFT) {
@@ -273,7 +305,9 @@ void PixelFighter::InitFighter(direction_t facing)
     xPos = 1;
   }
   yPos = BOARD_SIZE - FIGHTER_HEIGHT;
-  hitPoints = STARTING_HP;
+  if(resetHP) {
+    hitPoints = STARTING_HP;
+  }
   sprite = IDLE_1;
   danceTimer = DANCE_TIME;
   jumpTimer = 0;
@@ -348,7 +382,7 @@ void PixelFighter::ProcessFighterInput(uint32_t input)
  * Draws both the PixelFigher and it's HP bar
  * on the display
  */
-void PixelFighter::DrawFighter()
+void PixelFighter::DrawFighter(void)
 {
   int8_t index;
 
@@ -450,19 +484,19 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
     }
     else if (jumpTimer > (JUMP_TIME / 6) * 3) {
       /* Apex */
-      yPos = BOARD_SIZE - FIGHTER_HEIGHT - 3;
+      yPos = BOARD_SIZE - FIGHTER_HEIGHT - 3; //4
     }
     else if (jumpTimer > (JUMP_TIME / 6) * 2) {
       /* Falling */
-      yPos = BOARD_SIZE - FIGHTER_HEIGHT - 2;
+      yPos = BOARD_SIZE - FIGHTER_HEIGHT - 2; //5
     }
     else if (jumpTimer > (JUMP_TIME / 6) * 1) {
       /* Falling */
-      yPos = BOARD_SIZE - FIGHTER_HEIGHT - 1;
+      yPos = BOARD_SIZE - FIGHTER_HEIGHT - 1; //6
     }
     else if (jumpTimer > (JUMP_TIME / 6) * 0) {
       /* On the ground, resting */
-      yPos = BOARD_SIZE - FIGHTER_HEIGHT;
+      yPos = BOARD_SIZE - FIGHTER_HEIGHT; //7
     }
 
     jumpTimer--;
@@ -513,4 +547,44 @@ uint8_t PixelFighter::getXPos(void)
 uint8_t PixelFighter::isJumping(void)
 {
   return yPos != BOARD_SIZE - FIGHTER_HEIGHT;
+}
+
+/**
+ * TODO
+ */
+uint8_t PixelFighter::getActionHeight(void)
+{
+  uint8_t actionHeight;
+
+  /* is the fighter jumping or not */
+  if(isJumping()) {
+    actionHeight = 1;
+  }
+  else {
+    actionHeight = 0;
+  }
+
+  /* If this is a high action add one */
+  if(sprite == BLOCK_HIGH || sprite == ATTACK_HIGH) {
+    actionHeight++;
+  }
+
+  return actionHeight;
+}
+
+uint8_t PixelFighter::isAttacking(void)
+{
+  return (sprite == ATTACK_HIGH) || (sprite == ATTACK_LOW);
+}
+
+uint8_t PixelFighter::isBlocking(void)
+{
+  return (sprite == BLOCK_HIGH) || (sprite == BLOCK_LOW);
+}
+
+void PixelFighter::decrementHP(void)
+{
+  if(hitPoints > 0) {
+    hitPoints--;
+  }
 }
