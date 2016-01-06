@@ -26,7 +26,7 @@ typedef enum {
 class PixelFighter
 {
  public:
-  PixelFighter() {;}
+  PixelFighter();
   ~PixelFighter(void) {};
   void InitFighter(direction_t facing, uint8_t resetHP);
   void ProcessFighterInput(uint32_t input);
@@ -35,12 +35,15 @@ class PixelFighter
 
   uint8_t getXPos(void);
   uint8_t getActionHeight(void);
+  uint8_t getBodyHeight(void);
 
   uint8_t isJumping(void);
   uint8_t isAttacking(void);
   uint8_t isBlocking(void);
 
-  void decrementHP(void);
+  uint8_t decrementHP(void);
+  void SetPause(uint8_t);
+  void Lost(void);
  private:
   uint8_t xPos;
   int8_t velocity;
@@ -54,6 +57,9 @@ class PixelFighter
   uint8_t jumpTimer;
   uint8_t actionTimer;
   uint8_t moveTimer;
+
+  uint8_t pauseTimer;
+  uint8_t dontDrawTimer;
 };
 
 class PixelFighterGame : public ArduinoGame
@@ -62,8 +68,7 @@ class PixelFighterGame : public ArduinoGame
   PixelFighterGame(void);
   ~PixelFighterGame(void) {};
   void UpdatePhysics(void);
-  void ResetGame( uint8_t isInit,
-                  uint8_t losers);
+  void ResetGame( uint8_t isInit, uint8_t losers);
   void ProcessInput( int32_t p1, int32_t p2);
  private:
   PixelFighter fighterOne;

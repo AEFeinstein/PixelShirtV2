@@ -27,10 +27,12 @@
 #define STARTING_HP    5
 
 /* Timeouts to limit the speed of the game */
-#define JUMP_TIME   (6 * 3) /* Should be a multiple of 6 */
-#define MOVE_TIME   (IRQ_HZ/4)
-#define ACTION_TIME (IRQ_HZ/4) /* TODO split attack & block time */
-#define DANCE_TIME  (IRQ_HZ/2)
+#define JUMP_TIME       (6 * 3) /* Should be a multiple of 6 */
+#define MOVE_TIME       (IRQ_HZ/4)
+#define ACTION_TIME     (IRQ_HZ/4) /* TODO split attack & block time */
+#define DANCE_TIME      (IRQ_HZ/2)
+#define INIT_PAUSE_TIME (IRQ_HZ * 4)
+#define PAUSE_TIME      (IRQ_HZ * 2)
 
 /* RGB color defines */
 #define ATTACK_COLOR  0x202000
@@ -46,7 +48,7 @@ typedef enum {
   COLOR_IDX_BODY,
   COLOR_IDX_ATTACK,
   COLOR_IDX_BLOCK
-} figherColor_t;
+} fighterColor_t;
 
 /* The size of a fighter */
 #define FIGHTER_WIDTH  4
@@ -227,10 +229,14 @@ void PixelFighterGame::UpdatePhysics(void)
           fighterOne.getActionHeight() == fighterTwo.getActionHeight()) {
         /* Successful parry */
       }
-      else {
+      else if(fighterOne.getActionHeight() == fighterTwo.getBodyHeight() ||
+          fighterOne.getActionHeight() == fighterTwo.getBodyHeight() - 1){
         /* Successful hit */
-        fighterTwo.decrementHP();
-        /* Reset positions & timers TODO introduce pause? */
+        if(0 == fighterTwo.decrementHP()) {
+          /* P2 lost */
+          ResetGame(1, 2);
+        }
+        /* Reset positions & timers. Pause for a little */
         fighterOne.InitFighter(FACING_RIGHT, 0);
         fighterTwo.InitFighter(FACING_LEFT, 0);
       }
@@ -241,10 +247,14 @@ void PixelFighterGame::UpdatePhysics(void)
           fighterOne.getActionHeight() == fighterTwo.getActionHeight()) {
         /* Successful parry */
       }
-      else {
+      else if(fighterTwo.getActionHeight() == fighterOne.getBodyHeight() ||
+          fighterTwo.getActionHeight() == fighterOne.getBodyHeight() - 1){
         /* Successful hit */
-        fighterOne.decrementHP();
-        /* Reset positions & timers TODO introduce pause? */
+        if(0 == fighterOne.decrementHP()) {
+          /* P1 lost */
+          ResetGame(1, 1);
+        }
+        /* Reset positions & timers. Pause for a little */
         fighterOne.InitFighter(FACING_RIGHT, 0);
         fighterTwo.InitFighter(FACING_LEFT, 0);
       }
@@ -257,17 +267,40 @@ void PixelFighterGame::UpdatePhysics(void)
 }
 
 /**
- * TODO Document
+ * Reset the game by resetting the individual fighters. Pause them as
+ * appropriate. Hide the loser if there is a loser
  *
  * @param isInit Whether or not this is the initial reset
  * @param losers Which fighter lost the match
  */
-void PixelFighterGame::ResetGame(__attribute__((unused)) uint8_t isInit,
-                                 __attribute__((unused)) uint8_t losers)
+void PixelFighterGame::ResetGame(uint8_t isInit, uint8_t losers)
 {
-  /* TODO do something for the winner */
+  /* Initialize the fighers */
   fighterOne.InitFighter(FACING_RIGHT, 1);
   fighterTwo.InitFighter(FACING_LEFT, 1);
+
+  /* If this is the initial reset, pause longer */
+  if(isInit) {
+    fighterOne.SetPause(INIT_PAUSE_TIME);
+    fighterTwo.SetPause(INIT_PAUSE_TIME);
+  }
+  /* Otherwise pause a little */
+  else {
+    fighterOne.SetPause(PAUSE_TIME);
+    fighterTwo.SetPause(PAUSE_TIME);
+  }
+
+  /* If loser is 1 or 2, hide that player for the pause duration */
+  switch(losers) {
+    case 1: {
+      fighterOne.Lost();
+      break;
+    }
+    case 2: {
+      fighterTwo.Lost();
+      break;
+    }
+  }
 }
 
 /**
@@ -289,11 +322,21 @@ void PixelFighterGame::ProcessInput(int32_t p1, int32_t p2)
  ***********************************/
 
 /**
+ * Default constructor
+ */
+PixelFighter::PixelFighter()
+{
+  /* Set all variables, FACING_LEFT by default */
+  InitFighter(FACING_LEFT, 1);
+}
+
+/**
  * Initializer for a PixelFighter. Resets position, timers,
  * and hitpoints
  *
- * @param facing The direction this fighter is facing,
- *               either FACING_RIGHT or FACING_LEFT
+ * @param facing  The direction this fighter is facing,
+ *                either FACING_RIGHT or FACING_LEFT
+ * @param resetHP TRUE if HP should be reset, FALSE otherwise
  */
 void PixelFighter::InitFighter(direction_t facing, uint8_t resetHP)
 {
@@ -392,6 +435,11 @@ void PixelFighter::DrawFighter(void)
   uint32_t playerColor;
   uint32_t color;
 
+  /* If we shouldn't draw, return */
+  if(dontDrawTimer) {
+    return;
+  }
+
   if (direction == FACING_LEFT) {
     posMultiplier = -1;
     fighterOffset = FIGHTER_WIDTH - 1;
@@ -439,35 +487,72 @@ void PixelFighter::DrawFighter(void)
  * Manage timers for lateral movement, jumping, and actions
  * Move the fighter if necessary
  *
- * @param lowerBound As far left as the figher can move
- * @param upperBound As far rigth as the fighter can move
+ * @param lowerBound As far left as the fighter can move
+ * @param upperBound As far right as the fighter can move
  */
 void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
 {
-
-  /* If the fighter is moving, wait for the move to finish */
-  if (moveTimer > 0) {
-    moveTimer--;
+  /* If the fighter is paused, don't move, perform actions, or idle
+   * Jumping is OK
+   */
+  if (pauseTimer > 0) {
+    pauseTimer--;
   }
   else {
-    /* Is the fighter moving? */
-    switch (velocity) {
-      case 1: {
-          /* Moving rightward */
-          if (xPos + 1 <= upperBound) {
-            xPos++;
-            moveTimer = MOVE_TIME;
+    /* If the fighter is moving, wait for the move to finish */
+    if (moveTimer > 0) {
+      moveTimer--;
+    }
+    else {
+      /* Is the fighter moving? */
+      switch (velocity) {
+        case 1: {
+            /* Moving rightward */
+            if (xPos + 1 <= upperBound) {
+              xPos++;
+              moveTimer = MOVE_TIME;
+            }
+            break;
           }
-          break;
-        }
-      case -1: {
-          /* Moving leftward */
-          if (xPos >= lowerBound + 1) {
-            xPos--;
-            moveTimer = MOVE_TIME;
+        case -1: {
+            /* Moving leftward */
+            if (xPos >= lowerBound + 1) {
+              xPos--;
+              moveTimer = MOVE_TIME;
+            }
+            break;
           }
-          break;
+      }
+    }
+
+    /* Is an action being performed? */
+    if (actionTimer > 0) {
+      actionTimer--;
+      /* If the action ended, return to idle animation */
+      if (actionTimer == 0) {
+        sprite = IDLE_1;
+        danceTimer = DANCE_TIME;
+      }
+    }
+
+    /* Is the fighter idling? */
+    if (!isJumping() && (sprite == IDLE_1 || sprite == IDLE_2)) {
+      /* Hold the animation for DANCE_TIME */
+      if (danceTimer) {
+        danceTimer--;
+      }
+      /* When the timer expires */
+      else {
+        /* Swap the sprite */
+        if (sprite == IDLE_1) {
+          sprite = IDLE_2;
         }
+        else {
+          sprite = IDLE_1;
+        }
+        /* Reset the timer */
+        danceTimer = DANCE_TIME;
+      }
     }
   }
 
@@ -502,34 +587,9 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
     jumpTimer--;
   }
 
-  /* Is an action being performed? */
-  if (actionTimer > 0) {
-    actionTimer--;
-    /* If the action ended, return to idle animation */
-    if (actionTimer == 0) {
-      sprite = IDLE_1;
-      danceTimer = DANCE_TIME;
-    }
-  }
-
-  /* Is the fighter idling? */
-  if (!isJumping() && (sprite == IDLE_1 || sprite == IDLE_2)) {
-    /* Hold the animation for DANCE_TIME */
-    if (danceTimer) {
-      danceTimer--;
-    }
-    /* When the timer expires */
-    else {
-      /* Swap the sprite */
-      if (sprite == IDLE_1) {
-        sprite = IDLE_2;
-      }
-      else {
-        sprite = IDLE_1;
-      }
-      /* Reset the timer */
-      danceTimer = DANCE_TIME;
-    }
+  /* Decrement the don't draw timer if necessary */
+  if(dontDrawTimer > 0) {
+    dontDrawTimer--;
   }
 }
 
@@ -550,7 +610,7 @@ uint8_t PixelFighter::isJumping(void)
 }
 
 /**
- * TODO
+ * TODO document
  */
 uint8_t PixelFighter::getActionHeight(void)
 {
@@ -572,19 +632,62 @@ uint8_t PixelFighter::getActionHeight(void)
   return actionHeight;
 }
 
+/**
+ * TODO document
+ */
+uint8_t PixelFighter::getBodyHeight(void)
+{
+  if(isJumping()) {
+    return 2;
+  }
+  else {
+    return 1;
+  }
+}
+
+/**
+ * TODO document
+ * @return
+ */
 uint8_t PixelFighter::isAttacking(void)
 {
   return (sprite == ATTACK_HIGH) || (sprite == ATTACK_LOW);
 }
 
+/**
+ * TODO document
+ * @return
+ */
 uint8_t PixelFighter::isBlocking(void)
 {
   return (sprite == BLOCK_HIGH) || (sprite == BLOCK_LOW);
 }
 
-void PixelFighter::decrementHP(void)
+/**
+ * TODO document
+ * @return
+ */
+uint8_t PixelFighter::decrementHP(void)
 {
   if(hitPoints > 0) {
     hitPoints--;
   }
+  return hitPoints;
+}
+
+/**
+ * TODO document
+ * @param time
+ */
+void PixelFighter::SetPause(uint8_t time)
+{
+  pauseTimer = time;
+}
+
+/**
+ * TODO document
+ */
+void PixelFighter::Lost(void)
+{
+  dontDrawTimer = INIT_PAUSE_TIME - PAUSE_TIME;
 }
