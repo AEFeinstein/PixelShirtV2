@@ -19,7 +19,10 @@
 #include "ArduinoGame.h"
 #include "PixelFighter.h"
 #include "PlatformSpecific.h"
-#include <ncurses.h>
+
+/* TODO add time for the defender to block an attack after the "hit"
+ * TODO stun after a parry
+ */
 
 /* How many hits does it take to lose?
  * No more than 8
@@ -43,11 +46,11 @@
  * It's easier to store an 8 bit index than a 32 bit color
  */
 typedef enum {
-  COLOR_IDX_NONE,
-  COLOR_IDX_HEAD,
-  COLOR_IDX_BODY,
-  COLOR_IDX_ATTACK,
-  COLOR_IDX_BLOCK
+  COLOR_IDX_NONE,  //!< COLOR_IDX_NONE
+  COLOR_IDX_HEAD,  //!< COLOR_IDX_HEAD
+  COLOR_IDX_BODY,  //!< COLOR_IDX_BODY
+  COLOR_IDX_ATTACK,//!< COLOR_IDX_ATTACK
+  COLOR_IDX_BLOCK  //!< COLOR_IDX_BLOCK
 } fighterColor_t;
 
 /* The size of a fighter */
