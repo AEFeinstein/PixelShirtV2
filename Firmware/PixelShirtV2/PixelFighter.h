@@ -35,31 +35,36 @@ class PixelFighter
 
   uint8_t getXPos(void);
   uint8_t getActionHeight(void);
-  uint8_t getBodyHeight(void);
 
-  uint8_t isJumping(void);
   uint8_t isAttacking(void);
   uint8_t isBlocking(void);
 
   uint8_t decrementHP(void);
   void SetPause(uint8_t);
   void Lost(void);
+
+  uint8_t getSuccessfulAttackTimer(void);
+  void StartSuccessfulAttackTimer(void);
+
+  void attackIsBlocked(void);
+
  private:
   uint8_t xPos;
   int8_t velocity;
-  uint8_t yPos;
 
   uint8_t direction;
   uint8_t sprite;
   uint8_t hitPoints;
 
   uint8_t danceTimer;
-  uint8_t jumpTimer;
-  uint8_t actionTimer;
+  uint8_t attackTimer;
+  uint8_t blockTimer;
   uint8_t moveTimer;
 
   uint8_t pauseTimer;
   uint8_t dontDrawTimer;
+
+  uint8_t successfulAttackTimer;
 };
 
 class PixelFighterGame : public ArduinoGame
@@ -70,6 +75,9 @@ class PixelFighterGame : public ArduinoGame
   void UpdatePhysics(void);
   void ResetGame( uint8_t isInit, uint8_t losers);
   void ProcessInput( int32_t p1, int32_t p2);
+  void CheckForHitAndBlock(
+      PixelFighter * attackingFighter,
+      PixelFighter * defendingFighter);
  private:
   PixelFighter fighterOne;
   PixelFighter fighterTwo;
