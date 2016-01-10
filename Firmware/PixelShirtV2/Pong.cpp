@@ -156,6 +156,9 @@ void Pong::ResetGame(  uint8_t isInit,
   if (isInit) {
     paddleLocL = (V_M * S_M * BOARD_SIZE / 2) - (PADDLE_SIZE / 2);
     paddleLocR = (V_M * S_M * BOARD_SIZE / 2) - (PADDLE_SIZE / 2);
+
+    paddleVelL = 512;
+    paddleVelR = 512;
   }
   restartTimer = IRQ_HZ * 3;
   ballLoc[X] = V_M * S_M * (BOARD_SIZE / 2);
