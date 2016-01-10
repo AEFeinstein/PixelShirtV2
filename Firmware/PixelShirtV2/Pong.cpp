@@ -39,6 +39,33 @@ Pong::Pong(void)
  */
 void Pong::UpdatePhysics(void)
 {
+  /* Update paddles' locations */
+  if(movementTimer[0] == 0) {
+    if((paddleVelL) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (paddleVelL)) {
+      paddleLocL -= ((512 - (paddleVelL)) * 3);
+      if(paddleLocL < 0) {
+        paddleLocL = 0;
+      }
+      else if(paddleLocL > 12288) {
+        paddleLocL = 12288;
+      }
+      movementTimer[0] = MOVEMENT_TIMEOUT;
+    }
+  }
+
+  if(movementTimer[1] == 0) {
+    if((paddleVelR) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (paddleVelR)) {
+      paddleLocR -= ((512 - (paddleVelR)) * 3);
+      if(paddleLocR < 0) {
+        paddleLocR = 0;
+      }
+      else if(paddleLocR > 12288) {
+        paddleLocR = 12288;
+      }
+    }
+    movementTimer[1] = MOVEMENT_TIMEOUT;
+  }
+
   int16_t diff, rotation;
   /* If we're in a reset, don't update the game, just decrement the timer */
   if(restartTimer > 0) {
@@ -236,29 +263,6 @@ void Pong::DrawField(void)
  */
 void Pong::ProcessInput(int32_t p1, int32_t p2)
 {
-  if(movementTimer[0] == 0) {
-    if((GET_Y_AXIS(p1)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p1))) {
-      paddleLocL -= ((512 - (GET_Y_AXIS(p1))) * 3);
-      if(paddleLocL < 0) {
-        paddleLocL = 0;
-      }
-      else if(paddleLocL > 12288) {
-        paddleLocL = 12288;
-      }
-      movementTimer[0] = MOVEMENT_TIMEOUT;
-    }
-  }
-
-  if(movementTimer[1] == 0) {
-    if((GET_Y_AXIS(p2)) < 512 - DEAD_ZONE || 512 + DEAD_ZONE < (GET_Y_AXIS(p2))) {
-      paddleLocR -= ((512 - (GET_Y_AXIS(p2))) * 3);
-      if(paddleLocR < 0) {
-        paddleLocR = 0;
-      }
-      else if(paddleLocR > 12288) {
-        paddleLocR = 12288;
-      }
-    }
-    movementTimer[1] = MOVEMENT_TIMEOUT;
-  }
+  paddleVelL = GET_Y_AXIS(p1);
+  paddleVelR = GET_Y_AXIS(p2);
 }

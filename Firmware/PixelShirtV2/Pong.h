@@ -45,6 +45,8 @@ class Pong : public ArduinoGame
   void IncreaseSpeed(int16_t speedM);
   void RotateBall(int16_t degree);
   int16_t binPaddleLocation(int32_t loc);
+  int16_t paddleVelL;
+  int16_t paddleVelR;
   int16_t paddleLocL;
   int16_t paddleLocR;
   uint16_t restartTimer;
