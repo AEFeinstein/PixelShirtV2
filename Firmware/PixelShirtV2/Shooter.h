@@ -22,6 +22,7 @@
 
 typedef struct {
   int16_t position;
+  int16_t velocity;
   int8_t bullets[NUM_BULLETS][2];
   uint8_t shotClock;
 } Player;

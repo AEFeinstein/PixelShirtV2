@@ -59,6 +59,42 @@ void Shooter::UpdatePhysics(void)
     }
   }
   else {
+    /* Move players */
+    ClearPlayers();
+
+    /* Handle position */
+    if(((player1.velocity) < 512 - DEAD_ZONE ||
+        512 + DEAD_ZONE < (player1.velocity)) &&
+        playerMovementTimer[0] == 0) {
+      player1.position += (((player1.velocity) - 512) / 32);
+      if(player1.position < 0) {
+        player1.position = 0;
+      }
+      else if(player1.position > player2.position - PLAYER_SCALAR) {
+        player1.position = player2.position - PLAYER_SCALAR;
+      }
+      playerMovementTimer[0] = MOVEMENT_TIMEOUT;
+    }
+
+    if(((player2.velocity) < 512 - DEAD_ZONE ||
+        512 + DEAD_ZONE < (player2.velocity)) &&
+        playerMovementTimer[1] == 0) {
+      player2.position += (((player2.velocity) - 512) / 32);
+      if(player2.position < player1.position + PLAYER_SCALAR) {
+        player2.position = player1.position + PLAYER_SCALAR;
+      }
+      else if(player2.position > PLAYER_SCALAR * (BOARD_SIZE - 1)) {
+        player2.position = PLAYER_SCALAR * (BOARD_SIZE - 1);
+      }
+      playerMovementTimer[1] = MOVEMENT_TIMEOUT;
+    }
+
+    /* Try to draw the players back */
+    if(FALSE == DrawPlayers()) {
+      GameOver();
+      return;
+    }
+
     /* Clear bullets */
     for (i = 0; i < NUM_BULLETS; i++) {
       if(player1.bullets[i][1] != -1 &&
@@ -181,6 +217,9 @@ void Shooter::ResetGame(
   player1.position = PLAYER_SCALAR * 3;
   player2.position = PLAYER_SCALAR * 12;
 
+  player1.velocity = 512;
+  player2.velocity = 512;
+
   player1.shotClock = 0;
   player2.shotClock = 0;
 
@@ -232,38 +271,9 @@ void Shooter::ProcessInput(int32_t p1, int32_t p2)
   uint8_t i;
 
   if(resetTimer == 0) {
-    ClearPlayers();
-
-    /* Handle position */
-    if(((GET_X_AXIS(p1)) < 512 - DEAD_ZONE ||
-        512 + DEAD_ZONE < (GET_X_AXIS(p1))) &&
-        playerMovementTimer[0] == 0) {
-      player1.position += (((GET_X_AXIS(p1)) - 512) / 32);
-      if(player1.position < 0) {
-        player1.position = 0;
-      }
-      else if(player1.position > player2.position - PLAYER_SCALAR) {
-        player1.position = player2.position - PLAYER_SCALAR;
-      }
-      playerMovementTimer[0] = MOVEMENT_TIMEOUT;
-    }
-
-    if(((GET_X_AXIS(p2)) < 512 - DEAD_ZONE ||
-        512 + DEAD_ZONE < (GET_X_AXIS(p2))) &&
-        playerMovementTimer[1] == 0) {
-      player2.position += (((GET_X_AXIS(p2)) - 512) / 32);
-      if(player2.position < player1.position + PLAYER_SCALAR) {
-        player2.position = player1.position + PLAYER_SCALAR;
-      }
-      else if(player2.position > PLAYER_SCALAR * (BOARD_SIZE - 1)) {
-        player2.position = PLAYER_SCALAR * (BOARD_SIZE - 1);
-      }
-      playerMovementTimer[1] = MOVEMENT_TIMEOUT;
-    }
-
-    if(FALSE == DrawPlayers()) {
-      GameOver();
-    }
+    /* Store ship velocities for later */
+    player1.velocity = GET_X_AXIS(p1);
+    player2.velocity = GET_X_AXIS(p2);
 
     /* Handle bullets */
     /* If the player presses the button, and the timer has expired */
@@ -348,7 +358,7 @@ void Shooter::ShiftBoard(void)
         break;
       }
     case RIGHT : {
-        /* Check for right side boundry condition */
+        /* Check for right side boundary condition */
         ClearPlayers();
         for(y = 0; y < BOARD_SIZE; y++) {
           if(IsPixelLit(BOARD_SIZE - 1, y)) {
