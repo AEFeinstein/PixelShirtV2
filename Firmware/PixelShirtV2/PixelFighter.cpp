@@ -27,8 +27,8 @@
 
 /* Timeouts to limit the speed of the game */
 #define JUMP_TIME       (6 * 3) /* Should be a multiple of 6 */
-#define MOVE_TIME       (IRQ_HZ/4)
-#define ATTACK_TIME     (IRQ_HZ/4)
+#define MOVE_TIME       2 //(IRQ_HZ/4)
+#define ATTACK_TIME     (IRQ_HZ)
 #define BLOCK_TIME      (IRQ_HZ/4)
 #define DANCE_TIME      (IRQ_HZ/2)
 #define INIT_PAUSE_TIME (IRQ_HZ * 4)
@@ -712,7 +712,10 @@ void PixelFighter::StartSuccessfulAttackTimer(void)
 {
   if (successfulAttackTimer == 0) {
     // TODO modify value, shorten window after attack chains
-    successfulAttackTimer = IRQ_HZ / 4;
+    /* This timer should be the same as the attack animation timer, but it gets
+     * decremented once before this function is called
+     */
+    successfulAttackTimer = ATTACK_TIME - 1;
   }
 }
 
