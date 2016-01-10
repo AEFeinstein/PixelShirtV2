@@ -211,7 +211,8 @@ uint8_t readJoystickData(uint32_t* p1controller, uint32_t* p2controller)
  * @param p1 The player 1 controller to clear
  * @param p2 The player 2 controller to clear
  */
-void platformPostprocessInput(uint32_t * p1, uint32_t * p2) {
+void platformPostprocessInput(uint32_t* p1, uint32_t* p2)
+{
   *p1 = 0;
   *p2 = 0;
 }

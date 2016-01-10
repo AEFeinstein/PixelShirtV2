@@ -83,7 +83,7 @@ void Tetris::ResetGame(
   turboMode = 0;
   rowsCleared = 0;
   leadPlayer = 0;
-  downTimer = 0;
+  modeSwitchTimer = 0;
 }
 
 /**
@@ -91,10 +91,44 @@ void Tetris::ResetGame(
  */
 void Tetris::UpdatePhysics(void)
 {
+  /* If the game switch timer is active */
+  if(modeSwitchTimer > 0) {
+    /* Increment it */
+    modeSwitchTimer++;
+
+    /* If the timer reaches two seconds, switch the game mode */
+    if(modeSwitchTimer == IRQ_HZ * 2) {
+      multiplayer = (multiplayer+1)%2;
+      ResetGame(1, 0);
+      return;
+    }
+  }
+
   if(gameOver) {
     return;
   }
 
+  /* Process the controller input */
+
+  /* Lateral movement, with debounce */
+  if(cursorVelocity > 768) {
+    if(cursorTimer == 0) {
+      SlideActiveTetromino( T_RIGHT);
+      cursorTimer = IRQ_HZ/8;
+    }
+  }
+  else if(cursorVelocity < 256) {
+    if(cursorTimer == 0) {
+      SlideActiveTetromino( T_LEFT);
+      cursorTimer = IRQ_HZ/8;
+    }
+  }
+  else {
+    /* reset the timer */
+    cursorTimer = 0;
+  }
+
+  /***************/
   if(cursorTimer) {
     cursorTimer--;
   }
@@ -125,20 +159,19 @@ void Tetris::UpdatePhysics(void)
  */
 void Tetris::ProcessInput(int32_t p1, int32_t p2)
 {
-  int32_t ax, ay;
+  int32_t ay;
   int8_t br, bl, bu;
 
   /* If both controllers hold left for two seconds, switch game mode */
   if((GET_BUTTONS(p1) & LEFT) && (GET_BUTTONS(p2) & LEFT)) {
-    downTimer++;
+    /* Start the timer, if it isn't started */
+    if(modeSwitchTimer == 0) {
+      modeSwitchTimer = 1;
+    }
   }
   else {
-    downTimer = 0;
-  }
-  if(downTimer == IRQ_HZ * 2) {
-    multiplayer = (multiplayer+1)%2;
-    ResetGame(1, 0);
-    return;
+    /* Clear the timer */
+    modeSwitchTimer = 0;
   }
 
   /* If the game is over, and active players tap down, the game starts */
@@ -159,14 +192,14 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
   /* Get the input, depending on game mode */
   if(multiplayer) {
     if(leadPlayer%2) {
-      ax = (GET_X_AXIS(p1));
+      cursorVelocity = (GET_X_AXIS(p1));
       ay = (GET_Y_AXIS(p1));
       bu = (GET_BUTTONS(p2) & UP);
       bl = (GET_BUTTONS(p2) & LEFT);
       br = (GET_BUTTONS(p2) & RIGHT);
     }
     else {
-      ax = (GET_X_AXIS(p2));
+      cursorVelocity = (GET_X_AXIS(p2));
       ay = (GET_Y_AXIS(p2));
       bu = (GET_BUTTONS(p1) & UP);
       bl = (GET_BUTTONS(p1) & LEFT);
@@ -174,7 +207,7 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
     }
   }
   else {
-    ax = (GET_X_AXIS(p1));
+    cursorVelocity = (GET_X_AXIS(p1));
     ay = (GET_Y_AXIS(p1));
     bu = (GET_BUTTONS(p1) & UP);
     bl = (GET_BUTTONS(p1) & LEFT);
@@ -212,24 +245,6 @@ void Tetris::ProcessInput(int32_t p1, int32_t p2)
   }
   else if(ay <= 768) {
     turboMode = 0;
-  }
-
-  /* Lateral movement, with debounce */
-  if(ax > 768) {
-    if(cursorTimer == 0) {
-      SlideActiveTetromino( T_RIGHT);
-      cursorTimer = IRQ_HZ/8;
-    }
-  }
-  else if(ax < 256) {
-    if(cursorTimer == 0) {
-      SlideActiveTetromino( T_LEFT);
-      cursorTimer = IRQ_HZ/8;
-    }
-  }
-  else {
-    /* reset the timer */
-    cursorTimer = 0;
   }
 }
 

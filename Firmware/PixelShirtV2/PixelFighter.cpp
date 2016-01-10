@@ -235,7 +235,7 @@ void PixelFighterGame::UpdatePhysics(void)
   }
 
   /* Check for fighter interaction */
-  if (fighterTwo.getXPos() - fighterOne.getXPos() < FIGHTER_WIDTH + 3) {
+  if (fighterTwo.getXPos() - fighterOne.getXPos() < FIGHTER_WIDTH + 2) {
     /* fighters are within striking range */
     CheckForHitAndBlock(&fighterOne, &fighterTwo);
     CheckForHitAndBlock(&fighterTwo, &fighterOne);
@@ -482,10 +482,10 @@ void PixelFighter::DrawFighter(void)
 
       /* Find the old color index, to check for overdraw */
       uint32_t oldPixel = GetPixel(
-              fighterOffset + xPos +
-                  posMultiplier * (sprites[sprite][index][0] & 0x0F),
-              BOARD_SIZE - FIGHTER_HEIGHT +
-                  ((sprites[sprite][index][0] & 0xF0) >> 4));
+                            fighterOffset + xPos +
+                            posMultiplier * (sprites[sprite][index][0] & 0x0F),
+                            BOARD_SIZE - FIGHTER_HEIGHT +
+                            ((sprites[sprite][index][0] & 0xF0) >> 4));
 
       uint8_t oldIdx = 0;
       switch (oldPixel) {
@@ -517,11 +517,11 @@ void PixelFighter::DrawFighter(void)
       /* If the new pixel should be drawn over the old one */
       if (sprites[sprite][index][1] > oldIdx) {
         SetPixel(
-            fighterOffset + xPos +
-                posMultiplier * (sprites[sprite][index][0] & 0x0F),
-            BOARD_SIZE - FIGHTER_HEIGHT +
-                ((sprites[sprite][index][0] & 0xF0) >> 4),
-            color);
+          fighterOffset + xPos +
+          posMultiplier * (sprites[sprite][index][0] & 0x0F),
+          BOARD_SIZE - FIGHTER_HEIGHT +
+          ((sprites[sprite][index][0] & 0xF0) >> 4),
+          color);
       }
     }
   }

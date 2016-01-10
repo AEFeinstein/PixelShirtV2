@@ -182,8 +182,9 @@ uint8_t readJoystickData(uint32_t* p1controller, uint32_t* p2controller)
  * @param p1 unused
  * @param p2 unused
  */
-void platformPostprocessInput(__attribute__((unused)) uint32_t * p1,
-                              __attribute__((unused)) uint32_t * p2) {
+void platformPostprocessInput(__attribute__((unused)) uint32_t* p1,
+                              __attribute__((unused)) uint32_t* p2)
+{
   ;
 }
 

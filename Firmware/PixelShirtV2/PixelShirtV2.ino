@@ -32,14 +32,14 @@
 
 /* The different game IDs */
 typedef enum {
-//  SUPER_SQUARE,
+  //  SUPER_SQUARE,
   PONG,
   LIGHTCYCLE,
   SHOOTER,
   TETRIS,
   FIGHTER,
   LAST_GAME
-}gameType_t;
+} gameType_t;
 
 /* The current game's ID */
 uint8_t gameMode;
@@ -209,10 +209,10 @@ void switchGame(void)
         currentGame = &tetris;
         break;
       }
-//    case SUPER_SQUARE: {
-//        currentGame = &superSquare;
-//        break;
-//      }
+    //    case SUPER_SQUARE: {
+    //        currentGame = &superSquare;
+    //        break;
+    //      }
     case SHOOTER: {
         currentGame = &shooter;
         break;

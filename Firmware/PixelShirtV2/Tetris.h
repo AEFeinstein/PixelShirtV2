@@ -97,9 +97,10 @@ class Tetris : public ArduinoGame
   uint8_t rowsCleared;
   uint8_t leadPlayer;
   uint8_t multiplayer;
-  uint8_t downTimer;
+  uint8_t modeSwitchTimer;
   uint32_t nextTetrominoColor;
   uint32_t activeTetrominoColor;
+  int32_t cursorVelocity;
 };
 
 #endif

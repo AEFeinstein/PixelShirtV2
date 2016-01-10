@@ -10,7 +10,7 @@
 
 void initializeHardware(void);
 uint8_t readJoystickData(uint32_t*, uint32_t*);
-void platformPostprocessInput(uint32_t * p1, uint32_t * p2);
+void platformPostprocessInput(uint32_t* p1, uint32_t* p2);
 
 void SetPixel(int8_t y, int8_t x, uint32_t val);
 uint32_t GetPixel(int8_t x, int8_t y);
