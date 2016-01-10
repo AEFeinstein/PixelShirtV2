@@ -177,6 +177,17 @@ uint8_t readJoystickData(uint32_t* p1controller, uint32_t* p2controller)
 }
 
 /**
+ * Both button presses and releases are reported, so do nothing.
+ *
+ * @param p1 unused
+ * @param p2 unused
+ */
+void platformPostprocessInput(__attribute__((unused)) uint32_t * p1,
+                              __attribute__((unused)) uint32_t * p2) {
+  ;
+}
+
+/**
  * Pushes all pixels out to the display
  */
 void displayPixels(void)

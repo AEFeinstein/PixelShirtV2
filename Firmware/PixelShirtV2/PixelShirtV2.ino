@@ -30,16 +30,16 @@
 #include "PlatformSpecific.h"
 #include "PixelShirtV2.h"
 
-/* Manage the Games */
-#define NUM_GAMES 6
-
 /* The different game IDs */
-#define SUPER_SQUARE 0
-#define PONG 1
-#define LIGHTCYCLE 2
-#define SHOOTER 3
-#define TETRIS 4
-#define FIGHTER 5
+typedef enum {
+//  SUPER_SQUARE,
+  PONG,
+  LIGHTCYCLE,
+  SHOOTER,
+//  TETRIS,
+  FIGHTER,
+  LAST_GAME
+}gameType_t;
 
 /* The current game's ID */
 uint8_t gameMode;
@@ -53,11 +53,11 @@ uint8_t gameSwitchTimer;
 ArduinoGame* currentGame;
 
 /* The collection of games */
-SuperSquare superSquare;
+//SuperSquare superSquare;
 Pong pong;
 Lightcycle lightcycle;
 Shooter shooter;
-Tetris tetris;
+//Tetris tetris;
 PixelFighterGame fighter;
 
 /* To periodically call the main function in the loop */
@@ -128,12 +128,7 @@ void loop(void)
   /* If there was new joystick data read, process it */
   if(readJoystickData(&p1controller, &p2controller)) {
     currentGame->ProcessInput(p1controller, p2controller);
-    /* Controller input was processed, so clear it
-     * This is a little platform-wacky, since Arduino
-     * will report button releases, while Linux does not
-     */
-    p1controller = 0;
-    p2controller = 0;
+    platformPostprocessInput(&p1controller, &p2controller);
   }
 }
 
@@ -200,7 +195,7 @@ void doEverything(void)
  */
 void switchGame(void)
 {
-  gameMode = (gameMode+1)%NUM_GAMES;
+  gameMode = (gameMode+1)%LAST_GAME;
   switch(gameMode) {
     case PONG: {
         currentGame = &pong;
@@ -210,14 +205,14 @@ void switchGame(void)
         currentGame = &lightcycle;
         break;
       }
-    case TETRIS: {
-        currentGame = &tetris;
-        break;
-      }
-    case SUPER_SQUARE: {
-        currentGame = &superSquare;
-        break;
-      }
+//    case TETRIS: {
+//        currentGame = &tetris;
+//        break;
+//      }
+//    case SUPER_SQUARE: {
+//        currentGame = &superSquare;
+//        break;
+//      }
     case SHOOTER: {
         currentGame = &shooter;
         break;

@@ -205,6 +205,18 @@ uint8_t readJoystickData(uint32_t* p1controller, uint32_t* p2controller)
 }
 
 /**
+ * Since kbhit only reports button presses, not releases, manually clear
+ * values here. This does not happen on Arduino
+ *
+ * @param p1 The player 1 controller to clear
+ * @param p2 The player 2 controller to clear
+ */
+void platformPostprocessInput(uint32_t * p1, uint32_t * p2) {
+  *p1 = 0;
+  *p2 = 0;
+}
+
+/**
  * Sets a pixel in the display at the given position to the given color
  *
  * @param x   The X coordinate of the pixel to set
