@@ -36,7 +36,7 @@ typedef enum {
   PONG,
   LIGHTCYCLE,
   SHOOTER,
-//  TETRIS,
+  TETRIS,
   FIGHTER,
   LAST_GAME
 }gameType_t;
@@ -57,7 +57,7 @@ ArduinoGame* currentGame;
 Pong pong;
 Lightcycle lightcycle;
 Shooter shooter;
-//Tetris tetris;
+Tetris tetris;
 PixelFighterGame fighter;
 
 /* To periodically call the main function in the loop */
@@ -205,10 +205,10 @@ void switchGame(void)
         currentGame = &lightcycle;
         break;
       }
-//    case TETRIS: {
-//        currentGame = &tetris;
-//        break;
-//      }
+    case TETRIS: {
+        currentGame = &tetris;
+        break;
+      }
 //    case SUPER_SQUARE: {
 //        currentGame = &superSquare;
 //        break;
