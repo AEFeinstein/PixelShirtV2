@@ -19,8 +19,8 @@
 #define _FIGHTER_H_
 
 typedef enum {
-  FACING_RIGHT,
-  FACING_LEFT
+  FACING_RIGHT, //!< Identifier for a fighter facing right
+  FACING_LEFT   //!< Identifier for a fighter facing left
 } direction_t;
 
 class PixelFighter
@@ -30,7 +30,7 @@ class PixelFighter
   ~PixelFighter(void) {};
   void InitFighter(direction_t facing, uint8_t resetHP);
   void ProcessFighterInput(uint32_t input);
-  void ManageTimers(uint8_t xBound, uint8_t yBound);
+  uint8_t ManageTimers(uint8_t xBound, uint8_t yBound);
   void DrawFighter(void);
 
   uint8_t getXPos(void);
@@ -43,8 +43,8 @@ class PixelFighter
   void SetPause(uint8_t);
   void Lost(void);
 
-  uint8_t getSuccessfulAttackTimer(void);
   void StartSuccessfulAttackTimer(void);
+  void ClearSuccessfulAttackTimer(void);
 
   void attackIsBlocked(void);
 
@@ -76,8 +76,8 @@ class PixelFighterGame : public ArduinoGame
   void ResetGame( uint8_t isInit, uint8_t losers);
   void ProcessInput( int32_t p1, int32_t p2);
   void CheckForHitAndBlock(
-      PixelFighter * attackingFighter,
-      PixelFighter * defendingFighter);
+    PixelFighter* attackingFighter,
+    PixelFighter* defendingFighter);
  private:
   PixelFighter fighterOne;
   PixelFighter fighterTwo;

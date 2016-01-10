@@ -20,10 +20,6 @@
 #include "PixelFighter.h"
 #include "PlatformSpecific.h"
 
-/* TODO add time for the defender to block an attack after the "hit"
- * TODO stun after a parry
- */
-
 /* How many hits does it take to lose?
  * No more than 8
  */
@@ -32,7 +28,8 @@
 /* Timeouts to limit the speed of the game */
 #define JUMP_TIME       (6 * 3) /* Should be a multiple of 6 */
 #define MOVE_TIME       (IRQ_HZ/4)
-#define ACTION_TIME     (IRQ_HZ/4) /* TODO split attack & block time */
+#define ATTACK_TIME     (IRQ_HZ/4)
+#define BLOCK_TIME      (IRQ_HZ/4)
 #define DANCE_TIME      (IRQ_HZ/2)
 #define INIT_PAUSE_TIME (IRQ_HZ * 4)
 #define PAUSE_TIME      (IRQ_HZ * 2)
@@ -46,11 +43,11 @@
  * It's easier to store an 8 bit index than a 32 bit color
  */
 typedef enum {
-  COLOR_IDX_NONE,  //!< COLOR_IDX_NONE
-  COLOR_IDX_HEAD,  //!< COLOR_IDX_HEAD
-  COLOR_IDX_BODY,  //!< COLOR_IDX_BODY
-  COLOR_IDX_ATTACK,//!< COLOR_IDX_ATTACK
-  COLOR_IDX_BLOCK  //!< COLOR_IDX_BLOCK
+  COLOR_IDX_NONE,   //!< The color index for no color
+  COLOR_IDX_HEAD,   //!< The color index for the fighter's head band
+  COLOR_IDX_BODY,   //!< The color index for the fighter's body
+  COLOR_IDX_ATTACK, //!< The color index for the fighter's attack
+  COLOR_IDX_BLOCK   //!< The color index for the fighter's block
 } fighterColor_t;
 
 /* The size of a fighter */
@@ -61,12 +58,12 @@ typedef enum {
  * This matches the order of the values in sprites[][][]
  */
 typedef enum {
-  IDLE_1,
-  IDLE_2,
-  ATTACK_HIGH,
-  ATTACK_LOW,
-  BLOCK_HIGH,
-  BLOCK_LOW,
+  IDLE_1,       //!< The sprite index for the idle 1 sprite
+  IDLE_2,       //!< The sprite index for the idle 2 sprite
+  ATTACK_HIGH,  //!< The sprite index for the attacking high sprite
+  ATTACK_LOW,   //!< The sprite index for the attacking low sprite
+  BLOCK_HIGH,   //!< The sprite index for the blocking high sprite
+  BLOCK_LOW,    //!< The sprite index for the blocking low sprite
 } sprite_t;
 
 /* The maximum number of pixels in a sprite */
@@ -205,16 +202,29 @@ PixelFighterGame::PixelFighterGame(void)
 }
 
 /**
- * Called IRQ_HZ times per second. This handles timers
- * for each fighter, manages game state, and redraws
- * the fighters on the display
+ * Called IRQ_HZ times per second. This handles timers for each fighter, manages
+ * game state, and redraws the fighters on the display
  */
 void PixelFighterGame::UpdatePhysics(void)
 {
-  /* Handle timers for each fighter */
-  fighterOne.ManageTimers(0, fighterTwo.getXPos() - FIGHTER_WIDTH);
-  fighterTwo.ManageTimers(fighterOne.getXPos() + FIGHTER_WIDTH,
-                          BOARD_SIZE - FIGHTER_WIDTH);
+  /* Handle timers for each fighter, they return if there was a hit */
+  if (TRUE == fighterOne.ManageTimers(0,
+                                      fighterTwo.getXPos() - FIGHTER_WIDTH)) {
+    /* One hit two! Decrement HP and check for a game loss */
+    if (0 == fighterTwo.decrementHP()) {
+      /* Game over */
+      ResetGame(0, 2);
+    }
+  }
+
+  if (TRUE == fighterTwo.ManageTimers(fighterOne.getXPos() + FIGHTER_WIDTH,
+                                      BOARD_SIZE - FIGHTER_WIDTH)) {
+    /* Two hit one! Decrement HP and check for a game loss */
+    if (0 == fighterOne.decrementHP()) {
+      /* Game over */
+      ResetGame(0, 1);
+    }
+  }
 
   /* Clear the field */
   uint8_t x, y;
@@ -225,10 +235,15 @@ void PixelFighterGame::UpdatePhysics(void)
   }
 
   /* Check for fighter interaction */
-  if(fighterTwo.getXPos() - fighterOne.getXPos() < FIGHTER_WIDTH + 3) {
+  if (fighterTwo.getXPos() - fighterOne.getXPos() < FIGHTER_WIDTH + 3) {
     /* fighters are within striking range */
     CheckForHitAndBlock(&fighterOne, &fighterTwo);
     CheckForHitAndBlock(&fighterTwo, &fighterOne);
+  }
+  else {
+    /* Moved out of range, clear the successful attack timers */
+    fighterOne.ClearSuccessfulAttackTimer();
+    fighterTwo.ClearSuccessfulAttackTimer();
   }
 
   /* Draw the fighters */
@@ -237,25 +252,26 @@ void PixelFighterGame::UpdatePhysics(void)
 }
 
 /**
- * TODO
- * @param attackingFighter
- * @param defendingFighter
+ * Check for combat interactions between an attacking and defending fighter
+ *
+ * @param attackingFighter  The fighter to be checked for attacking actions
+ * @param defendingFighter  The fighter to be checked for blocking actions
  */
-void PixelFighterGame::CheckForHitAndBlock(
-    PixelFighter * attackingFighter,
-    PixelFighter * defendingFighter)
+void PixelFighterGame::CheckForHitAndBlock(PixelFighter* attackingFighter,
+    PixelFighter* defendingFighter)
 {
   /* Check to see if the fighter is starting an attack */
-  if(attackingFighter->getSuccessfulAttackTimer() == 0 &&
-      attackingFighter->isAttacking()) {
-    /* Start the successful attack timer. */
+  if (attackingFighter->isAttacking()) {
+    /* Start the successful attack timer, regardless of block. That will be
+     * checked below
+     */
     attackingFighter->StartSuccessfulAttackTimer();
   }
 
   /* Check to see if the attack was blocked */
-  if(attackingFighter->getSuccessfulAttackTimer() > 0 &&
-      (defendingFighter->isBlocking() &&
-          (defendingFighter->getActionHeight() == attackingFighter->getActionHeight()))) {
+  if ((defendingFighter->isBlocking()
+       && (defendingFighter->getActionHeight()
+           == attackingFighter->getActionHeight()))) {
     attackingFighter->attackIsBlocked();
   }
 }
@@ -274,7 +290,7 @@ void PixelFighterGame::ResetGame(uint8_t isInit, uint8_t losers)
   fighterTwo.InitFighter(FACING_LEFT, 1);
 
   /* If this is the initial reset, pause longer */
-  if(isInit) {
+  if (isInit) {
     fighterOne.SetPause(INIT_PAUSE_TIME);
     fighterTwo.SetPause(INIT_PAUSE_TIME);
   }
@@ -285,15 +301,15 @@ void PixelFighterGame::ResetGame(uint8_t isInit, uint8_t losers)
   }
 
   /* If loser is 1 or 2, hide that player for the pause duration */
-  switch(losers) {
+  switch (losers) {
     case 1: {
-      fighterOne.Lost();
-      break;
-    }
+        fighterOne.Lost();
+        break;
+      }
     case 2: {
-      fighterTwo.Lost();
-      break;
-    }
+        fighterTwo.Lost();
+        break;
+      }
   }
 }
 
@@ -325,8 +341,7 @@ PixelFighter::PixelFighter()
 }
 
 /**
- * Initializer for a PixelFighter. Resets position, timers,
- * and hitpoints
+ * Initializer for a PixelFighter. Resets position, timers, and hitpoints
  *
  * @param facing  The direction this fighter is facing,
  *                either FACING_RIGHT or FACING_LEFT
@@ -341,7 +356,7 @@ void PixelFighter::InitFighter(direction_t facing, uint8_t resetHP)
   else if (facing == FACING_RIGHT) {
     xPos = 1;
   }
-  if(resetHP) {
+  if (resetHP) {
     hitPoints = STARTING_HP;
   }
   sprite = IDLE_1;
@@ -351,19 +366,26 @@ void PixelFighter::InitFighter(direction_t facing, uint8_t resetHP)
   moveTimer = 0;
   velocity = 0;
   successfulAttackTimer = 0;
+  pauseTimer = 0;
+  dontDrawTimer = 0;
+
 }
 
 /**
- * Process joystick input for a figher. Button actions
- * may only be performed if their respective timers have
- * timed out. The joystick doesn't actually move the fighter,
- * but rather sets a velocity for it. The movement happens in
+ * Process joystick input for a fighter. Button actions may only be performed if
+ * their respective timers have timed out. The joystick doesn't actually move
+ * the fighter, but rather sets a velocity for it. The movement happens in
  * PixelFighter::ManageTimers()
  *
  * @param input The controller input to process
  */
 void PixelFighter::ProcessFighterInput(uint32_t input)
 {
+  /* Don't process input if the fighter is paused */
+  if (pauseTimer > 0) {
+    return;
+  }
+
   /* Set the X axis velocity, only when on the ground */
   if (GET_X_AXIS(input) < 256) {
     velocity = -1;
@@ -388,7 +410,7 @@ void PixelFighter::ProcessFighterInput(uint32_t input)
         sprite = ATTACK_HIGH;
       }
       /* Set the action timer */
-      attackTimer = ACTION_TIME;
+      attackTimer = ATTACK_TIME;
     }
     /* This is a block */
     else if (GET_BUTTONS(input) & DOWN) {
@@ -401,14 +423,13 @@ void PixelFighter::ProcessFighterInput(uint32_t input)
         sprite = BLOCK_HIGH;
       }
       /* Set the action timer */
-      blockTimer = ACTION_TIME;
+      blockTimer = BLOCK_TIME;
     }
   }
 }
 
 /**
- * Draws both the PixelFigher and it's HP bar
- * on the display
+ * Draws both the PixelFigher and it's HP bar on the display
  */
 void PixelFighter::DrawFighter(void)
 {
@@ -421,7 +442,7 @@ void PixelFighter::DrawFighter(void)
   uint32_t color;
 
   /* If we shouldn't draw, return */
-  if(dontDrawTimer) {
+  if (dontDrawTimer) {
     return;
   }
 
@@ -461,41 +482,46 @@ void PixelFighter::DrawFighter(void)
 
       /* Find the old color index, to check for overdraw */
       uint32_t oldPixel = GetPixel(
-          (fighterOffset + posMultiplier * (sprites[sprite][index][0] & 0x0F)) + xPos,
-          ((sprites[sprite][index][0] & 0xF0) >> 4) + BOARD_SIZE - FIGHTER_HEIGHT);
+              fighterOffset + xPos +
+                  posMultiplier * (sprites[sprite][index][0] & 0x0F),
+              BOARD_SIZE - FIGHTER_HEIGHT +
+                  ((sprites[sprite][index][0] & 0xF0) >> 4));
+
       uint8_t oldIdx = 0;
-      switch(oldPixel) {
+      switch (oldPixel) {
         case BODY_COLOR: {
-          oldIdx = COLOR_IDX_BODY;
-          break;
-        }
+            oldIdx = COLOR_IDX_BODY;
+            break;
+          }
         case P1_COLOR: {
-          oldIdx = COLOR_IDX_HEAD;
-          break;
-        }
+            oldIdx = COLOR_IDX_HEAD;
+            break;
+          }
         case P2_COLOR: {
-          oldIdx = COLOR_IDX_HEAD;
-          break;
-        }
+            oldIdx = COLOR_IDX_HEAD;
+            break;
+          }
         case ATTACK_COLOR: {
-          oldIdx = COLOR_IDX_ATTACK;
-          break;
-        }
+            oldIdx = COLOR_IDX_ATTACK;
+            break;
+          }
         case BLOCK_COLOR: {
-          oldIdx = COLOR_IDX_BLOCK;
-          break;
-        }
+            oldIdx = COLOR_IDX_BLOCK;
+            break;
+          }
         default: {
-          oldIdx = COLOR_IDX_NONE;
-        }
+            oldIdx = COLOR_IDX_NONE;
+          }
       }
 
       /* If the new pixel should be drawn over the old one */
-      if(sprites[sprite][index][1] > oldIdx) {
+      if (sprites[sprite][index][1] > oldIdx) {
         SetPixel(
-          (fighterOffset + posMultiplier * (sprites[sprite][index][0] & 0x0F)) + xPos,
-          ((sprites[sprite][index][0] & 0xF0) >> 4) + BOARD_SIZE - FIGHTER_HEIGHT,
-          color);
+            fighterOffset + xPos +
+                posMultiplier * (sprites[sprite][index][0] & 0x0F),
+            BOARD_SIZE - FIGHTER_HEIGHT +
+                ((sprites[sprite][index][0] & 0xF0) >> 4),
+            color);
       }
     }
   }
@@ -505,14 +531,17 @@ void PixelFighter::DrawFighter(void)
 }
 
 /**
- * Manage timers for lateral movement, jumping, and actions
+ * Manage timers for lateral movement, jumping, and actions.
  * Move the fighter if necessary
  *
  * @param lowerBound As far left as the fighter can move
  * @param upperBound As far right as the fighter can move
+ * @return TRUE if an attack was successful, FALSE otherwise
  */
-void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
+uint8_t PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
 {
+  uint8_t attackSuccess = FALSE;
+
   /* If the fighter is paused, don't move, perform actions, or idle
    * Jumping is OK
    */
@@ -587,20 +616,20 @@ void PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
     }
 
     /* Make sure the attack isn't parried */
-    if(successfulAttackTimer > 0) {
+    if (successfulAttackTimer > 0) {
       successfulAttackTimer--;
       if (successfulAttackTimer == 0) {
-        // TODO attack was successful, decrement HP
-        decrementHP();
+        attackSuccess = TRUE;
       }
     }
   }
 
   /* Decrement the don't draw timer if necessary */
-  if(dontDrawTimer > 0) {
+  if (dontDrawTimer > 0) {
     dontDrawTimer--;
   }
 
+  return attackSuccess;
 }
 
 /**
@@ -612,11 +641,11 @@ uint8_t PixelFighter::getXPos(void)
 }
 
 /**
- * TODO document
+ * @return The height of the action, 1 for high, 0 for low
  */
 uint8_t PixelFighter::getActionHeight(void)
 {
-  if(sprite == BLOCK_HIGH || sprite == ATTACK_HIGH) {
+  if (sprite == BLOCK_HIGH || sprite == ATTACK_HIGH) {
     return 1;
   }
   else {
@@ -625,8 +654,7 @@ uint8_t PixelFighter::getActionHeight(void)
 }
 
 /**
- * TODO document
- * @return
+ * @return TRUE if the fighter is attacking, FALSE otherwise
  */
 uint8_t PixelFighter::isAttacking(void)
 {
@@ -634,8 +662,7 @@ uint8_t PixelFighter::isAttacking(void)
 }
 
 /**
- * TODO document
- * @return
+ * @return TRUE if the fighter is blocking, FALSE otherwise
  */
 uint8_t PixelFighter::isBlocking(void)
 {
@@ -643,19 +670,22 @@ uint8_t PixelFighter::isBlocking(void)
 }
 
 /**
- * TODO document
- * @return
+ * Decrement this fighter's HP by one, and return the new HP value
+ *
+ * @return The new HP value
  */
 uint8_t PixelFighter::decrementHP(void)
 {
-  if(hitPoints > 0) {
+  if (hitPoints > 0) {
     hitPoints--;
   }
   return hitPoints;
 }
 
 /**
- * TODO document
+ * Pause the fighter for the given number of cycles (in 1/IRQ_HZ seconds).
+ * The fighter will not be able to move or accept input
+ *
  * @param time
  */
 void PixelFighter::SetPause(uint8_t time)
@@ -664,7 +694,8 @@ void PixelFighter::SetPause(uint8_t time)
 }
 
 /**
- * TODO document
+ * Call this when a fighter loses. It removes the fighter from the screen,
+ * so only the winner is shown
  */
 void PixelFighter::Lost(void)
 {
@@ -672,27 +703,38 @@ void PixelFighter::Lost(void)
 }
 
 /**
- * TODO
+ * For an attack to be successful, it has to land on the opponent for
+ * a period of time without being blocked. Call this when the attack starts.
+ * If the timer decrements to zero without being cleared, the attack will be
+ * successful.
  */
-void PixelFighter::StartSuccessfulAttackTimer(void) {
-  successfulAttackTimer = IRQ_HZ / 4;
+void PixelFighter::StartSuccessfulAttackTimer(void)
+{
+  if (successfulAttackTimer == 0) {
+    // TODO modify value, shorten window after attack chains
+    successfulAttackTimer = IRQ_HZ / 4;
+  }
 }
 
 /**
- * TODO
- * @return
+ * Clear the successful attack timer. Useful for when fighters move out of
+ * range of each other
  */
-uint8_t PixelFighter::getSuccessfulAttackTimer(void) {
-  return successfulAttackTimer;
-}
-
-/**
- * TODO
- */
-void PixelFighter::attackIsBlocked(void) {
+void PixelFighter::ClearSuccessfulAttackTimer(void)
+{
   successfulAttackTimer = 0;
-  attackTimer = 0;
-  sprite = IDLE_1;
-  SetPause(IRQ_HZ); // TODO find a proper value
-  SetPixel(1,1,P1_COLOR);
+}
+
+/**
+ * If an attack is blocked, stop the attack animation timer & successful attack
+ * timer, set the sprite to IDLE_1 and pause the fighter for a bit (stun)
+ */
+void PixelFighter::attackIsBlocked(void)
+{
+  if (successfulAttackTimer > 0) {
+    successfulAttackTimer = 0;
+    attackTimer = 0;
+    sprite = IDLE_1;
+    SetPause(IRQ_HZ); // TODO find a proper value
+  }
 }
