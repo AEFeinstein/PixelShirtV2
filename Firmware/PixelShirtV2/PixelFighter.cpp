@@ -26,11 +26,11 @@
 #define STARTING_HP    5
 
 /* Timeouts to limit the speed of the game */
-#define JUMP_TIME       (6 * 3) /* Should be a multiple of 6 */
-#define MOVE_TIME       2 //(IRQ_HZ/4)
-#define ATTACK_TIME     (IRQ_HZ)
-#define BLOCK_TIME      (IRQ_HZ/4)
-#define DANCE_TIME      (IRQ_HZ/2)
+#define MOVE_TIME       (IRQ_HZ / 16)
+#define ATTACK_TIME     (IRQ_HZ / 2)
+#define BLOCK_TIME      (IRQ_HZ / 4)
+#define PARRIED_TIME    (IRQ_HZ / 3)
+#define DANCE_TIME      (IRQ_HZ / 2)
 #define INIT_PAUSE_TIME (IRQ_HZ * 4)
 #define PAUSE_TIME      (IRQ_HZ * 2)
 
@@ -215,6 +215,9 @@ void PixelFighterGame::UpdatePhysics(void)
       /* Game over */
       ResetGame(0, 2);
     }
+
+    fighterOne.resetAttackTimeout();
+    fighterTwo.resetAttackTimeout();
   }
 
   if (TRUE == fighterTwo.ManageTimers(fighterOne.getXPos() + FIGHTER_WIDTH,
@@ -224,6 +227,9 @@ void PixelFighterGame::UpdatePhysics(void)
       /* Game over */
       ResetGame(0, 1);
     }
+
+    fighterOne.resetAttackTimeout();
+    fighterTwo.resetAttackTimeout();
   }
 
   /* Clear the field */
@@ -369,6 +375,7 @@ void PixelFighter::InitFighter(direction_t facing, uint8_t resetHP)
   pauseTimer = 0;
   dontDrawTimer = 0;
 
+  attackTimeout = ATTACK_TIME;
 }
 
 /**
@@ -410,7 +417,7 @@ void PixelFighter::ProcessFighterInput(uint32_t input)
         sprite = ATTACK_HIGH;
       }
       /* Set the action timer */
-      attackTimer = ATTACK_TIME;
+      attackTimer = attackTimeout;
     }
     /* This is a block */
     else if (GET_BUTTONS(input) & DOWN) {
@@ -531,7 +538,7 @@ void PixelFighter::DrawFighter(void)
 }
 
 /**
- * Manage timers for lateral movement, jumping, and actions.
+ * Manage timers for movement and actions.
  * Move the fighter if necessary
  *
  * @param lowerBound As far left as the fighter can move
@@ -542,9 +549,12 @@ uint8_t PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
 {
   uint8_t attackSuccess = FALSE;
 
-  /* If the fighter is paused, don't move, perform actions, or idle
-   * Jumping is OK
-   */
+  /* Decrement the don't draw timer if necessary */
+  if (dontDrawTimer > 0) {
+    dontDrawTimer--;
+  }
+
+  /* If the fighter is paused, don't move, perform actions, or idle */
   if (pauseTimer > 0) {
     pauseTimer--;
   }
@@ -554,24 +564,27 @@ uint8_t PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
       moveTimer--;
     }
     else {
-      /* Is the fighter moving? */
-      switch (velocity) {
-        case 1: {
-            /* Moving rightward */
-            if (xPos + 1 <= upperBound) {
-              xPos++;
-              moveTimer = MOVE_TIME;
+      /* Only move when an action isn't performed */
+      if(!isAttacking() && !isBlocking()) {
+        /* Is the fighter moving? */
+        switch (velocity) {
+          case 1: {
+              /* Moving rightward */
+              if (xPos + 1 <= upperBound) {
+                xPos++;
+                moveTimer = MOVE_TIME;
+              }
+              break;
             }
-            break;
-          }
-        case -1: {
-            /* Moving leftward */
-            if (xPos >= lowerBound + 1) {
-              xPos--;
-              moveTimer = MOVE_TIME;
+          case -1: {
+              /* Moving leftward */
+              if (xPos >= lowerBound + 1) {
+                xPos--;
+                moveTimer = MOVE_TIME;
+              }
+              break;
             }
-            break;
-          }
+        }
       }
     }
 
@@ -623,12 +636,6 @@ uint8_t PixelFighter::ManageTimers(uint8_t lowerBound, uint8_t upperBound)
       }
     }
   }
-
-  /* Decrement the don't draw timer if necessary */
-  if (dontDrawTimer > 0) {
-    dontDrawTimer--;
-  }
-
   return attackSuccess;
 }
 
@@ -711,11 +718,10 @@ void PixelFighter::Lost(void)
 void PixelFighter::StartSuccessfulAttackTimer(void)
 {
   if (successfulAttackTimer == 0) {
-    // TODO modify value, shorten window after attack chains
     /* This timer should be the same as the attack animation timer, but it gets
      * decremented once before this function is called
      */
-    successfulAttackTimer = ATTACK_TIME - 1;
+    successfulAttackTimer = attackTimeout;
   }
 }
 
@@ -738,6 +744,21 @@ void PixelFighter::attackIsBlocked(void)
     successfulAttackTimer = 0;
     attackTimer = 0;
     sprite = IDLE_1;
-    SetPause(IRQ_HZ); // TODO find a proper value
+    SetPause(PARRIED_TIME);
+    /* When an attack is blocked, decrement the attack timeout
+     * This speeds up the game
+     */
+    if(attackTimeout > 4) {
+      attackTimeout -= 4;
+    }
   }
+}
+
+/**
+ * Reset the attack timeout to ATTACK_TIME. This should be called after
+ * anyone's HP decrements, for both players
+ */
+void PixelFighter::resetAttackTimeout(void)
+{
+  attackTimeout = ATTACK_TIME;
 }
