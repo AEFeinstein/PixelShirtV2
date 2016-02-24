@@ -47,6 +47,7 @@ class PixelFighter
   void ClearSuccessfulAttackTimer(void);
 
   void attackIsBlocked(void);
+  void resetAttackTimeout(void);
 
  private:
   uint8_t xPos;
@@ -65,6 +66,7 @@ class PixelFighter
   uint8_t dontDrawTimer;
 
   uint8_t successfulAttackTimer;
+  uint8_t attackTimeout;
 };
 
 class PixelFighterGame : public ArduinoGame

@@ -84,6 +84,10 @@ void Lightcycle::UpdatePhysics(void)
     }
 
     /* Check for collisions, add to cycle trails */
+    if(p1pos[X] == p2pos[X] && p1pos[Y] == p2pos[Y]) {
+      losers |= 0x01;
+      losers |= 0x02;      
+    }
     if(IsPixelLit(p1pos[X], p1pos[Y])) {
       losers |= 0x01;
     }

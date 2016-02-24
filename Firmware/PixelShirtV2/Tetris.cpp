@@ -476,7 +476,7 @@ uint8_t Tetris::DropActiveTetromino(void)
     for(i=0; i < BOARD_SIZE; i++) {
       rowFull = 1;
       for(j=0; j < 10; j++) {
-        if(!IsPixelLit(j + 3, i)) {
+        if(!IsPixelLit(j + 4, i)) {
           rowFull = 0;
         }
       }
