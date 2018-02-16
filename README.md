@@ -47,4 +47,26 @@ This is what it looks like all soldered together. Not pictured, RJ45 connector a
 
 ## The Final Product
 Here's me at Magfest 14 wearing the display mounted underneath a shirt and holding two controllers. The PixelShirtV2 is playing the PixelFighter game.
-<br><img src="https://raw.githubusercontent.com/AEFeinstein/PixelShirtV2/master/Hardware/Images/worn.png" width="425">
+<br><img src="https://raw.githubusercontent.com/AEFeinstein/PixelShirtV2/master/Hardware/Images/worn.png">
+
+# Earlier Versions
+
+## Version 1
+The first version of the PixelShirt used blue LEDs poked through a t-shirt. The cathodes were soldered together in rows, a layer of insulating fabric was layered, then the anodes were soldered in columns. The 32 rows and columns were controlled by four daisy chained 8-bit shift registers and the display would refresh one row at a time, kind of like a CRT TV.
+<br><img src="https://github.com/AEFeinstein/PixelShirtV2/raw/master/Hardware/Images/v1_grid.jpg">
+
+The upside to this design was that the LED grid was flexible and comfortable. The downside was that it wasn't mechanically strong (a few solder joints broke), the grid wasn't very regular (I'm not great with fabrics), and it just generally didn't look good. The controllers are [SparkFun Joystick Shield Kits](https://www.sparkfun.com/products/9760). 
+<br><img src="https://github.com/AEFeinstein/PixelShirtV2/raw/master/Hardware/Images/v1_standing.jpg" width="425">
+
+But people seemed to get a kick out of it, so I iterated on the design. I wore it first at Magfest 12, but I think this picture is from AwesomeCon. At the time it only had Pong, Lightcycle, and Tetris.
+<br><img src="https://github.com/AEFeinstein/PixelShirtV2/raw/master/Hardware/Images/v1_playing.jpg">
+
+## Version 2.0
+The next year I swapped out the display for the giant PCB with RGB LEDs. Pros: colors! mechanical strength! no undershirt required! Cons: less flexible. I kept the same Sparkfun controllers. I wore this one at Magfest 13. With the advent of color, I added Space Invader.
+<br><img src="https://github.com/AEFeinstein/PixelShirtV2/raw/master/Hardware/Images/v1.5_playing.jpg">
+
+## Version 2.1
+For Magfest 14, I got over my fear of non-tethered controllers and made [wireless ones](https://github.com/AEFeinstein/WirelessController), which are mentioned above. They worked great and I didn't lose either one, but I did accidentally short their batteries a little when carelessly throwing them in a pocket. They got warm, but no harm no foul.
+
+## Version 2.2
+Magfest 15 only had software updates. I added the Fighter and Super Square games. There were no changes for Magfest 16, and I ended up not wearing it at all :(
